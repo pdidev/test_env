@@ -1,6 +1,12 @@
 FROM pdidev/centos_cmake3.5
 
-COPY --from=pdidev/centos_libs /libs /usr/local
+USER 0
+
+COPY --from=pdidev/centos_libs /usr/local /usr/local
+RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/pdi_deps.conf \
+ && ldconfig
+
+USER 1001
 
 # FLOWVR ENV
 ENV FLOWVR_PREFIX=/usr/local

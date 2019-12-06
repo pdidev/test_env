@@ -2,8 +2,11 @@ FROM pdidev/centos_base
 
 USER 0
 
-RUN yum install -y epel-release \
- && yum install -y hdf5-openmpi3-devel
+RUN yum install -y --setopt=tsflags=nodocs \
+    epel-release \
+ && yum install -y --setopt=tsflags=nodocs \
+    hdf5-openmpi3-devel \
+ && yum clean all -y
 
 USER 1001
 
