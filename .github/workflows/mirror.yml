@@ -1,0 +1,16 @@
+name: Mirror
+on:
+  schedule:
+    - cron:  '*/5 * * * *'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Mirror
+      run: |
+        git clone --mirror 'https://gitlab.maisondelasimulation.fr/pdidev/dockerfiles.git' \
+        && cd dockerfiles.git \
+        && git remote add github "https://$GITHUB_ACTOR:$PUSH_TOKEN@github.com/pdidev/dockerfiles.git" \
+        && git push --mirror github
+      env:
+        PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
