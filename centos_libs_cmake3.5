@@ -2,7 +2,7 @@ FROM pdidevel/centos_cmake3.5
 
 USER 0
 
-COPY --from=pdidev/centos_libs /usr/local /usr/local
+COPY --from=pdidevel/centos_libs /usr/local /usr/local
 RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/pdi_deps.conf \
  && ldconfig
 
