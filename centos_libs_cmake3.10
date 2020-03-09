@@ -1,4 +1,4 @@
-FROM docker.pkg.github.com/pdidev/dockerfiles/centos_cmake3.10
+FROM pdidevel/centos_cmake3.10
 
 USER 0
 
