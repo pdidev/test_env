@@ -1,4 +1,4 @@
-FROM docker.pkg.github.com/pdidev/dockerfiles/centos_base:latest
+FROM pdidevel/centos_base:latest
 
 USER 0
 
