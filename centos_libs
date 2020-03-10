@@ -30,8 +30,8 @@ RUN wget -O bpp.tar.gz https://gitlab.maisondelasimulation.fr/jbigot/bpp/-/archi
 
 RUN wget -O doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
  && tar -xzf doxygen.tar.gz \
- && cd doxygen* \
  && rm doxygen.tar.gz \
+ && cd doxygen* \
  && cmake . \
  && make -j \
  && make install
@@ -47,7 +47,7 @@ RUN wget -O flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/rel
 RUN wget -O fti.tar.bz2 https://github.com/leobago/fti/archive/fix-cmake.tar.bz2 \
  && tar -xjf fti.tar.bz2 \
  && rm fti.tar.bz2 \
- && cd fti-* \
+ && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
  && make -j \
  && make install
@@ -60,8 +60,9 @@ RUN wget -O libparaconf.tar.bz2 https://gitlab.maisondelasimulation.fr/jbigot/li
  && make -j \
  && make install
 
-RUN wget https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
- && tar -xzf v2.4.3.tar.gz \
+RUN wget -O pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
+ && tar -xzf pybind11.tar.gz \
+ && rm pybind11.tar.gz \
  && cd pybind11* \
  && cmake -DPYBIND11_TEST=OFF . \
  && make -j \
@@ -78,6 +79,7 @@ RUN wget -O sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?v
 
 RUN wget -O spdlog.tar.gz https://github.com/gabime/spdlog/archive/v1.4.2.tar.gz \
  && tar -xzf spdlog.tar.gz \
+ && rm spdlog.tar.gz \
  && cd spdlog* \
  && cmake -DSPDLOG_BUILD_SHARED=ON -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_BUILD_BENCH=OFF . \
  && make -j \
