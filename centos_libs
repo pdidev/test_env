@@ -44,8 +44,8 @@ RUN wget -O flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/rel
  && make -j \
  && make install
 
-RUN wget -O fti.tar.bz2 https://github.com/leobago/fti/archive/fix-cmake.tar.bz2 \
- && tar -xjf fti.tar.bz2 \
+RUN wget -O fti.tar.bz2 https://github.com/leobago/fti/archive/fix-cmake.tar.gz \
+ && tar -xjf fti.tar.gz \
  && rm fti.tar.bz2 \
  && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
