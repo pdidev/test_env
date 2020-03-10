@@ -52,9 +52,9 @@ RUN wget -O fti.tar.gz https://github.com/leobago/fti/archive/fix-cmake.tar.gz \
  && make -j \
  && make install
 
-RUN wget -O libparaconf.tar.bz2 https://gitlab.maisondelasimulation.fr/jbigot/libparaconf/-/archive/0.4.3/libparaconf-0.4.3.tar.bz2 \
- && tar -xf libparaconf.tar.bz2 \
- && rm libparaconf.tar.bz2 \
+RUN wget -O libparaconf.tar.gz https://gitlab.maisondelasimulation.fr/jbigot/libparaconf/-/archive/0.4.3/libparaconf-0.4.3.tar.gz \
+ && tar -xf libparaconf.tar.gz \
+ && rm libparaconf.tar.gz \
  && cd libparaconf*/paraconf \
  && cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF . \
  && make -j \
