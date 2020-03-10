@@ -3,7 +3,7 @@ FROM pdidevel/centos_cmake3.10 AS builder
 USER 0
 
 RUN wget -O libyaml.tar.gz https://github.com/yaml/libyaml/archive/0.2.2.tar.gz \
- && tar -xzf libyaml.tar.gz \
+ && tar -xf libyaml.tar.gz \
  && rm libyaml.tar.gz \
  && cd libyaml* \
  && cmake -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DINSTALL_CMAKE_DIR=share/yaml/cmake . \
@@ -13,7 +13,7 @@ RUN wget -O libyaml.tar.gz https://github.com/yaml/libyaml/archive/0.2.2.tar.gz 
  && ldconfig
 
 RUN wget -O astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz \
- && tar -xzf astyle.tar.gz \
+ && tar -xf astyle.tar.gz \
  && rm astyle.tar.gz \
  && cd astyle* \
  && cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=OFF . \
@@ -21,7 +21,7 @@ RUN wget -O astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle/a
  && install -s astyle /usr/local/bin
 
 RUN wget -O bpp.tar.gz https://gitlab.maisondelasimulation.fr/jbigot/bpp/-/archive/v0.3.0/bpp-v0.3.0.tar.gz \
- && tar -xzf bpp.tar.gz \
+ && tar -xf bpp.tar.gz \
  && rm bpp.tar.gz \
  && cd bpp* \
  && cmake . \
@@ -29,7 +29,7 @@ RUN wget -O bpp.tar.gz https://gitlab.maisondelasimulation.fr/jbigot/bpp/-/archi
  && make install
 
 RUN wget -O doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
- && tar -xzf doxygen.tar.gz \
+ && tar -xf doxygen.tar.gz \
  && rm doxygen.tar.gz \
  && cd doxygen* \
  && cmake . \
@@ -37,23 +37,23 @@ RUN wget -O doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.
  && make install
 
 RUN wget -O flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/relocatable_cmake/flowvr-ex-relocatable_cmake.tar.gz \
- && tar -xzf flowvr.tar.gz \
+ && tar -xf flowvr.tar.gz \
  && rm flowvr.tar.gz \
  && cd flowvr* \
  && cmake -DOpenGL_GL_PREFERENCE=LEGACY . \
  && make -j \
  && make install
 
-RUN wget -O fti.tar.bz2 https://github.com/leobago/fti/archive/fix-cmake.tar.gz \
- && tar -xjf fti.tar.gz \
- && rm fti.tar.bz2 \
+RUN wget -O fti.tar.gz https://github.com/leobago/fti/archive/fix-cmake.tar.gz \
+ && tar -xf fti.tar.gz \
+ && rm fti.tar.gz \
  && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
  && make -j \
  && make install
 
 RUN wget -O libparaconf.tar.bz2 https://gitlab.maisondelasimulation.fr/jbigot/libparaconf/-/archive/0.4.3/libparaconf-0.4.3.tar.bz2 \
- && tar -xjf libparaconf.tar.bz2 \
+ && tar -xf libparaconf.tar.bz2 \
  && rm libparaconf.tar.bz2 \
  && cd libparaconf*/paraconf \
  && cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF . \
@@ -61,7 +61,7 @@ RUN wget -O libparaconf.tar.bz2 https://gitlab.maisondelasimulation.fr/jbigot/li
  && make install
 
 RUN wget -O pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
- && tar -xzf pybind11.tar.gz \
+ && tar -xf pybind11.tar.gz \
  && rm pybind11.tar.gz \
  && cd pybind11* \
  && cmake -DPYBIND11_TEST=OFF . \
@@ -69,7 +69,7 @@ RUN wget -O pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.ta
  && make install
 
 RUN wget -O sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
- && tar -xzf sionlib.tar.gz \
+ && tar -xf sionlib.tar.gz \
  && rm sionlib.tar.gz \
  && cd sionlib* \
  && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx \
@@ -78,7 +78,7 @@ RUN wget -O sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?v
  && make install
 
 RUN wget -O spdlog.tar.gz https://github.com/gabime/spdlog/archive/v1.4.2.tar.gz \
- && tar -xzf spdlog.tar.gz \
+ && tar -xf spdlog.tar.gz \
  && rm spdlog.tar.gz \
  && cd spdlog* \
  && cmake -DSPDLOG_BUILD_SHARED=ON -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_BUILD_BENCH=OFF . \
