@@ -4,9 +4,8 @@ USER 0
 
 COPY --from=pdidevel/centos_libs /usr/local /usr/local
 RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/pdi_deps.conf \
- && ldconfig
-
-RUN yum install -y --setopt=tsflags=nodocs \
+ && ldconfig \
+ && yum install -y --setopt=tsflags=nodocs \
     hdf5-openmpi3-devel \
  && yum clean all -y
 
