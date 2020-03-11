@@ -1,20 +1,63 @@
+FROM pdidevel/centos_cmake3.10 AS builder
+
+RUN wget -O astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz \
+ && tar -xf astyle.tar.gz \
+ && cd astyle* \
+ && cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=OFF . \
+ && make -j \
+ && install -s astyle /usr/local/bin
+
+RUN wget -O bpp.tar.gz https://github.com/pdidev/bpp/archive/master.tar.gz \
+ && tar -xf bpp.tar.gz \
+ && cd bpp* \
+ && cmake . \
+ && make -j \
+ && make install
+
+RUN wget -O doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
+ && tar -xf doxygen.tar.gz \
+ && cd doxygen* \
+ && cmake . \
+ && make -j \
+ && make install
+
+RUN wget -O flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/relocatable_cmake/flowvr-ex-relocatable_cmake.tar.gz \
+ && tar -xf flowvr.tar.gz \
+ && cd flowvr* \
+ && cmake -DOpenGL_GL_PREFERENCE=LEGACY . \
+ && make -j \
+ && make install
+
+RUN wget -O fti.tar.gz https://github.com/leobago/fti/archive/fix-cmake.tar.gz \
+ && tar -xf fti.tar.gz \
+ && cd fti* \
+ && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
+ && make -j \
+ && make install
+
+RUN wget -O pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
+ && tar -xf pybind11.tar.gz \
+ && cd pybind11* \
+ && cmake -DPYBIND11_TEST=OFF . \
+ && make -j \
+ && make install
+
+RUN wget -O sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
+ && tar -xf sionlib.tar.gz \
+ && cd sionlib* \
+ && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx \
+ && cd build-linux-gomp-openmpi \
+ && make -j \
+ && make install
+
 FROM pdidevel/centos_cmake3.10
 
-USER 0
+COPY --from=builder /usr/local /usr/local
 
-COPY --from=pdidevel/centos_libs /usr/local /usr/local
-RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/pdi_deps.conf \
- && ldconfig \
- && yum install -y --setopt=tsflags=nodocs \
+RUN yum install -y --setopt=tsflags=nodocs \
     hdf5-openmpi3-devel \
- && yum clean all -y
-
-USER 1001
-
-# FLOWVR ENV
-ENV FLOWVR_PREFIX=/usr/local
-ENV PATH=/usr/local/share/flowvr/modules/bin:${PATH}
-ENV FLOWVR_DATA_PATH /usr/local/share/flowvr-render/data
-ENV FLOWVR_PID_LOG_DIR "./.flowvr"
-ENV FlowVR_DIR /usr/local/share/flowvr/cmake
-ENV PYTHONPATH /usr/local/lib/flowvr/python/
+    libparaconf-devel \
+    libyaml-devel \
+    spdlog-devel \
+ && yum clean all -y \
+ && echo '. /usr/local/bin/flowvr-suite-config.sh' >> /etc/profile.d/sh.local

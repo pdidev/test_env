@@ -32,13 +32,6 @@ jobs:
         username: jbigot
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         dockerfile: centos_cmake3.10
-    - name: centos_libs Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/centos_libs
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        dockerfile: centos_libs
     - name: centos_libs_cmake3.5 Docker image
       uses: elgohr/Publish-Docker-Github-Action@2.13
       with:

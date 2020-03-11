@@ -1,17 +1,30 @@
 # Docker images:
 
+A set of related Docker images to build and test PDI.
+
+Their relationship is as follow:
+```
+centos_base ---------------> centos_cmake3.5 ----------------> centos_libs_cmake3.5
+           \                                                /
+            `-> centos_cmake3.10 -> centos_libs_cmake3.10 -'
+```
+
 ## centos_base
 
-The minimal dependencies to build the full PDI distribution except for cmake
+Centos 7 with the minimal set of dependencies installed to build the full PDI
+distribution in "embedded" mode, except for cmake.
+It enables the SCL, EPEL and home:pdi repositories and activates devtoolset-7
+by default.
 
 ## centos_cmake3.5
 
 centos_base extended with the minimal dependencies to build the full PDI 
 distribution with cmake-3.5 (without running the tests):
 * cmake 3.5
-* hdf5 because HDF5 embedded build requires cmake-3.10
+* hdf5 because HDF5 build requires cmake-3.10
 
-Used for PDI embedded build with cmake 3.5 (HDF5 from system)
+Used for PDI "embedded" build with cmake 3.5 (using all libs embedded in the PDI
+distribution except for HDF5 from the docker image)
 
 ## centos_cmake3.10
 
@@ -21,42 +34,45 @@ distribution with cmake-3.10 and to run the tests:
 * numpy
 * mpi4py
 
-Used for PDI embedded build and tests with cmake 3.10 (all libs are embedded)
-
-## centos_libs
-
-Building of the dependencies required for the PDI distribution without relying
-on embedded dependencies:
-* libyaml,
-* astyle,
-* bpp,
-* flowvr,
-* libparaconf,
-* fti,
-* spdlog,
-* pybind11,
-* sionlib
-
-## centos_libs_cmake3.5
-
-Integration of the libraries from centos_libs into centos_cmake3.5
-
-Used for PDI system build with cmake 3.5
+Used for PDI "embedded" build and tests with cmake 3.10 (using all libs embedded
+in the PDI distribution)
 
 ## centos_libs_cmake3.10
 
-Integration of the libraries from centos_libs into centos_cmake3.10.
-In addition, hdf5 that is not available in centos_libs because it is in
-centos_cmake3.5 is integrated.
+Building of the dependencies required for the PDI distribution without relying
+on embedded dependencies:
+* astyle,
+* bpp,
+* doxygen,
+* flowvr,
+* fti,
+* pybind11,
+* sionlib.
 
-Used for PDI system build and tests with cmake 3.10
+Installation of the libs that are available as packages:
+* hdf5,
+* libparaconf,
+* libyaml,
+* spdlog.
 
-# Docker images dependencies
+Used for PDI "system" build and tests with cmake 3.10 (using all libs from the
+docker image)
 
-```
-centos_base -----> centos_cmake3.5 ----------------------> centos_libs_cmake3.5
-           \                                           /
-            \                      .-> centos_libs ---<
-             \                    /                    \
-              `-> centos_cmake3.10 ----------------------> centos_libs_cmake3.10
-```
+## centos_libs_cmake3.5
+
+Integration of the libraries built inside centos_libs_cmake3.10 into 
+centos_cmake3.5:
+* astyle,
+* bpp,
+* flowvr,
+* fti,
+* pybind11,
+* sionlib.
+
+Installation of the libs that are available as packages:
+* libparaconf,
+* libyaml,
+* spdlog.
+
+
+Used for PDI "system" build with cmake 3.5 (using all libs from the docker image)
