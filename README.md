@@ -13,7 +13,7 @@ centos_base ---------------> centos_cmake3.5 ----------------> centos_libs_cmake
 
 Centos 7 with the minimal set of dependencies installed to build the full PDI
 distribution in "embedded" mode, except for cmake.
-It enables the SCL, EPEL and home:pdi repositories and activates devtoolset-7
+It enables the SCL, EPEL and home:pdi repositories and activates devtoolset-6
 by default.
 
 ## centos_cmake3.5

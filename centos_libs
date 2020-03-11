@@ -1,3 +1,0 @@
-FROM pdidevel/centos_cmake3.10
-
-COPY --from=builder /usr/local /usr/local
