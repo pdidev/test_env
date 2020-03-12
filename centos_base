@@ -42,8 +42,10 @@ RUN yum install -y --setopt=tsflags=nodocs \
     which \
  && pip3 install pyyaml \
  && yum clean all -y --enablerepo='*' \
- && rm -f /*.log \
+ && rm -f /*.log ${HOME}/* \
  && echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1' > /etc/profile.d/zzz_enable_mpi.sh \
- && echo 'source scl_source enable devtoolset-6 || true' > /etc/profile.d/zzz_enable_devtoolset6.sh \
+ && echo 'source scl_source enable devtoolset-6' > /etc/profile.d/zzz_enable_devtoolset6.sh \
  && echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
  && ldconfig
+
+SHELL ["/bin/bash", "-l", "-c"]
