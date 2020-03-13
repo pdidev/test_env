@@ -3,15 +3,15 @@ FROM centos:7
 ENV HOME /root
 WORKDIR ${HOME}
 
-RUN yum install -y --setopt=tsflags=nodocs \
+RUN rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
+ && yum install -y --setopt=tsflags=nodocs \
     yum-utils \
- && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
  && yum install -y --setopt=tsflags=nodocs \
     centos-release-scl-rh \
     epel-release \
-    wget \
- && wget -O /etc/yum.repos.d/home:pdi.repo https://download.opensuse.org/repositories/home:pdi/CentOS_7/home:pdi.repo \
- && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
+ && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 \
+ && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-SCLo \
+ && curl -Lso /etc/yum.repos.d/home:pdi.repo https://download.opensuse.org/repositories/home:pdi/CentOS_7/home:pdi.repo \
  && yum update -y --setopt=tsflags=nodocs \
  && yum upgrade -y --setopt=tsflags=nodocs \
  && yum install -y --setopt=tsflags=nodocs \
@@ -40,12 +40,15 @@ RUN yum install -y --setopt=tsflags=nodocs \
     tar \
     unzip \
     which \
- && pip3 install pyyaml \
  && yum clean all -y --enablerepo='*' \
- && rm -f /*.log ${HOME}/* \
- && echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1' > /etc/profile.d/zzz_enable_mpi.sh \
- && echo 'source scl_source enable devtoolset-6' > /etc/profile.d/zzz_enable_devtoolset6.sh \
- && echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
+ && rm -f /*.log ${HOME}/*
+RUN pip3 install --no-cache-dir pyyaml
+RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
  && ldconfig
 
-SHELL ["/bin/bash", "-l", "-c"]
+RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1' > /etc/profile.d/zzz_enable_mpi.sh
+ENV BASH_ENV=/etc/profile
+
+SHELL ["/usr/bin/scl", "enable", "devtoolset-6", "--", "/bin/bash", "-c"]
+ENTRYPOINT ["/usr/bin/scl", "enable", "devtoolset-6", "--"]
+CMD ["/bin/bash"]

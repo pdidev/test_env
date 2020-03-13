@@ -6,9 +6,9 @@ RUN yum install -y --setopt=tsflags=nodocs \
     openssh-server \
     openssh-clients \
     cmake3 \
- && yum clean all -y \
- && ln -s "$(which ccmake3)" /usr/bin/ccmake \
+ && yum clean all -y
+RUN ln -s "$(which ccmake3)" /usr/bin/ccmake \
  && ln -s "$(which cmake3)"  /usr/bin/cmake \
  && ln -s "$(which cpack3)"  /usr/bin/cpack \
- && ln -s "$(which ctest3)"  /usr/bin/ctest \
- && pip3 install numpy mpi4py
+ && ln -s "$(which ctest3)"  /usr/bin/ctest
+RUN pip3 install --no-cache-dir numpy mpi4py

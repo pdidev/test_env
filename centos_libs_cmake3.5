@@ -6,5 +6,5 @@ RUN yum install -y --setopt=tsflags=nodocs \
     libparaconf-devel \
     libyaml-devel \
     spdlog-devel \
- && yum clean all -y \
- && echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
+ && yum clean all -y
+RUN echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
