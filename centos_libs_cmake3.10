@@ -1,5 +1,11 @@
 FROM pdidevel/centos_cmake3.10 AS builder
 
+USER 0
+
+RUN yum install -y --setopt=tsflags=nodocs \
+    libyaml-devel \
+ && yum clean all -y
+
 RUN curl -Lso astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz \
  && tar -xf astyle.tar.gz \
  && cd astyle* \
@@ -7,7 +13,7 @@ RUN curl -Lso astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle
  && make -j \
  && install -s astyle /usr/local/bin
 
-RUN curl -Lso bpp.tar.gz https://github.com/pdidev/bpp/archive/master.tar.gz \
+RUN curl -Lso bpp.tar.gz https://github.com/pdidev/bpp/archive/v0.3.0.tar.gz \
  && tar -xf bpp.tar.gz \
  && cd bpp* \
  && cmake . \
@@ -35,6 +41,20 @@ RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/fix-cmake.tar.gz
  && make -j \
  && make install
 
+RUN curl -Lso paraconf.tar.gz https://github.com/pdidev/paraconf/archive/0.4.6.tar.gz \
+ && tar -xf paraconf.tar.gz \
+ && cd paraconf*/paraconf \
+ && cmake . \
+ && make -j \
+ && make install
+
+RUN curl -Lso pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
+ && tar -xf pybind11.tar.gz \
+ && cd pybind11* \
+ && cmake -DPYBIND11_TEST=OFF . \
+ && make -j \
+ && make install
+
 RUN curl -Lso pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
  && tar -xf pybind11.tar.gz \
  && cd pybind11* \
@@ -52,12 +72,15 @@ RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php
 
 FROM pdidevel/centos_cmake3.10
 
+USER 0
+
 COPY --from=builder /usr/local /usr/local
 
 RUN yum install -y --setopt=tsflags=nodocs \
     hdf5-openmpi3-devel \
-    libparaconf-devel \
     libyaml-devel \
     spdlog-devel \
  && yum clean all -y
 RUN echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
+
+USER 1001

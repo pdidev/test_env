@@ -1,8 +1,5 @@
 FROM centos:7
 
-ENV HOME /root
-WORKDIR ${HOME}
-
 RUN rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
  && yum install -y --setopt=tsflags=nodocs \
     yum-utils \
@@ -47,8 +44,13 @@ RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
  && ldconfig
 
 RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1' > /etc/profile.d/zzz_enable_mpi.sh
-ENV BASH_ENV=/etc/profile
 
+ENV HOME /home/default
+RUN useradd -d ${HOME} -m -u 1001 -U default
+USER 1001
+WORKDIR ${HOME}
+
+ENV BASH_ENV=/etc/profile
 SHELL ["/usr/bin/scl", "enable", "devtoolset-6", "--", "/bin/bash", "-c"]
 ENTRYPOINT ["/usr/bin/scl", "enable", "devtoolset-6", "--"]
 CMD ["/bin/bash"]
