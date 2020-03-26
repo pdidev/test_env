@@ -42,3 +42,17 @@ jobs:
         username: jbigot
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         dockerfile: centos_libs_cmake3.5
+    - name: deb_builder Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/deb_builder
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: deb_builder
+    - name: rpm_builder Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/rpm_builder
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: rpm_builder
