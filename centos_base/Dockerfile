@@ -8,15 +8,14 @@ RUN rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
     epel-release \
  && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 \
  && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-SCLo \
- && curl -Lso /etc/yum.repos.d/home:pdi.repo https://download.opensuse.org/repositories/home:pdi/CentOS_7/home:pdi.repo \
  && yum update -y --setopt=tsflags=nodocs \
  && yum upgrade -y --setopt=tsflags=nodocs \
  && yum install -y --setopt=tsflags=nodocs \
     bison \
     bsdtar \
-    devtoolset-6-gcc \
-    devtoolset-6-gcc-c++ \
-    devtoolset-6-gcc-gfortran \
+    devtoolset-7-gcc \
+    devtoolset-7-gcc-c++ \
+    devtoolset-7-gcc-gfortran \
     file \
     findutils \
     flex \
@@ -51,6 +50,6 @@ USER 1001
 WORKDIR ${HOME}
 
 ENV BASH_ENV=/etc/profile
-SHELL ["/usr/bin/scl", "enable", "devtoolset-6", "--", "/bin/bash", "-c"]
-ENTRYPOINT ["/usr/bin/scl", "enable", "devtoolset-6", "--"]
+SHELL ["/usr/bin/scl", "enable", "devtoolset-7", "--", "/bin/bash", "-c"]
+ENTRYPOINT ["/usr/bin/scl", "enable", "devtoolset-7", "--"]
 CMD ["/bin/bash"]

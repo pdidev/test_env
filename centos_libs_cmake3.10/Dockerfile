@@ -13,13 +13,6 @@ RUN curl -Lso astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle
  && make -j \
  && install -s astyle /usr/local/bin
 
-RUN curl -Lso bpp.tar.gz https://github.com/pdidev/bpp/archive/v0.3.0.tar.gz \
- && tar -xf bpp.tar.gz \
- && cd bpp* \
- && cmake . \
- && make -j \
- && make install
-
 RUN curl -Lso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
  && tar -xf doxygen.tar.gz \
  && cd doxygen* \
@@ -55,18 +48,18 @@ RUN curl -Lso pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.
  && make -j \
  && make install
 
-RUN curl -Lso pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
- && tar -xf pybind11.tar.gz \
- && cd pybind11* \
- && cmake -DPYBIND11_TEST=OFF . \
- && make -j \
- && make install
-
 RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
  && tar -xf sionlib.tar.gz \
  && cd sionlib* \
  && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx \
  && cd build-linux-gomp-openmpi \
+ && make -j \
+ && make install
+
+RUN curl -Lso spdlog.tar.gz https://github.com/gabime/spdlog/archive/v1.4.2.tar.gz \
+ && tar -xf spdlog.tar.gz \
+ && cd spdlog* \
+ && cmake -DSPDLOG_BUILD_SHARED=ON -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_BUILD_BENCH=OFF . \
  && make -j \
  && make install
 
@@ -79,7 +72,6 @@ COPY --from=builder /usr/local /usr/local
 RUN yum install -y --setopt=tsflags=nodocs \
     hdf5-openmpi3-devel \
     libyaml-devel \
-    spdlog-devel \
  && yum clean all -y
 RUN echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
 

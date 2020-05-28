@@ -1,0 +1,76 @@
+name: Docker Image CI
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build_xenial:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: xenial_cmake3.5 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/xenial_cmake3.5
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: xenial_cmake3.5
+    - name: xenial_cmake3.10 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/xenial_cmake3.10
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: xenial_cmake3.10
+    - name: xenial_libs_cmake3.5 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/xenial_libs_cmake3.5
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: xenial_libs_cmake3.5
+    - name: xenial_libs_cmake3.10 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/xenial_libs_cmake3.10
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: xenial_libs_cmake3.10
+  build_centos:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: centos_base Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/centos_base
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: centos_base
+    - name: centos_cmake3.5 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/centos_cmake3.5
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: centos_cmake3.5
+    - name: centos_cmake3.10 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/centos_cmake3.10
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: centos_cmake3.10
+    - name: centos_libs_cmake3.10 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/centos_libs_cmake3.10
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: centos_libs_cmake3.10
+    - name: centos_libs_cmake3.5 Docker image
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: pdidevel/centos_libs_cmake3.5
+        username: jbigot
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        workdir: centos_libs_cmake3.5
