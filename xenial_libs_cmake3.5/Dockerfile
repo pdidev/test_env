@@ -5,14 +5,7 @@ USER 0
 RUN apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y \
-    astyle \
-    curl \
-    doxygen \
-    libhdf5-mpich-dev \
-    libparaconf-dev \
-    libspdlog-dev \
-    pybind11-dev \
-    zpp
+    curl
 
 RUN curl -Lso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
  && tar -xf doxygen.tar.gz \
@@ -32,14 +25,6 @@ RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/master.tar.gz \
  && tar -xf fti.tar.gz \
  && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
- && make -j \
- && make install
-
-RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
- && tar -xf sionlib.tar.gz \
- && cd sionlib* \
- && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx --mpi=mpich3 --force-64 \
- && cd build-linux-gomp-mpich3-64 \
  && make -j \
  && make install
 

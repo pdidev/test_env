@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:xenial as prebuild
 
 RUN apt-get update -y \
  && apt-get upgrade -y \
@@ -29,6 +29,25 @@ RUN apt-get update -y \
     python3-yaml \
     rsync \
     unzip
+
+FROM prebuild as builder
+
+RUN apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y \
+    curl
+
+RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
+ && tar -xf sionlib.tar.gz \
+ && cd sionlib* \
+ && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx --mpi=mpich3 --force-64 \
+ && cd build-linux-gomp-mpich3-64 \
+ && make -j \
+ && make install
+
+FROM prebuild
+
+COPY --from=builder /usr/local /usr/local
 
 ENV HOME /home/default
 RUN useradd -d ${HOME} -m -u 1001 -U default
