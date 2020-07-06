@@ -45,6 +45,14 @@ RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php
  && make -j \
  && make install
 
+# No parallel NetCDF package on ubuntu xenial -> install from source
+RUN curl -Lso netcdf.tar.gz 'https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.4.tar.gz' \
+ && tar -xf netcdf.tar.gz \
+ && cd netcdf* \
+ && CC=mpicc LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/mpich CPPFLAGS=-I/usr/include/hdf5/mpich ./configure --prefix=/usr/local --enable-netcdf-4  --disable-dap --disable-utilities --disable-testsets \
+ && make -j \
+ && make install
+
 FROM prebuild
 
 COPY --from=builder /usr/local /usr/local

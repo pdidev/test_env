@@ -14,14 +14,14 @@ RUN curl -Lso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-
  && make -j \
  && make install
 
-RUN curl -Lso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/master/flowvr-ex-master.tar.gz \
+RUN curl -Lso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/cfdbddb6b64d38dca7f0712971109041d082a886/flowvr-ex-cfdbddb6b64d38dca7f0712971109041d082a886.tar.gz \
  && tar -xf flowvr.tar.gz \
  && cd flowvr* \
  && cmake -DOpenGL_GL_PREFERENCE=LEGACY . \
  && make -j \
  && make install
 
-RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/master.tar.gz \
+RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/1.4.tar.gz \
  && tar -xf fti.tar.gz \
  && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \

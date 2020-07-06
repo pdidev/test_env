@@ -59,6 +59,7 @@ Installation of the libs that are available as packages:
 * hdf5,
 * libparaconf,
 * libyaml,
+* netcdf,
 * spdlog.
 
 Used for PDI "system" build and tests with cmake 3.10 (using all libs from the
@@ -78,6 +79,7 @@ centos_cmake3.5:
 Installation of the libs that are available as packages:
 * libparaconf,
 * libyaml,
+* netcdf,
 * spdlog.
 
 
@@ -106,6 +108,7 @@ Building of the dependencies required for the PDI distribution without relying
 on embedded dependencies:
 * flowvr,
 * fti,
+* netcdf,
 * sionlib.
 
 Installation of the libs that are available as packages:
