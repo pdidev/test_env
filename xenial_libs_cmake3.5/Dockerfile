@@ -14,7 +14,7 @@ RUN curl -Lso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-
  && make -j \
  && make install
 
-RUN curl -Lso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/cfdbddb6b64d38dca7f0712971109041d082a886/flowvr-ex-cfdbddb6b64d38dca7f0712971109041d082a886.tar.gz \
+RUN curl -Lso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/v2.3.0/flowvr-ex-v2.3.0.tar.gz \
  && tar -xf flowvr.tar.gz \
  && cd flowvr* \
  && cmake -DOpenGL_GL_PREFERENCE=LEGACY . \
