@@ -20,6 +20,10 @@ USER 0
 
 COPY --from=builder /usr/local /usr/local
 
-RUN ldconfig
+RUN apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y \
+    python3-mpi4py \
+ && ldconfig
 
 USER 1001
