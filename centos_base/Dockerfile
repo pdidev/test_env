@@ -42,6 +42,8 @@ RUN pip3 install --no-cache-dir pyyaml
 RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
  && ldconfig
 
+# MPI_LIB flag for FlowVR example launching script
+ENV MPI_LIB openmpi
 RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1' > /etc/profile.d/zzz_enable_mpi.sh
 
 ENV HOME /home/default

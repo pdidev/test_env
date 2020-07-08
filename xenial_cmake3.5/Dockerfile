@@ -58,6 +58,9 @@ FROM prebuild
 COPY --from=builder /usr/local /usr/local
 
 ENV HOME /home/default
+
+# MPI_LIB flag for FlowVR example launching script
+ENV MPI_LIB mpich
 RUN useradd -d ${HOME} -m -u 1001 -U default
 USER 1001
 WORKDIR ${HOME}
