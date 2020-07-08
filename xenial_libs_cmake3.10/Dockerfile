@@ -1,24 +1,8 @@
-FROM pdidevel/xenial_libs_cmake3.5 AS builder
-
-USER 0
-
-RUN apt-get update -y \
- && apt-get upgrade -y \
- && apt-get install -y \
-    curl
-
-RUN curl -Lso cmake.tar.gz https://cmake.org/files/v3.10/cmake-3.10.0.tar.gz \
- && tar -xf cmake.tar.gz \
- && cd cmake* \
- && cmake . \
- && make -j 4 \
- && make install
-
 FROM pdidevel/xenial_libs_cmake3.5
 
 USER 0
 
-COPY --from=builder /usr/local /usr/local
+COPY --from=pdidevel/xenial_cmake3.10 /usr/local /usr/local
 
 RUN apt-get update -y \
  && apt-get upgrade -y \
