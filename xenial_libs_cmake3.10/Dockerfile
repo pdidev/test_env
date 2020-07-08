@@ -10,7 +10,7 @@ RUN apt-get update -y \
 
 COPY --from=pdidevel/xenial_cmake3.10 /usr/local /tmp/xenial_cmake3.10
 
-RUN rsync /tmp/xenial_cmake3.10/ /usr/local/
+RUN rsync -r /tmp/xenial_cmake3.10/ /usr/local/
 
 FROM pdidevel/xenial_libs_cmake3.5
 
