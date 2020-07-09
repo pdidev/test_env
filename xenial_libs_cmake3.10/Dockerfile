@@ -5,12 +5,14 @@ USER 0
 RUN apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y \
-    curl \
-    rsync
+    curl
 
-COPY --from=pdidevel/xenial_cmake3.10 /usr/local /tmp/xenial_cmake3.10
-
-RUN rsync -r /tmp/xenial_cmake3.10/ /usr/local/
+RUN curl -Lso cmake.tar.gz https://cmake.org/files/v3.10/cmake-3.10.0.tar.gz \
+ && tar -xf cmake.tar.gz \
+ && cd cmake* \
+ && cmake . \
+ && make -j 4 \
+ && make install
 
 FROM pdidevel/xenial_libs_cmake3.5
 
@@ -21,7 +23,7 @@ COPY --from=builder /usr/local /usr/local
 RUN apt-get update -y \
  && apt-get purge -y \
     cmake \
- && apt-get autoremove \
+ && apt-get autoremove -y \
  && apt-get upgrade -y \
  && apt-get install -y \
     python3-mpi4py \

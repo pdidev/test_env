@@ -23,7 +23,7 @@ COPY --from=builder /usr/local /usr/local
 RUN apt-get update -y \
  && apt-get purge -y \
     cmake \
- && apt-get autoremove \
+ && apt-get autoremove -y \
  && apt-get upgrade -y \
  && apt-get install -y \
     python3-mpi4py \

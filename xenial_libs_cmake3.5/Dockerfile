@@ -28,6 +28,13 @@ RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/1.4.tar.gz \
  && make -j \
  && make install
 
+RUN curl -Lso netcdf.tar.gz 'https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.4.tar.gz' \
+ && tar -xf netcdf.tar.gz \
+ && cd netcdf* \
+ && env "CC=h5pcc -shlib" ./configure --prefix=/usr/local --enable-netcdf-4  --disable-dap --disable-utilities --disable-testsets \
+ && make -j \
+ && make install
+
 FROM pdidevel/xenial_cmake3.5
 
 USER 0
