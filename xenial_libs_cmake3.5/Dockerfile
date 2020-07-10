@@ -49,6 +49,8 @@ RUN apt-get update -y \
     libspdlog-dev \
     pybind11-dev \
     zpp \
+ && apt-get clean \
+ && apt-get autoclean \
  && ldconfig \
  && echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
 

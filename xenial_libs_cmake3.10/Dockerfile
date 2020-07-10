@@ -28,6 +28,8 @@ RUN apt-get update -y \
  && apt-get install -y \
     python3-mpi4py \
     python3-numpy \
+ && apt-get clean \
+ && apt-get autoclean \
  && ldconfig
 
 USER 1001

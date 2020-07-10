@@ -3,13 +3,14 @@ FROM ubuntu:xenial as prebuild
 RUN apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
-    wget \
+    curl \
     ca-certificates \
     apt-transport-https \
- && wget -O /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/pkgs/repo/pdidev-archive-keyring.gpg \
+ && curl -Lso /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/pkgs/repo/pdidev-archive-keyring.gpg \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/pkgs/repo/ubuntu/ xenial main" > /etc/apt/sources.list.d/pdi.list \
  && echo "deb-src [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/pkgs/repo/ubuntu/ xenial main" >> /etc/apt/sources.list.d/pdi.list \
  && apt-get update -y \
+ && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
     bison \
     build-essential \
@@ -28,7 +29,18 @@ RUN apt-get update -y \
     python3-numpy \
     python3-yaml \
     rsync \
-    unzip
+    unzip \
+ && curl -Lso hwloc-nox_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/hwloc-nox_1.11.9-1_amd64.deb \
+ && curl -Lso libhwloc5_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/libhwloc5_1.11.9-1_amd64.deb \
+ && curl -Lso libhwloc-dev_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/libhwloc-dev_1.11.9-1_amd64.deb \
+ && dpkg -i libhwloc5_1.11.9-1_amd64.deb hwloc-nox_1.11.9-1_amd64.deb libhwloc-dev_1.11.9-1_amd64.deb\
+ && apt-get install -y \
+ && apt-get upgrade -y \
+ && apt-get purge -y \
+    curl \
+ && apt-get autoremove -y \
+ && apt-get clean \
+ && apt-get autoclean
 
 FROM prebuild as builder
 
