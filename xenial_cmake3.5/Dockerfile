@@ -36,6 +36,7 @@ RUN apt-get update -y \
  && dpkg -i libhwloc5_1.11.9-1_amd64.deb hwloc-nox_1.11.9-1_amd64.deb libhwloc-dev_1.11.9-1_amd64.deb\
  && apt-get install -y \
  && apt-get upgrade -y \
+ && rm *.deb \
  && apt-get purge -y \
     curl \
  && apt-get autoremove -y \
