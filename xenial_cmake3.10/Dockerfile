@@ -26,10 +26,13 @@ RUN apt-get update -y \
  && apt-get autoremove -y \
  && apt-get upgrade -y \
  && apt-get install -y \
-    python3-mpi4py \
     python3-numpy \
+    python3-pip \
+    libmpich-dev \
  && apt-get clean \
  && apt-get autoclean \
+ && pip3 install --upgrade pip \
+ && pip3 install --no-cache-dir mpi4py \
  && ldconfig
 
 USER 1001
