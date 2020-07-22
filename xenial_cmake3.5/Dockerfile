@@ -15,6 +15,7 @@ RUN apt-get update -y \
     bison \
     build-essential \
     cmake \
+    file \
     flex \
     freeglut3-dev \
     gfortran \
