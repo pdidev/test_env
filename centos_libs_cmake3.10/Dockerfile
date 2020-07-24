@@ -27,7 +27,7 @@ RUN curl -Lso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/v
  && make -j \
  && make install
 
-RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/1.4.tar.gz \
+RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/b465b4ae7cc1be384dfcb728609f6d970df49886.tar.gz \
  && tar -xf fti.tar.gz \
  && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
