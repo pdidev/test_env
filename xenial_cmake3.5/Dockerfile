@@ -22,6 +22,7 @@ RUN apt-get update -y \
     libhdf5-mpich-dev \
     libhwloc-dev \
     libmpich-dev \
+    libz-dev \
     mpich \
     pkg-config \
     python-dev \

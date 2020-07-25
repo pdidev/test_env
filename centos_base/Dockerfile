@@ -36,6 +36,7 @@ RUN rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
     tar \
     unzip \
     which \
+    zlib-devel \
  && yum clean all -y --enablerepo='*' \
  && rm -f /*.log ${HOME}/*
 RUN pip3 install --no-cache-dir pyyaml
