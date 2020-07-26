@@ -34,6 +34,13 @@ RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/1.4.tar.gz \
  && make -j \
  && make install
 
+RUN curl -Lso netcdf.tar.gz https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.4.tar.gz \
+ && tar -xf netcdf.tar.gz \
+ && cd netcdf* \
+ && env "CC=h5pcc -shlib" ./configure --prefix=/usr/local --enable-netcdf-4  --disable-dap --disable-utilities --disable-testsets \
+ && make -j \
+ && make install
+
 RUN curl -Lso paraconf.tar.gz https://github.com/pdidev/paraconf/archive/0.4.6.tar.gz \
  && tar -xf paraconf.tar.gz \
  && cd paraconf*/paraconf \
@@ -71,7 +78,6 @@ COPY --from=builder /usr/local /usr/local
 
 RUN yum install -y --setopt=tsflags=nodocs \
     hdf5-openmpi3-devel \
-    netcdf-openmpi-devel \
     libyaml-devel \
  && yum clean all -y
 RUN echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
