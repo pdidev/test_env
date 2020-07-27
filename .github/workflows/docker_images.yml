@@ -2,75 +2,50 @@ name: Docker Image CI
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 jobs:
   build_xenial:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: xenial_cmake3.5 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/xenial_cmake3.5
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: xenial_cmake3.5
-    - name: xenial_cmake3.10 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/xenial_cmake3.10
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: xenial_cmake3.10
-    - name: xenial_libs_cmake3.5 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/xenial_libs_cmake3.5
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: xenial_libs_cmake3.5
-    - name: xenial_libs_cmake3.10 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/xenial_libs_cmake3.10
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: xenial_libs_cmake3.10
+    - name: build
+      run: |
+        docker build -t pdidevel/xenial_cmake3.5 xenial_cmake3.5
+        docker build -t pdidevel/xenial_cmake3.10 xenial_cmake3.10
+        docker build -t pdidevel/xenial_libs_cmake3.5 xenial_libs_cmake3.5
+        docker build -t pdidevel/xenial_libs_cmake3.10 xenial_libs_cmake3.10
+    - uses: actions/checkout@v2
+    - name: publish
+      if: ${{ github.event_name == 'push' }}
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/xenial_cmake3.5
+        docker push pdidevel/xenial_cmake3.10
+        docker push pdidevel/xenial_libs_cmake3.5
+        docker push pdidevel/xenial_libs_cmake3.10
   build_centos:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: centos_base Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/centos_base
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: centos_base
-    - name: centos_cmake3.5 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/centos_cmake3.5
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: centos_cmake3.5
-    - name: centos_cmake3.10 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/centos_cmake3.10
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: centos_cmake3.10
-    - name: centos_libs_cmake3.10 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/centos_libs_cmake3.10
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: centos_libs_cmake3.10
-    - name: centos_libs_cmake3.5 Docker image
-      uses: elgohr/Publish-Docker-Github-Action@2.13
-      with:
-        name: pdidevel/centos_libs_cmake3.5
-        username: jbigot
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        workdir: centos_libs_cmake3.5
+    - name: build
+      run: |
+        docker build -t pdidevel/centos_base centos_base
+        docker build -t pdidevel/centos_cmake3.5 centos_cmake3.5
+        docker build -t pdidevel/centos_cmake3.10 centos_cmake3.10
+        docker build -t pdidevel/centos_libs_cmake3.10 centos_libs_cmake3.10
+        docker build -t pdidevel/centos_libs_cmake3.5 centos_libs_cmake3.5
+    - uses: actions/checkout@v2
+    - name: publish
+      if: ${{ github.event_name == 'push' }}
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/centos_base
+        docker push pdidevel/centos_cmake3.5
+        docker push pdidevel/centos_cmake3.10
+        docker push pdidevel/centos_libs_cmake3.10
+        docker push pdidevel/centos_libs_cmake3.5
