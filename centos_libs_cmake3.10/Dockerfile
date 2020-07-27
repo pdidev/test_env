@@ -38,8 +38,10 @@ RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/1.4.tar.gz \
 RUN curl -Lso netcdf.tar.gz https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.4.tar.gz \
  && tar -xf netcdf.tar.gz \
  && cd netcdf* \
- && export HDF5_USE_SHLIB=yes ; export CC=h5pcc ; export CFLAGS="-O2" \
- && ./configure --prefix=/usr/local --enable-netcdf-4  --disable-dap --disable-utilities --disable-testsets \
+ && export CC="$(h5pcc -shlib -show | awk '{print $1}')" \
+ && export CFLAGS="$(h5pcc -shlib -show | sed "s%^${CC}\s*%%")" \
+ && export LDFLAGS="${CFLAGS}" \
+ && ./configure --disable-static --enable-netcdf-4 --disable-dap --disable-utilities --disable-testsets \
  && make -j \
  && make install
 
