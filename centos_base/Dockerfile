@@ -45,7 +45,7 @@ RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
 
 # MPI_LIB flag for FlowVR example launching script
 ENV MPI_LIB openmpi
-RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1' > /etc/profile.d/zzz_enable_mpi.sh
+RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1; source scl_source enable devtoolset-7' > /etc/profile.d/zzz_enable_mpi.sh
 
 ENV HOME /home/default
 RUN useradd -d ${HOME} -m -u 1001 -U default
@@ -53,6 +53,5 @@ USER 1001
 WORKDIR ${HOME}
 
 ENV BASH_ENV=/etc/profile
-SHELL ["/usr/bin/scl", "enable", "devtoolset-7", "--", "/bin/bash", "-c"]
-ENTRYPOINT ["/usr/bin/scl", "enable", "devtoolset-7", "--"]
+SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
