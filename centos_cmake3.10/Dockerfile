@@ -8,6 +8,7 @@ RUN yum install -y --setopt=tsflags=nodocs \
     openssh-server \
     openssh-clients \
     cmake3 \
+    curl \
  && yum clean all -y
 RUN ln -s "$(which ccmake3)" /usr/bin/ccmake \
  && ln -s "$(which cmake3)"  /usr/bin/cmake \
