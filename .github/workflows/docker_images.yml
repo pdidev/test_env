@@ -16,12 +16,14 @@ jobs:
         docker build -t pdidevel/xenial_libs_cmake3.5 xenial_libs_cmake3.5
         docker build -t pdidevel/xenial_libs_cmake3.10 xenial_libs_cmake3.10
     - uses: actions/checkout@v2
-    - name: test
-      run: |
-        sh xenial_cmake3.5/test.sh
-        sh xenial_cmake3.10/test.sh
-        sh xenial_libs_cmake3.5/test.sh
-        sh xenial_libs_cmake3.10/test.sh
+    - name: xenial_cmake3.5_test
+      run: sh xenial_cmake3.5/test.sh
+    - name: xenial_cmake3.10_test
+      run: sh xenial_cmake3.10/test.sh
+    - name: xenial_libs_cmake3.5_test
+      run: sh xenial_libs_cmake3.5/test.sh
+    - name: xenial_libs_cmake3.10_test
+      run: sh xenial_libs_cmake3.10/test.sh
     - uses: actions/checkout@v2
     - name: publish
       if: ${{ github.event_name == 'push' }}
@@ -44,13 +46,14 @@ jobs:
         docker build -t pdidevel/centos_cmake3.10 centos_cmake3.10
         docker build -t pdidevel/centos_libs_cmake3.10 centos_libs_cmake3.10
         docker build -t pdidevel/centos_libs_cmake3.5 centos_libs_cmake3.5
-    - uses: actions/checkout@v2
-    - name: test
-      run: |
-        sh centos_cmake3.5/test.sh
-        sh centos_cmake3.10/test.sh
-        sh centos_libs_cmake3.5/test.sh
-        sh centos_libs_cmake3.10/test.sh
+    - name: centos_cmake3.5_test
+      run: sh centos_cmake3.5/test.sh
+    - name: centos_cmake3.10_test
+      run: sh centos_cmake3.10/test.sh
+    - name: centos_libs_cmake3.5_test
+      run: sh centos_libs_cmake3.5/test.sh
+    - name: centos_libs_cmake3.10_test
+      run: sh centos_libs_cmake3.10/test.sh        
     - uses: actions/checkout@v2
     - name: publish
       if: ${{ github.event_name == 'push' }}
