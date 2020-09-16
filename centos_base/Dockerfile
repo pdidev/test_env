@@ -52,6 +52,9 @@ RUN useradd -d ${HOME} -m -u 1001 -U default
 USER 1001
 WORKDIR ${HOME}
 
+# disable ctest for centos images (gitlab CI deadlock)
+ENV DISABLE_CTEST=1
+
 ENV BASH_ENV=/etc/profile
 SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
