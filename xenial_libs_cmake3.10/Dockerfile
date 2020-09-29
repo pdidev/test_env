@@ -35,4 +35,6 @@ RUN apt-get update -y \
  && pip3 install --no-cache-dir mpi4py \
  && ldconfig
 
+ENV PDI_LIBS=provided
+
 USER 1001

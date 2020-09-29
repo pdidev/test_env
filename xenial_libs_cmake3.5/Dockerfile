@@ -57,4 +57,6 @@ RUN apt-get update -y \
  && ldconfig \
  && echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
 
+ENV PDI_LIBS=provided
+
 USER 1001

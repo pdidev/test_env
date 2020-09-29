@@ -66,6 +66,8 @@ COPY --from=builder /usr/local /usr/local
 
 ENV HOME /home/default
 
+ENV PDI_SYSTEM=docker-ubuntu-xenial
+
 # MPI_LIB flag for FlowVR example launching script
 ENV MPI_LIB mpich
 RUN apt-get install -y curl && useradd -d ${HOME} -m -u 1001 -U default
