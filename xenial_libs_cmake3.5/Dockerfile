@@ -5,7 +5,14 @@ USER 0
 RUN apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y \
-    curl
+    astyle \
+    libhdf5-mpich-dev \
+    libparaconf-dev \
+    libspdlog-dev \
+    pybind11-dev \
+    zpp \
+ && apt-get clean \
+ && apt-get autoclean
 
 RUN curl -Lso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
  && tar -xf doxygen.tar.gz \
@@ -48,6 +55,7 @@ RUN apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y \
     astyle \
+    libhdf5-mpich-dev \
     libparaconf-dev \
     libspdlog-dev \
     pybind11-dev \

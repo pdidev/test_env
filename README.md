@@ -19,18 +19,17 @@ xenial_cmake3.5 -> xenial_libs_cmake3.5 -> xenial_libs_cmake3.10
 
 Centos 7 with the minimal set of dependencies installed to build the full PDI
 distribution in "embedded" mode, except for cmake.
-It enables the SCL, EPEL and home:pdi repositories and activates devtoolset-7
-by default.
+It enables the SCL, EPEL and pdi repositories and activates devtoolset-7 by
+default.
 
 ## centos_cmake3.5
 
 centos_base extended with the minimal dependencies to build the full PDI 
 distribution with cmake-3.5 (without running the tests):
 * cmake 3.5
-* hdf5 because HDF5 build requires cmake-3.10
 
 Used for PDI "embedded" build with cmake 3.5 (using all libs embedded in the PDI
-distribution except for HDF5 from the docker image)
+distribution)
 
 ## centos_cmake3.10
 
@@ -52,15 +51,15 @@ on embedded dependencies:
 * doxygen,
 * flowvr,
 * fti,
+* netcdf,
+* paraconf,
 * pybind11,
-* sionlib.
+* sionlib,
+* spdlog.
 
 Installation of the libs that are available as packages:
 * hdf5,
-* libparaconf,
-* libyaml,
-* netcdf,
-* spdlog.
+* libyaml.
 
 Used for PDI "system" build and tests with cmake 3.10 (using all libs from the
 docker image)
@@ -68,22 +67,14 @@ docker image)
 ## centos_libs_cmake3.5
 
 Integration of the libraries built inside centos_libs_cmake3.10 into 
-centos_cmake3.5:
-* astyle,
-* bpp,
-* flowvr,
-* fti,
-* pybind11,
-* sionlib.
+centos_cmake3.5.
 
 Installation of the libs that are available as packages:
-* libparaconf,
-* libyaml,
-* netcdf,
-* spdlog.
+* hdf5,
+* libyaml.
 
-
-Used for PDI "system" build with cmake 3.5 (using all libs from the docker image)
+Used for PDI "system" build with cmake 3.5 (using all libs from the docker
+image)
 
 ## xenial_cmake3.5
 
@@ -91,7 +82,7 @@ Ubuntu Xenial with the minimal set of dependencies installed to build the full
 PDI distribution in "embedded" mode (without running the tests).
 
 Used for PDI "embedded" build with cmake 3.5 (using all libs embedded in the PDI
-distribution except for HDF5 from the docker image)
+distribution, except for SIONlib)
 
 ## xenial_cmake3.10
 
@@ -106,22 +97,21 @@ in the PDI distribution)
 
 Building of the dependencies required for the PDI distribution without relying
 on embedded dependencies:
+* doxygen,
 * flowvr,
 * fti,
-* netcdf,
-* sionlib.
+* netcdf.
 
 Installation of the libs that are available as packages:
 * astyle,
-* doxygen,
-* libhdf5-mpich-dev,
-* libparaconf-dev,
-* libspdlog-dev,
-* pybind11-dev,
-* python,
+* hdf5,
+* paraconf,
+* spdlog,
+* pybind11,
 * zpp.
 
-Used for PDI "system" build with cmake 3.5 (using all libs from the docker image)
+Used for PDI "system" build with cmake 3.5 (using all libs from the docker
+image)
 
 ## xenial_libs_cmake3.10
 

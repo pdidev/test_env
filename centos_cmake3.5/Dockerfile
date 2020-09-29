@@ -1,12 +1,7 @@
-FROM pdidevel/centos_base:latest
-
-# Install HDF5 that requires CMake 10 in embedded mode + CMake 3.5
+FROM pdidevel/centos_base AS builder
 
 USER 0
 
-RUN yum install -y --setopt=tsflags=nodocs \
-    hdf5-openmpi3-devel \
- && yum clean all -y
 RUN curl -Lso cmake.tar.gz https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz \
  && tar -xzf cmake.tar.gz \
  && rm cmake.tar.gz \
@@ -16,5 +11,11 @@ RUN curl -Lso cmake.tar.gz https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz \
  && make install \
  && cd \
  && rm -r cmake*
+
+FROM pdidevel/centos_cmake3.10
+
+USER 0
+
+COPY --from=builder /usr/local /usr/local
 
 USER 1001

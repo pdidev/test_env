@@ -19,7 +19,6 @@ RUN apt-get update -y \
     flex \
     freeglut3-dev \
     gfortran \
-    libhdf5-mpich-dev \
     libhwloc-dev \
     libmpich-dev \
     libz-dev \
@@ -29,6 +28,8 @@ RUN apt-get update -y \
     python-yaml \
     python3-dev \
     python3-numpy \
+    python3-pip \
+    python3-setuptools \
     python3-yaml \
     rsync \
     unzip \
@@ -39,18 +40,11 @@ RUN apt-get update -y \
  && apt-get install -y \
  && apt-get upgrade -y \
  && rm *.deb \
- && apt-get purge -y \
-    curl \
  && apt-get autoremove -y \
  && apt-get clean \
  && apt-get autoclean
 
 FROM prebuild as builder
-
-RUN apt-get update -y \
- && apt-get upgrade -y \
- && apt-get install -y \
-    curl
 
 RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
  && tar -xf sionlib.tar.gz \

@@ -1,6 +1,4 @@
-FROM pdidevel/centos_base:latest
-
-# Install CMake 3.10+ and stuff needed for tests
+FROM pdidevel/centos_base
 
 USER 0
 
