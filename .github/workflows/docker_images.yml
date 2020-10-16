@@ -84,14 +84,6 @@ jobs:
         docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_cmake3.10 /bin/bash -c \
             "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
              && sh tools/build_scripts/build_and_run.sh"
-    - name: build centos_libs_cmake3.5
-      run: |
-        docker build -t pdidevel/centos_libs_cmake3.5 centos_libs_cmake3.5
-    - name: test centos_libs_cmake3.5
-      run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_libs_cmake3.5 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
     - name: build centos_libs_cmake3.10
       run: |
         docker build -t pdidevel/centos_libs_cmake3.10 centos_libs_cmake3.10
@@ -99,7 +91,15 @@ jobs:
       run: |
         docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_libs_cmake3.10 /bin/bash -c \
             "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"     
+             && sh tools/build_scripts/build_and_run.sh"
+    - name: build centos_libs_cmake3.5
+      run: |
+        docker build -t pdidevel/centos_libs_cmake3.5 centos_libs_cmake3.5
+    - name: test centos_libs_cmake3.5
+      run: |
+        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_libs_cmake3.5 /bin/bash -c \
+            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
+            && sh tools/build_scripts/build_and_run.sh"
     - name: publish
       if: ${{ github.event_name == 'push' }}
       env:
