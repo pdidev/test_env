@@ -2,7 +2,7 @@ FROM pdidevel/xenial_libs_cmake3.5 AS builder
 
 USER 0
 
-RUN curl -Lso cmake.tar.gz https://cmake.org/files/v3.10/cmake-3.10.0.tar.gz \
+RUN curl -LSfso cmake.tar.gz https://cmake.org/files/v3.10/cmake-3.10.0.tar.gz \
  && tar -xf cmake.tar.gz \
  && cd cmake* \
  && cmake . \

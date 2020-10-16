@@ -6,7 +6,7 @@ RUN apt-get update -y \
     curl \
     ca-certificates \
     apt-transport-https \
- && curl -Lso /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/pkgs/repo/pdidev-archive-keyring.gpg \
+ && curl -LSfso /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/pkgs/repo/pdidev-archive-keyring.gpg \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/pkgs/repo/ubuntu/ xenial main" > /etc/apt/sources.list.d/pdi.list \
  && echo "deb-src [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/pkgs/repo/ubuntu/ xenial main" >> /etc/apt/sources.list.d/pdi.list \
  && apt-get update -y \
@@ -34,9 +34,9 @@ RUN apt-get update -y \
     python3-yaml \
     rsync \
     unzip \
- && curl -Lso hwloc-nox_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/hwloc-nox_1.11.9-1_amd64.deb \
- && curl -Lso libhwloc5_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/libhwloc5_1.11.9-1_amd64.deb \
- && curl -Lso libhwloc-dev_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/libhwloc-dev_1.11.9-1_amd64.deb \
+ && curl -LSfso hwloc-nox_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/hwloc-nox_1.11.9-1_amd64.deb \
+ && curl -LSfso libhwloc5_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/libhwloc5_1.11.9-1_amd64.deb \
+ && curl -LSfso libhwloc-dev_1.11.9-1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/universe/h/hwloc/libhwloc-dev_1.11.9-1_amd64.deb \
  && dpkg -i libhwloc5_1.11.9-1_amd64.deb hwloc-nox_1.11.9-1_amd64.deb libhwloc-dev_1.11.9-1_amd64.deb\
  && apt-get install -y \
  && apt-get upgrade -y \
@@ -47,7 +47,7 @@ RUN apt-get update -y \
 
 FROM prebuild as builder
 
-RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
+RUN curl -LSfso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
  && tar -xf sionlib.tar.gz \
  && cd sionlib* \
  && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx --mpi=mpich3 --force-64 \

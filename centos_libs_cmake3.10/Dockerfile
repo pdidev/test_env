@@ -7,35 +7,35 @@ RUN yum install -y --setopt=tsflags=nodocs \
     libyaml-devel \
  && yum clean all -y
 
-RUN curl -Lso astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz \
+RUN curl -LSfso astyle.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz \
  && tar -xf astyle.tar.gz \
  && cd astyle* \
  && cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=OFF . \
  && make -j \
  && install -s astyle /usr/local/bin
 
-RUN curl -Lso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
+RUN curl -LSfso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
  && tar -xf doxygen.tar.gz \
  && cd doxygen* \
  && cmake . \
  && make -j \
  && make install
 
-RUN curl -Lso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/v2.3.1/flowvr-ex-v2.3.1.tar.gz \
+RUN curl -LSfso flowvr.tar.gz https://gitlab.inria.fr/flowvr/flowvr-ex/-/archive/v2.3.1/flowvr-ex-v2.3.1.tar.gz \
  && tar -xf flowvr.tar.gz \
  && cd flowvr* \
  && cmake -DOpenGL_GL_PREFERENCE=LEGACY . \
  && make -j \
  && make install
 
-RUN curl -Lso fti.tar.gz https://github.com/leobago/fti/archive/v1.5.1.tar.gz \
+RUN curl -LSfso fti.tar.gz https://github.com/leobago/fti/archive/v1.5.1.tar.gz \
  && tar -xf fti.tar.gz \
  && cd fti* \
  && cmake -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_DOCU=OFF . \
  && make -j \
  && make install
 
-RUN curl -Lso netcdf.tar.gz https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.4.tar.gz \
+RUN curl -LSfso netcdf.tar.gz https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.4.tar.gz \
  && tar -xf netcdf.tar.gz \
  && cd netcdf* \
  && export CC="$(h5pcc -shlib -show | awk '{print $1}')" \
@@ -45,21 +45,21 @@ RUN curl -Lso netcdf.tar.gz https://www.unidata.ucar.edu/downloads/netcdf/ftp/ne
  && make -j \
  && make install
 
-RUN curl -Lso paraconf.tar.gz https://github.com/pdidev/paraconf/archive/0.4.6.tar.gz \
+RUN curl -LSfso paraconf.tar.gz https://github.com/pdidev/paraconf/archive/0.4.6.tar.gz \
  && tar -xf paraconf.tar.gz \
  && cd paraconf*/paraconf \
  && cmake . \
  && make -j \
  && make install
 
-RUN curl -Lso pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
+RUN curl -LSfso pybind11.tar.gz https://github.com/pybind/pybind11/archive/v2.4.3.tar.gz \
  && tar -xf pybind11.tar.gz \
  && cd pybind11* \
  && cmake -DPYBIND11_TEST=OFF . \
  && make -j \
  && make install
 
-RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
+RUN curl -LSfso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
  && tar -xf sionlib.tar.gz \
  && cd sionlib* \
  && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx \
@@ -67,7 +67,7 @@ RUN curl -Lso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php
  && make -j \
  && make install
 
-RUN curl -Lso spdlog.tar.gz https://github.com/gabime/spdlog/archive/v1.4.2.tar.gz \
+RUN curl -LSfso spdlog.tar.gz https://github.com/gabime/spdlog/archive/v1.4.2.tar.gz \
  && tar -xf spdlog.tar.gz \
  && cd spdlog* \
  && cmake -DSPDLOG_BUILD_SHARED=ON -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_BUILD_BENCH=OFF . \
