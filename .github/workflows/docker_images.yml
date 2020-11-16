@@ -3,6 +3,8 @@ on:
   push:
     branches: [ master ]
   pull_request:
+env:
+  MAKEFLAGS: -j 5
 jobs:
   build_xenial:
     runs-on: ubuntu-latest
