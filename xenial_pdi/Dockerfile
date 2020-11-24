@@ -14,5 +14,6 @@ FROM pdidevel/xenial_libs_cmake3.10
 USER 0
 
 COPY --from=builder /usr/local /usr/local
+RUN echo ". /usr/local/share/pdi/env.bash" > /etc/profile.d/zzz_enable_pdi.sh
 
 USER 1001

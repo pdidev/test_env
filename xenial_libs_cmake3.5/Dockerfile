@@ -6,13 +6,12 @@ RUN apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y \
     astyle \
+    curl \
     libhdf5-mpich-dev \
     libparaconf-dev \
     libspdlog-dev \
     pybind11-dev \
-    zpp \
- && apt-get clean \
- && apt-get autoclean
+    zpp
 
 RUN curl -LSfso doxygen.tar.gz https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.src.tar.gz \
  && tar -xf doxygen.tar.gz \
@@ -53,15 +52,17 @@ COPY --from=builder /usr/local /usr/local
 
 RUN apt-get update -y \
  && apt-get upgrade -y \
- && apt-get install -y \
+ && apt-get install -y --no-install-recommends \
     astyle \
     libhdf5-mpich-dev \
     libparaconf-dev \
     libspdlog-dev \
     pybind11-dev \
     zpp \
- && apt-get clean \
- && apt-get autoclean \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && rm -rf /var/lib/apt/lists/* \
  && ldconfig \
  && echo '. /usr/local/bin/flowvr-suite-config.sh' > /etc/profile.d/zzz_enable_flowvr.sh
 

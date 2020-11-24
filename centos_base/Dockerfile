@@ -1,6 +1,11 @@
 FROM centos:7
 
-RUN rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
+COPY bash_run /bin/
+ENV BASH_ENV=/etc/profile
+SHELL ["/bin/bash", "-c"]
+
+RUN chmod +x /bin/bash_run \
+ && rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
  && yum install -y --setopt=tsflags=nodocs \
     yum-utils \
  && yum install -y --setopt=tsflags=nodocs \
@@ -45,6 +50,7 @@ RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
 
 # MPI_LIB flag for FlowVR example launching script
 ENV MPI_LIB openmpi
+ENV PDI_SYSTEM=docker-centos-7
 RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1; source scl_source enable devtoolset-7' > /etc/profile.d/zzz_enable_mpi.sh
 
 ENV HOME /home/default
@@ -52,8 +58,5 @@ RUN useradd -d ${HOME} -m -u 1001 -U default
 USER 1001
 WORKDIR ${HOME}
 
-ENV PDI_SYSTEM=docker-centos-7
-
-ENV BASH_ENV=/etc/profile
-SHELL ["/bin/bash", "-c"]
-CMD ["/bin/bash"]
+ENTRYPOINT ["/bin/bash_run"]
+CMD ["/bin/bash", "-li"]

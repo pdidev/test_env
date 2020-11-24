@@ -1,14 +1,18 @@
 FROM ubuntu:xenial as prebuild
 
-RUN apt-get update -y \
+COPY bash_run /bin/
+ENV BASH_ENV=/etc/profile
+SHELL ["/bin/bash", "-c"]
+
+RUN chmod +x /bin/bash_run \
+ && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     apt-transport-https \
- && curl -LSfso /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/pkgs/repo/pdidev-archive-keyring.gpg \
- && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/pkgs/repo/ubuntu/ xenial main" > /etc/apt/sources.list.d/pdi.list \
- && echo "deb-src [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/pkgs/repo/ubuntu/ xenial main" >> /etc/apt/sources.list.d/pdi.list \
+ && curl -LSfso /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/ubuntu/pdidev-archive-keyring.gpg \
+ && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/ubuntu/ xenial main" > /etc/apt/sources.list.d/pdi.list \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -24,8 +28,6 @@ RUN apt-get update -y \
     libz-dev \
     mpich \
     pkg-config \
-    python-dev \
-    python-yaml \
     python3-dev \
     python3-numpy \
     python3-pip \
@@ -41,15 +43,37 @@ RUN apt-get update -y \
  && apt-get install -y \
  && apt-get upgrade -y \
  && rm *.deb \
+ && apt-get purge -y \
+    curl \
  && apt-get autoremove -y \
- && apt-get clean \
- && apt-get autoclean
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && rm -rf /var/lib/apt/lists/* \
+ && ln -s /usr/bin/python3 /usr/bin/python
+
+# MPI_LIB flag for FlowVR example launching script
+ENV PDI_SYSTEM=docker-ubuntu-xenial
+ENV MPI_LIB mpich
+
+ENV HOME /home/default
+RUN useradd -d ${HOME} -m -u 1001 -U default
+USER 1001
+WORKDIR ${HOME}
+
+ENTRYPOINT ["/bin/bash_run"]
+CMD ["/bin/bash", "-li"]
 
 FROM prebuild as builder
 
-RUN curl -LSfso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6' \
- && tar -xf sionlib.tar.gz \
- && cd sionlib* \
+USER 0
+
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install -y curl
+
+RUN curl -LSfso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.php?version=1.7.6'
+RUN tar -xf sionlib.tar.gz
+RUN cd sionlib* \
  && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx --mpi=mpich3 --force-64 \
  && cd build-linux-gomp-mpich3-64 \
  && make -j \
@@ -58,13 +82,3 @@ RUN curl -LSfso sionlib.tar.gz 'http://apps.fz-juelich.de/jsc/sionlib/download.p
 FROM prebuild
 
 COPY --from=builder /usr/local /usr/local
-
-ENV HOME /home/default
-
-ENV PDI_SYSTEM=docker-ubuntu-xenial
-
-# MPI_LIB flag for FlowVR example launching script
-ENV MPI_LIB mpich
-RUN apt-get install -y curl && useradd -d ${HOME} -m -u 1001 -U default
-USER 1001
-WORKDIR ${HOME}
