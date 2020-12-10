@@ -76,7 +76,7 @@ RUN tar -xf sionlib.tar.gz
 RUN cd sionlib* \
  && ./configure --prefix=/usr/local --disable-fortran --disable-parutils --disable-cxx --mpi=mpich3 --force-64 \
  && cd build-linux-gomp-mpich3-64 \
- && make -j \
+ && make -j 4 \
  && make install
 
 FROM prebuild

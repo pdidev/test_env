@@ -7,7 +7,7 @@ RUN curl -LSfso cmake.tar.gz https://cmake.org/files/v3.5/cmake-3.5.2.tar.gz \
  && rm cmake.tar.gz \
  && cd cmake* \
  && ./configure \
- && make -j \
+ && make -j 4 \
  && make install \
  && cd \
  && rm -r cmake*

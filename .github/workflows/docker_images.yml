@@ -4,11 +4,18 @@ on:
     branches: [ master ]
   pull_request:
 env:
-  MAKEFLAGS: -j 5
+  MAKEFLAGS: -j 4
 jobs:
   build_xenial:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup python
+      uses: actions/setup-python@v2
+      with:
+       python-version: '3.9'
+    - name: Setup python deps
+      run: |
+        python3 -m pip install PyYAML
     - uses: actions/checkout@v2
     - name: checkout PDI master
       run: |
@@ -18,33 +25,25 @@ jobs:
         docker build -t pdidevel/xenial_cmake3.5 xenial_cmake3.5
     - name: test xenial_cmake3.5
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/xenial_cmake3.5 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.5_embedded
     - name: build xenial_cmake3.10
       run: |
         docker build -t pdidevel/xenial_cmake3.10 xenial_cmake3.10
     - name: test xenial_cmake3.10
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/xenial_cmake3.10 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.10_embedded
     - name: build xenial_libs_cmake3.5
       run: |
         docker build -t pdidevel/xenial_libs_cmake3.5 xenial_libs_cmake3.5
     - name: test xenial_libs_cmake3.5
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/xenial_libs_cmake3.5 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.5_system
     - name: build xenial_libs_cmake3.10
       run: |
         docker build -t pdidevel/xenial_libs_cmake3.10 xenial_libs_cmake3.10
     - name: test xenial_libs_cmake3.10
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/xenial_libs_cmake3.10 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.10_system
     - name: build xenial_pdi
       run: |
         cp -la pdi_repo xenial_pdi/
@@ -63,6 +62,13 @@ jobs:
   build_centos:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup python
+      uses: actions/setup-python@v2
+      with:
+       python-version: '3.9'
+    - name: Setup python deps
+      run: |
+        python3 -m pip install PyYAML
     - uses: actions/checkout@v2
     - name: checkout PDI master
       run: |
@@ -75,33 +81,25 @@ jobs:
         docker build -t pdidevel/centos_cmake3.5 centos_cmake3.5
     - name: test centos_cmake3.5
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_cmake3.5 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.5_embedded
     - name: build centos_cmake3.10
       run: |
         docker build -t pdidevel/centos_cmake3.10 centos_cmake3.10
     - name: test centos_cmake3.10
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_cmake3.10 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.10_embedded
     - name: build centos_libs_cmake3.10
       run: |
         docker build -t pdidevel/centos_libs_cmake3.10 centos_libs_cmake3.10
     - name: test centos_libs_cmake3.10
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_libs_cmake3.10 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-             && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.10_system
     - name: build centos_libs_cmake3.5
       run: |
         docker build -t pdidevel/centos_libs_cmake3.5 centos_libs_cmake3.5
     - name: test centos_libs_cmake3.5
       run: |
-        docker run -e DOCKER_RUNNER=github -t -v $PWD/pdi_repo:/data/ pdidevel/centos_libs_cmake3.5 /bin/bash -c \
-            "mkdir /tmp/pdi_repo && cp -a /data/ /tmp/pdi_repo && cd /tmp/pdi_repo/data/ \
-            && sh tools/build_scripts/build_and_run.sh"
+        ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.5_system
     - name: publish
       if: ${{ github.event_name == 'push' }}
       env:
