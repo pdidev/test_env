@@ -14,6 +14,14 @@ FROM pdidevel/xenial_libs_cmake3.10
 USER 0
 
 COPY --from=builder /usr/local /usr/local
-RUN echo ". /usr/local/share/pdi/env.bash" > /etc/profile.d/zzz_enable_pdi.sh
+RUN echo ". /usr/local/share/pdi/env.bash" > /etc/profile.d/zzz_enable_pdi.sh \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+    hdf5-tools \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && rm -rf /var/lib/apt/lists/*
 
 USER 1001
