@@ -43,15 +43,18 @@ RUN chmod +x /bin/bash_run \
     which \
     zlib-devel \
  && yum clean all -y --enablerepo='*' \
- && rm -f /*.log ${HOME}/*
-RUN pip3 install --no-cache-dir pyyaml
-RUN echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
- && ldconfig
+ && rm -f /*.log ${HOME}/* \
+ && pip3 install --no-cache-dir pyyaml \
+ && echo -e '/usr/local/lib\n/usr/local/lib64' > /etc/ld.so.conf.d/local.conf \
+ && ldconfig \
+ && echo 'btl_base_warn_component_unused=0' >> /etc/openmpi3-x86_64/openmpi-mca-params.conf \
+ && echo 'rmaps_base_oversubscribe=1' >> /etc/openmpi3-x86_64/openmpi-mca-params.conf \
+ && echo 'module load mpi' > /etc/profile.d/zzz_enable_mpi.sh \
+ && echo 'source scl_source enable devtoolset-7' > /etc/profile.d/zzz_enable_devtoolset.sh
 
-# MPI_LIB flag for FlowVR example launching script
-ENV MPI_LIB openmpi
 ENV PDI_SYSTEM=docker-centos-7
-RUN echo -e 'module load mpi\nexport OMPI_MCA_rmaps_base_oversubscribe=1; source scl_source enable devtoolset-7' > /etc/profile.d/zzz_enable_mpi.sh
+ENV PDI_MPI=openmpi
+ENV MPI_LIB=openmpi
 
 ENV HOME /home/default
 RUN useradd -d ${HOME} -m -u 1001 -U default

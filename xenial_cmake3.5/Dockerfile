@@ -51,9 +51,9 @@ RUN chmod +x /bin/bash_run \
  && rm -rf /var/lib/apt/lists/* \
  && ln -s /usr/bin/python3 /usr/bin/python
 
-# MPI_LIB flag for FlowVR example launching script
 ENV PDI_SYSTEM=docker-ubuntu-xenial
-ENV MPI_LIB mpich
+ENV PDI_MPI=mpich
+ENV MPI_LIB=mpich
 
 ENV HOME /home/default
 RUN useradd -d ${HOME} -m -u 1001 -U default
