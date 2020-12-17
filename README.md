@@ -15,6 +15,8 @@ xenial_cmake3.5 -> xenial_libs_cmake3.5 -> xenial_libs_cmake3.10
                 `-> xenial_cmake3.10
 ```
 
+Docker images versions should correspond to the PDI version that is in progress.
+
 ## centos_base
 
 Centos 7 with the minimal set of dependencies installed to build the full PDI

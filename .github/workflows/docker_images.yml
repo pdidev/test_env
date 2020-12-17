@@ -1,8 +1,13 @@
 name: Docker Image CI
 on:
   push:
-    branches: [ master ]
+    branches:
+        - master
+        - 'v*'
   pull_request:
+defaults:
+  run:
+    shell: bash
 env:
   MAKEFLAGS: -j 4
 jobs:
@@ -20,34 +25,52 @@ jobs:
     - name: checkout PDI master
       run: |
         git clone https://gitlab.maisondelasimulation.fr/pdidev/pdi.git pdi_repo
+    - name: detect current version
+      run: |
+        if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]
+        then
+            BRANCH_NAME="${GITHUB_HEAD_REF}"
+        else
+            BRANCH_NAME="${GITHUB_REF/*\/}"
+        fi
+        echo "BRANCH_NAME=${BRANCH_NAME}"
+        set +e
+        if echo "${BRANCH_NAME}" | grep -qs '^v[0-9]*$' &> /dev/null
+        then
+            image_version="$(echo "${BRANCH_NAME}" | sed 's%^v\([0-9]*\)$%\1%')"
+        else
+            image_version="$(( 0$(git branch -r --merged | grep '^\s*origin/v[0-9]*\s*$' | sed 's%^\s*origin/v\([0-9]*\)\s*$%\1%' | sort -nu | head -n 1 ) +1 ))"
+        fi
+        echo "image_version=${image_version}"
+        echo "image_version=v${image_version}" >> $GITHUB_ENV
     - name: build xenial_cmake3.5
       run: |
-        docker build -t pdidevel/xenial_cmake3.5 xenial_cmake3.5
+        docker build -t pdidevel/xenial_cmake3.5 -t pdidevel/xenial_cmake3.5:${image_version} xenial_cmake3.5
     - name: test xenial_cmake3.5
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.5_embedded --no-pull
     - name: build xenial_cmake3.10
       run: |
-        docker build -t pdidevel/xenial_cmake3.10 xenial_cmake3.10
+        docker build -t pdidevel/xenial_cmake3.10 -t pdidevel/xenial_cmake3.10:${image_version} xenial_cmake3.10
     - name: test xenial_cmake3.10
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.10_embedded --no-pull
     - name: build xenial_libs_cmake3.5
       run: |
-        docker build -t pdidevel/xenial_libs_cmake3.5 xenial_libs_cmake3.5
+        docker build -t pdidevel/xenial_libs_cmake3.5 -t pdidevel/xenial_libs_cmake3.5:${image_version} xenial_libs_cmake3.5
     - name: test xenial_libs_cmake3.5
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.5_system --no-pull
     - name: build xenial_libs_cmake3.10
       run: |
-        docker build -t pdidevel/xenial_libs_cmake3.10 xenial_libs_cmake3.10
+        docker build -t pdidevel/xenial_libs_cmake3.10 -t pdidevel/xenial_libs_cmake3.10:${image_version} xenial_libs_cmake3.10
     - name: test xenial_libs_cmake3.10
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.10_system --no-pull
     - name: build xenial_pdi
       run: |
         cp -la pdi_repo xenial_pdi/
-        docker build -t pdidevel/xenial_pdi xenial_pdi
+        docker build -t pdidevel/xenial_pdi -t pdidevel/xenial_pdi:${image_version} xenial_pdi
     - name: publish
       if: ${{ github.event_name == 'push' }}
       env:
@@ -59,6 +82,11 @@ jobs:
         docker push pdidevel/xenial_libs_cmake3.5
         docker push pdidevel/xenial_libs_cmake3.10
         docker push pdidevel/xenial_pdi
+        docker push pdidevel/xenial_cmake3.5:${image_version}
+        docker push pdidevel/xenial_cmake3.10:${image_version}
+        docker push pdidevel/xenial_libs_cmake3.5:${image_version}
+        docker push pdidevel/xenial_libs_cmake3.10:${image_version}
+        docker push pdidevel/xenial_pdi:${image_version}
   build_centos:
     runs-on: ubuntu-latest
     steps:
@@ -73,30 +101,48 @@ jobs:
     - name: checkout PDI master
       run: |
         git clone https://gitlab.maisondelasimulation.fr/pdidev/pdi.git pdi_repo
+    - name: detect current version
+      run: |
+        if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]
+        then
+            BRANCH_NAME="${GITHUB_HEAD_REF}"
+        else
+            BRANCH_NAME="${GITHUB_REF/*\/}"
+        fi
+        echo "BRANCH_NAME=${BRANCH_NAME}"
+        set +e
+        if echo "${BRANCH_NAME}" | grep -qs '^v[0-9]*$' &> /dev/null
+        then
+            image_version="$(echo "${BRANCH_NAME}" | sed 's%^v\([0-9]*\)$%\1%')"
+        else
+            image_version="$(( 0$(git branch -r --merged | grep '^\s*origin/v[0-9]*\s*$' | sed 's%^\s*origin/v\([0-9]*\)\s*$%\1%' | sort -nu | head -n 1 ) +1 ))"
+        fi
+        echo "image_version=${image_version}"
+        echo "image_version=v${image_version}" >> $GITHUB_ENV
     - name: build centos_base
       run: |
-        docker build -t pdidevel/centos_base centos_base
+        docker build -t pdidevel/centos_base -t pdidevel/centos_base:${image_version} centos_base
     - name: build centos_cmake3.5
       run: |
-        docker build -t pdidevel/centos_cmake3.5 centos_cmake3.5
+        docker build -t pdidevel/centos_cmake3.5 -t pdidevel/centos_cmake3.5:${image_version} centos_cmake3.5
     - name: test centos_cmake3.5
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.5_embedded --no-pull
     - name: build centos_cmake3.10
       run: |
-        docker build -t pdidevel/centos_cmake3.10 centos_cmake3.10
+        docker build -t pdidevel/centos_cmake3.10 -t pdidevel/centos_cmake3.10:${image_version} centos_cmake3.10
     - name: test centos_cmake3.10
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.10_embedded --no-pull
     - name: build centos_libs_cmake3.10
       run: |
-        docker build -t pdidevel/centos_libs_cmake3.10 centos_libs_cmake3.10
+        docker build -t pdidevel/centos_libs_cmake3.10 -t pdidevel/centos_libs_cmake3.10:${image_version} centos_libs_cmake3.10
     - name: test centos_libs_cmake3.10
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.10_system --no-pull
     - name: build centos_libs_cmake3.5
       run: |
-        docker build -t pdidevel/centos_libs_cmake3.5 centos_libs_cmake3.5
+        docker build -t pdidevel/centos_libs_cmake3.5 -t pdidevel/centos_libs_cmake3.5:${image_version} centos_libs_cmake3.5
     - name: test centos_libs_cmake3.5
       run: |
         ./pdi_repo/tools/build_scripts/test_in_docker github centos_cmake3.5_system --no-pull
@@ -111,3 +157,8 @@ jobs:
         docker push pdidevel/centos_cmake3.10
         docker push pdidevel/centos_libs_cmake3.10
         docker push pdidevel/centos_libs_cmake3.5
+        docker push pdidevel/centos_base:${image_version}
+        docker push pdidevel/centos_cmake3.5:${image_version}
+        docker push pdidevel/centos_cmake3.10:${image_version}
+        docker push pdidevel/centos_libs_cmake3.10:${image_version}
+        docker push pdidevel/centos_libs_cmake3.5:${image_version}
