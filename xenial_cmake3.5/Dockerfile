@@ -23,6 +23,7 @@ RUN chmod +x /bin/bash_run \
     flex \
     freeglut3-dev \
     gfortran \
+    git \
     libhwloc-dev \
     libmpich-dev \
     libz-dev \
