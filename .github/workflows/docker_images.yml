@@ -22,6 +22,14 @@ jobs:
     - name: build bionic
       run: |
         docker build -t pdidevel/bionic -t pdidevel/bionic:${image_version} bionic
+    - name: publish
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        set -ex
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/bionic
+        docker push pdidevel/bionic:${image_version}
   build_bionic_gcc_7_4_0:
     runs-on: ubuntu-latest
     needs: build_bionic
@@ -31,7 +39,20 @@ jobs:
       run: . .github/detect_version.sh
     - name: build bionic/gcc@7.4.0
       run: |
-        docker build --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" --build-arg "GCC_VERSION=@7.4.0" -t pdidevel/bionic/gcc-7.4.0 -t pdidevel/gcc-7.4.0:${image_version} gcc
+        docker build \
+          --build-arg "GCC_VERSION=@7.4.0" \
+          --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
+          -t pdidevel/bionic/gcc-7.4.0 \
+          -t pdidevel/bionic/gcc-7.4.0:${image_version} \
+          gcc
+    - name: publish
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        set -ex
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/bionic/gcc-7.4.0
+        docker push pdidevel/bionic/gcc-7.4.0:${image_version}
   build_bionic_gcc_latest:
     runs-on: ubuntu-latest
     needs: build_bionic
@@ -41,4 +62,39 @@ jobs:
       run: . .github/detect_version.sh
     - name: build bionic/gcc@latest
       run: |
-        docker build --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" -t pdidevel/bionic/gcc-latest -t pdidevel/gcc-latest:${image_version} gcc
+        docker build \
+          --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
+          -t pdidevel/bionic/gcc-latest \
+          -t pdidevel/bionic/gcc-latest:${image_version} \
+          gcc
+    - name: publish
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        set -ex
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/bionic/gcc-latest
+        docker push pdidevel/bionic/gcc-latest:${image_version}
+  build_bionic_gcc_latest_openmpi_latest:
+    runs-on: ubuntu-latest
+    needs: build_bionic_gcc_latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: detect current version
+      run: . .github/detect_version.sh
+    - name: build bionic/gcc@latest
+      run: |
+        docker build \
+          --build-arg "MPI=openmpi" \
+          --build-arg "BASE_IMAGE=pdidevel/bionic/gcc-latest:${image_version}" \
+          -t pdidevel/bionic/gcc-latest/openmpi-latest \
+          -t pdidevel/bionic/gcc-latest/openmpi-latest:${image_version} \
+          mpi
+    - name: publish
+      env:
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      run: |
+        set -ex
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/bionic/gcc-latest/openmpi-latest
+        docker push pdidevel/bionic/gcc-latest/openmpi-latest:${image_version}
