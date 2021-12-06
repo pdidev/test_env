@@ -56,4 +56,5 @@ SHELL ["docker-shell"]
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
-RUN spack spec hdf5+mpi
+RUN spack spec hdf5+mpi \
+ && sed 's/target:.*/target: x86_64/' -i /root/.spack/linux/compilers.yaml

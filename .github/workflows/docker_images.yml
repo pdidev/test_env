@@ -68,7 +68,7 @@ jobs:
   build_cmake:
     strategy:
       matrix:
-        compiler_version:  ['gcc-latest', 'gcc-7.5.0']
+        compiler:  ['gcc-latest', 'gcc-7.5.0']
         cmake_version: ['latest', '3.10.2']
     needs: build_gcc
     runs-on: ubuntu-latest
@@ -78,32 +78,32 @@ jobs:
       run: . .github/detect_version.sh
     - name: build
       env:
-        COMPILER_VERSION: "${{ matrix.compiler_version }}"
+        COMPILER: "${{ matrix.compiler }}"
         CMAKE_VERSION: "${{ matrix.cmake_version }}"
       run: |
         set -ex
         docker build \
           --build-arg "PARALLELISM=3" \
-          --build-arg "BASE_IMAGE=pdidevel/bionic_gcc-latest:${image_version}" \
+          --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}:${image_version}" \
           --build-arg "CMAKE_VERSION=$([ latest = "${CMAKE_VERSION}" ] || echo "@${CMAKE_VERSION}")" \
-          -t pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION} \
-          -t pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}:${image_version} \
+          -t pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION} \
+          -t pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}:${image_version} \
           cmake
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        COMPILER_VERSION: "${{ matrix.compiler_version }}"
+        COMPILER: "${{ matrix.compiler }}"
         CMAKE_VERSION: "${{ matrix.cmake_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}
-        docker push pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}:${image_version}
+        docker push pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}
+        docker push pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}:${image_version}
   build_openmpi:
     strategy:
       matrix:
-        compiler_version:  ['gcc-latest', 'gcc-7.5.0']
-        cmake_version: ['latest', '3.10.2']
+        compiler:  ['gcc-latest', 'gcc-7.5.0']
+        cmake: ['cmake-latest', 'cmake-3.10.2']
         openmpi_version: ['latest', '2.1.1']
     needs: build_cmake
     runs-on: ubuntu-latest
@@ -113,36 +113,36 @@ jobs:
       run: . .github/detect_version.sh
     - name: build
       env:
-        COMPILER_VERSION: "${{ matrix.compiler_version }}"
-        CMAKE_VERSION: "${{ matrix.cmake_version }}"
+        COMPILER: "${{ matrix.compiler }}"
+        CMAKE: "${{ matrix.cmake }}"
         OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
       run: |
         set -ex
         docker build \
           --build-arg "PARALLELISM=3" \
-          --build-arg "BASE_IMAGE=pdidevel/bionic_gcc-latest_cmake-3.10.2:${image_version}" \
+          --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}_${CMAKE}:${image_version}" \
           --build-arg "MPI=openmpi$([ latest = "${OPENMPI_VERSION}" ] || echo "@${OPENMPI_VERSION}")" \
-          -t pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION} \
-          -t pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION}:${image_version} \
+          -t pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION} \
+          -t pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}:${image_version} \
           mpi
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        COMPILER_VERSION: "${{ matrix.compiler_version }}"
-        CMAKE_VERSION: "${{ matrix.cmake_version }}"
+        COMPILER: "${{ matrix.compiler }}"
+        CMAKE: "${{ matrix.cmake }}"
         OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION}
-        docker push pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION}:${image_version}
+        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}
+        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}:${image_version}
   build_libs:
     strategy:
       matrix:
-        compiler_version:  ['gcc-latest', 'gcc-7.5.0']
-        cmake_version: ['latest', '3.10.2']
-        mpi_version: ['openmpi-latest', 'openmpi-2.1.1']
-        libs: [ 'mini' ]
+        compiler:  ['gcc-latest', 'gcc-7.5.0']
+        cmake: ['cmake-latest', 'cmake-3.10.2']
+        mpi: ['openmpi-latest', 'openmpi-2.1.1']
+        libs_version: [ 'mini' ]
     needs: build_openmpi
     runs-on: ubuntu-latest
     steps:
@@ -151,28 +151,28 @@ jobs:
       run: . .github/detect_version.sh
     - name: build
       env:
-        COMPILER_VERSION: "${{ matrix.compiler_version }}"
-        CMAKE_VERSION: "${{ matrix.cmake_version }}"
-        MPI_VERSION: "${{ matrix.mpi_version }}"
-        LIBS: "${{ matrix.libs }}"
+        COMPILER: "${{ matrix.compiler }}"
+        CMAKE: "${{ matrix.cmake }}"
+        MPI`: "${{ matrix.mpi }}"
+        LIBS_VERSION: "${{ matrix.libs_version }}"
       run: |
         set -ex
         docker build \
           --build-arg "PARALLELISM=3" \
-          --build-arg "BASE_IMAGE=pdidevel/bionic_gcc-latest_cmake-3.10.2:${image_version}" \
-          --build-arg "LIBS=${LIBS}" \
-          -t pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_${MPI_VERSION}_libs-${LIBS} \
-          -t pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_${MPI_VERSION}_libs-${LIBS}:${image_version} \
-          mpi
+          --build-arg "BASE_IMAGE=bionic_${COMPILER}_${CMAKE}_${MPI}:${image_version}" \
+          --build-arg "LIBS_VERSION=${LIBS_VERSION}" \
+          -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION} \
+          -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION}:${image_version} \
+          libs
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        COMPILER_VERSION: "${{ matrix.compiler_version }}"
-        CMAKE_VERSION: "${{ matrix.cmake_version }}"
-        MPI_VERSION: "${{ matrix.mpi_version }}"
-        LIBS: "${{ matrix.libs }}"
+        COMPILER: "${{ matrix.compiler }}"
+        CMAKE: "${{ matrix.cmake }}"
+        MPI: "${{ matrix.mpi }}"
+        LIBS_VERSION: "${{ matrix.libs_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_${MPI_VERSION}_libs-${LIBS} \
-        docker push pdidevel/bionic_${COMPILER_VERSION}_cmake-${CMAKE_VERSION}_${MPI_VERSION}_libs-${LIBS}:${image_version} \
+        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION}
+        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION}:${image_version}

@@ -19,4 +19,4 @@ RUN set -ex \
  && spack load ${COMPILER} \
  && spack compiler find \
  && spack unload ${COMPILER} \
- && spack config add 'compilers:compiler:target:[x86_64]'
+ && sed 's/target:.*/target: x86_64/' -i /root/.spack/linux/compilers.yaml

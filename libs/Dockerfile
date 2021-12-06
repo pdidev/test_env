@@ -2,7 +2,7 @@ ARG BASE_IMAGE
 
 FROM ${BASE_IMAGE}
 
-ARG LIBS
+ARG LIBS_VERSION
 ARG SPACK_INSTALL_ARGS
 ARG PARALLELISM=1
 
@@ -21,8 +21,11 @@ RUN git clone https://github.com/pdidev/spack /opt/spack-pdi
 RUN spack repo add /opt/spack-pdi
 
 RUN mkdir /opt/spack-environment
-COPY tests/${LIBS}.yaml /opt/spack-environment/
-RUN mv /opt/spack-environment/${LIBS}.yaml /opt/spack-environment/spack.yaml
+COPY ${LIBS_VERSION}.yaml /opt/spack-environment/
+RUN set -ex \
+ && mv /opt/spack-environment/${LIBS_VERSION}.yaml /opt/spack-environment/spack.yaml \
+ && sed -i "s/@CMAKE@/${CMAKE}/" /opt/spack-environment/spack.yaml \
+ && cat /opt/spack-environment/spack.yaml
 
 RUN cd /opt/spack-environment \
  && spack env activate . \
