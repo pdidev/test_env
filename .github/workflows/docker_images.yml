@@ -10,8 +10,6 @@ on:
 defaults:
   run:
     shell: bash
-env:
-  MAKEFLAGS: -j 4
 jobs:
   build_bionic:
     runs-on: ubuntu-latest
@@ -150,12 +148,12 @@ jobs:
       env:
         COMPILER: "${{ matrix.compiler }}"
         CMAKE: "${{ matrix.cmake }}"
-        MPI`: "${{ matrix.mpi }}"
+        MPI: "${{ matrix.mpi }}"
         LIBS_VERSION: "${{ matrix.libs_version }}"
       run: |
         set -ex
         docker build \
-          --build-arg "BASE_IMAGE=bionic_${COMPILER}_${CMAKE}_${MPI}:${image_version}" \
+          --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}:${image_version}" \
           --build-arg "LIBS_VERSION=${LIBS_VERSION}" \
           -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION} \
           -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION}:${image_version} \

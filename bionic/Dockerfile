@@ -59,7 +59,8 @@ SHELL ["docker-shell"]
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
-RUN spack install ${SPACK_INSTALL_ARGS} --reuse patchelf target=x86_64 \
+RUN spack solve --reuse patchelf target=x86_64 \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse patchelf target=x86_64 \
  && spack spec hdf5+mpi \
  && spack reindex \
  && sed 's/target:.*/target: x86_64/' -i /root/.spack/linux/compilers.yaml

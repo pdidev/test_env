@@ -11,7 +11,8 @@ ENV COMPILER=gcc${GCC_VERSION}
 SHELL ["/usr/local/bin/spack-env", "/bin/bash", "-c"]
 
 RUN set -ex \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "${COMPILER}" target=x86_64 \
+ && spack solve --reuse "${COMPILER}" target=x86_64 ~bootstrap \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "${COMPILER}" target=x86_64 ~bootstrap \
  && spack load ${COMPILER} \
  && spack compiler find \
  && spack unload ${COMPILER} \

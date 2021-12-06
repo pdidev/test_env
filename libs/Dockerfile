@@ -38,4 +38,5 @@ RUN cd /opt/spack-environment \
 
 RUN cd /opt/spack-environment \
  && spack env activate . \
+ && spack solve --reuse \
  && spack install ${SPACK_INSTALL_ARGS} --reuse
