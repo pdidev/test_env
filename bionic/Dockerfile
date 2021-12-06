@@ -1,5 +1,9 @@
 FROM ubuntu:18.04
 
+ARG SPACK_INSTALL_ARGS
+
+ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--verbose --fail-fast"}
+
 ENV DOCKERFILE_BASE=ubuntu            \
     DOCKERFILE_DISTRO=ubuntu          \
     DOCKERFILE_DISTRO_VERSION=18.04   \
@@ -46,9 +50,8 @@ RUN set -ex \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env \
- && mkdir -p /root/.spack \
- && cp ${SPACK_ROOT}/share/spack/docker/modules.yaml /root/.spack/modules.yaml \
  && rm -rf /root/*.* /run/nologin ${SPACK_ROOT}/.git \
+ && mkdir -p /root/.spack \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
 WORKDIR /root
@@ -56,5 +59,7 @@ SHELL ["docker-shell"]
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
-RUN spack spec hdf5+mpi \
+RUN spack install ${SPACK_INSTALL_ARGS} --reuse patchelf target=x86_64 \
+ && spack spec hdf5+mpi \
+ && spack reindex \
  && sed 's/target:.*/target: x86_64/' -i /root/.spack/linux/compilers.yaml

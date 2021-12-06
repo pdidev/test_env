@@ -4,9 +4,8 @@ FROM ${BASE_IMAGE}
 
 ARG LIBS_VERSION
 ARG SPACK_INSTALL_ARGS
-ARG PARALLELISM=1
 
-ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--show-log-on-error --fail-fast"}
+ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--verbose --test=all --fail-fast"}
 ENV MPI=${MPI}
 
 SHELL ["/usr/local/bin/spack-env", "/bin/bash", "-c"]
@@ -39,9 +38,4 @@ RUN cd /opt/spack-environment \
 
 RUN cd /opt/spack-environment \
  && spack env activate . \
- && ( for N in {2..${PARALLELISM}} \
-    ; do spack install ${SPACK_INSTALL_ARGS} --reuse \
-    & done \
-   && spack install ${SPACK_INSTALL_ARGS} --reuse \
-    ) \
- || tail -n +1 -- /tmp/root/spack-stage/spack-stage-*/spack-*-out.txt
+ && spack install ${SPACK_INSTALL_ARGS} --reuse

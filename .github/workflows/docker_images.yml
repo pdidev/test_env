@@ -50,7 +50,6 @@ jobs:
       run: |
         set -ex
         docker build \
-          --build-arg "PARALLELISM=3" \
           --build-arg "GCC_VERSION=$([ latest = "${GCC_VERSION}" ] || echo "@${GCC_VERSION}")" \
           --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
           -t pdidevel/bionic_gcc-${GCC_VERSION} \
@@ -83,7 +82,6 @@ jobs:
       run: |
         set -ex
         docker build \
-          --build-arg "PARALLELISM=3" \
           --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}:${image_version}" \
           --build-arg "CMAKE_VERSION=$([ latest = "${CMAKE_VERSION}" ] || echo "@${CMAKE_VERSION}")" \
           -t pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION} \
@@ -119,7 +117,6 @@ jobs:
       run: |
         set -ex
         docker build \
-          --build-arg "PARALLELISM=3" \
           --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}_${CMAKE}:${image_version}" \
           --build-arg "MPI=openmpi$([ latest = "${OPENMPI_VERSION}" ] || echo "@${OPENMPI_VERSION}")" \
           -t pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION} \
@@ -158,7 +155,6 @@ jobs:
       run: |
         set -ex
         docker build \
-          --build-arg "PARALLELISM=3" \
           --build-arg "BASE_IMAGE=bionic_${COMPILER}_${CMAKE}_${MPI}:${image_version}" \
           --build-arg "LIBS_VERSION=${LIBS_VERSION}" \
           -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_libs-${LIBS_VERSION} \
