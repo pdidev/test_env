@@ -36,12 +36,12 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/bionic
         docker push pdidevel/bionic:${image_version}
-  build_bionic_gcc_7_4_0:
+  build_gcc:
     strategy:
       matrix:
         gcc_version: ['latest', '7.4.0']
-    runs-on: ubuntu-latest
     needs: build_bionic
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: detect current version
@@ -51,14 +51,8 @@ jobs:
         GCC_VERSION: "${{ matrix.gcc_version }}"
       run: |
         set -ex
-        if [ latest = "${GCC_VERSION}" ] 
-        then
-          DOCKER_GCC_VERSION=""
-        else 
-          DOCKER_GCC_VERSION="@${GCC_VERSION}"
-        fi
         docker build \
-          --build-arg "GCC_VERSION=${DOCKER_GCC_VERSION}" \
+          --build-arg "GCC_VERSION=$([ latest = "${GCC_VERSION}" ] || echo "@${GCC_VERSION}")" \
           --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
           -t pdidevel/bionic_gcc-${GCC_VERSION} \
           -t pdidevel/bionic_gcc-${GCC_VERSION}:${image_version} \
@@ -72,74 +66,72 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/bionic_gcc-${GCC_VERSION}
         docker push pdidevel/bionic_gcc-${GCC_VERSION}:${image_version}
-  build_bionic_gcc_latest:
+  build_cmake:
+    strategy:
+      matrix:
+        gcc_version: ['latest', '7.4.0']
+        cmake_version: ['latest', '3.10.2']
+    needs: build_gcc
     runs-on: ubuntu-latest
-    needs: build_bionic
     steps:
     - uses: actions/checkout@v2
     - name: detect current version
       run: . .github/detect_version.sh
     - name: build
-      run: |
-        set -ex
-        docker build \
-          --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
-          -t pdidevel/bionic_gcc-latest \
-          -t pdidevel/bionic_gcc-latest:${image_version} \
-          gcc
-    - name: publish
       env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      run: |
-        set -ex
-        docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_gcc-latest
-        docker push pdidevel/bionic_gcc-latest:${image_version}
-  build_bionic_gcc_latest_cmake_3_10_2:
-    runs-on: ubuntu-latest
-    needs: build_bionic_gcc_latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
-    - name: build
+        GCC_VERSION: "${{ matrix.gcc_version }}"
+        CMAKE_VERSION: "${{ matrix.cmake_version }}"
       run: |
         set -ex
         docker build \
           --build-arg "BASE_IMAGE=pdidevel/bionic_gcc-latest:${image_version}" \
-          --build-arg "CMAKE_VERSION=@3.10.2" \
-          -t pdidevel/bionic_gcc-latest_cmake-3.10.2 \
-          -t pdidevel/bionic_gcc-latest_cmake-3.10.2:${image_version} \
+          --build-arg "CMAKE_VERSION=$([ latest = "${CMAKE_VERSION}" ] || echo "@${CMAKE_VERSION}")" \
+          -t pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION} \
+          -t pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}:${image_version} \
           cmake
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        GCC_VERSION: "${{ matrix.gcc_version }}"
+        CMAKE_VERSION: "${{ matrix.cmake_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_gcc-latest_cmake-3.10.2
-        docker push pdidevel/bionic_gcc-latest_cmake-3.10.2:${image_version}
-  build_bionic_gcc_latest_cmake_3_10_2_openmpi_latest:
+        docker push pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}
+        docker push pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}:${image_version}
+  build_openmpi:
+    strategy:
+      matrix:
+        gcc_version: ['latest', '7.4.0']
+        cmake_version: ['latest', '3.10.2']
+        openmpi_version: ['latest', '']
+    needs: build_cmake
     runs-on: ubuntu-latest
-    needs: build_bionic_gcc_latest_cmake_3_10_2
     steps:
     - uses: actions/checkout@v2
     - name: detect current version
       run: . .github/detect_version.sh
     - name: build
+      env:
+        GCC_VERSION: "${{ matrix.gcc_version }}"
+        CMAKE_VERSION: "${{ matrix.cmake_version }}"
+        OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
       run: |
         set -ex
         docker build \
           --build-arg "BASE_IMAGE=pdidevel/bionic_gcc-latest_cmake-3.10.2:${image_version}" \
-          --build-arg "MPI=openmpi" \
-          -t pdidevel/bionic_gcc-latest_cmake-3.10.2_openmpi-latest \
-          -t pdidevel/bionic_gcc-latest_cmake-3.10.2_openmpi-latest:${image_version} \
+          --build-arg "MPI=openmpi$([ latest = "${OPENMPI_VERSION}" ] || echo "@${OPENMPI_VERSION}")" \
+          -t pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION} \
+          -t pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION}:${image_version} \
           mpi
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        GCC_VERSION: "${{ matrix.gcc_version }}"
+        CMAKE_VERSION: "${{ matrix.cmake_version }}"
+        OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_gcc-latest_cmake-3.10.2_openmpi-latest
-        docker push pdidevel/bionic_gcc-latest_cmake-3.10.2_openmpi-latest:${image_version}
+        docker push pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION}
+        docker push pdidevel/bionic_gcc-${GCC_VERSION}_cmake-${CMAKE_VERSION}_openmpi-${OPENMPI_VERSION}:${image_version}
