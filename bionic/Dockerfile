@@ -42,7 +42,7 @@ RUN set -ex \
  && locale-gen ${LC_ALL} \
  && pip3 --no-cache-dir install boto3 \
  && mkdir -p ${SPACK_ROOT} \
- && git clone https://github.com/spack/spack.git ${SPACK_ROOT} \
+ && git clone --depth 1 https://github.com/spack/spack.git ${SPACK_ROOT} \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env \

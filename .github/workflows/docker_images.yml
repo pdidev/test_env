@@ -18,99 +18,27 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: detect current version
-      run: |
-        if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]
-        then
-            BRANCH_NAME="${GITHUB_HEAD_REF}"
-        else
-            BRANCH_NAME="${GITHUB_REF/*\/}"
-        fi
-        echo "BRANCH_NAME=${BRANCH_NAME}"
-        set +e
-        if echo "${BRANCH_NAME}" | grep -qs '^v[0-9]*$' &> /dev/null
-        then
-            image_version="$(echo "${BRANCH_NAME}" | sed 's%^v\([0-9]*\)$%\1%')"
-        else
-            image_version="$(( 0$(git branch -r --merged | grep '^\s*origin/v[0-9]*\s*$' | sed 's%^\s*origin/v\([0-9]*\)\s*$%\1%' | sort -nu | head -n 1 ) +1 ))"
-        fi
-        echo "image_version=${image_version}"
-        echo "image_version=v${image_version}" >> $GITHUB_ENV
+      run: . .github/detect_version.sh
     - name: build bionic
       run: |
         docker build -t pdidevel/bionic -t pdidevel/bionic:${image_version} bionic
-  build_xenial:
+  build_bionic_gcc_7_4_0:
     runs-on: ubuntu-latest
+    needs: build_bionic
     steps:
-    - name: Setup python
-      uses: actions/setup-python@v2
-      with:
-       python-version: '3.9'
-    - name: Setup python deps
-      run: |
-        python3 -m pip install PyYAML
     - uses: actions/checkout@v2
-    - name: checkout PDI master
-      run: |
-        git clone https://gitlab.maisondelasimulation.fr/pdidev/pdi.git pdi_repo
     - name: detect current version
+      run: . .github/detect_version.sh
+    - name: build bionic/gcc@7.4.0
       run: |
-        if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]
-        then
-            BRANCH_NAME="${GITHUB_HEAD_REF}"
-        else
-            BRANCH_NAME="${GITHUB_REF/*\/}"
-        fi
-        echo "BRANCH_NAME=${BRANCH_NAME}"
-        set +e
-        if echo "${BRANCH_NAME}" | grep -qs '^v[0-9]*$' &> /dev/null
-        then
-            image_version="$(echo "${BRANCH_NAME}" | sed 's%^v\([0-9]*\)$%\1%')"
-        else
-            image_version="$(( 0$(git branch -r --merged | grep '^\s*origin/v[0-9]*\s*$' | sed 's%^\s*origin/v\([0-9]*\)\s*$%\1%' | sort -nu | head -n 1 ) +1 ))"
-        fi
-        echo "image_version=${image_version}"
-        echo "image_version=v${image_version}" >> $GITHUB_ENV
-    - name: build xenial_cmake3.5
+        docker build --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" --build-arg "GCC_VERSION=@7.4.0" -t pdidevel/bionic/gcc-7.4.0 -t pdidevel/gcc-7.4.0:${image_version} gcc
+  build_bionic_gcc_latest:
+    runs-on: ubuntu-latest
+    needs: build_bionic
+    steps:
+    - uses: actions/checkout@v2
+    - name: detect current version
+      run: . .github/detect_version.sh
+    - name: build bionic/gcc@latest
       run: |
-        docker build -t pdidevel/xenial_cmake3.5 -t pdidevel/xenial_cmake3.5:${image_version} xenial_cmake3.5
-    - name: test xenial_cmake3.5
-      run: |
-        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.5_embedded --no-pull
-    - name: build xenial_cmake3.10
-      run: |
-        docker build -t pdidevel/xenial_cmake3.10 -t pdidevel/xenial_cmake3.10:${image_version} xenial_cmake3.10
-    - name: test xenial_cmake3.10
-      run: |
-        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.10_embedded --no-pull
-    - name: build xenial_libs_cmake3.5
-      run: |
-        docker build -t pdidevel/xenial_libs_cmake3.5 -t pdidevel/xenial_libs_cmake3.5:${image_version} xenial_libs_cmake3.5
-    - name: test xenial_libs_cmake3.5
-      run: |
-        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.5_system --no-pull
-    - name: build xenial_libs_cmake3.10
-      run: |
-        docker build -t pdidevel/xenial_libs_cmake3.10 -t pdidevel/xenial_libs_cmake3.10:${image_version} xenial_libs_cmake3.10
-    - name: test xenial_libs_cmake3.10
-      run: |
-        ./pdi_repo/tools/build_scripts/test_in_docker github xenial_cmake3.10_system --no-pull
-    - name: build xenial_pdi
-      run: |
-        cp -la pdi_repo xenial_pdi/
-        docker build -t pdidevel/xenial_pdi -t pdidevel/xenial_pdi:${image_version} xenial_pdi
-    - name: publish
-      if: ${{ github.event_name == 'push' }}
-      env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      run: |
-        docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/xenial_cmake3.5
-        docker push pdidevel/xenial_cmake3.10
-        docker push pdidevel/xenial_libs_cmake3.5
-        docker push pdidevel/xenial_libs_cmake3.10
-        docker push pdidevel/xenial_pdi
-        docker push pdidevel/xenial_cmake3.5:${image_version}
-        docker push pdidevel/xenial_cmake3.10:${image_version}
-        docker push pdidevel/xenial_libs_cmake3.5:${image_version}
-        docker push pdidevel/xenial_libs_cmake3.10:${image_version}
-        docker push pdidevel/xenial_pdi:${image_version}
+        docker build --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" -t pdidevel/bionic/gcc-latest -t pdidevel/gcc-latest:${image_version} gcc
