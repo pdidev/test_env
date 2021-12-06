@@ -40,8 +40,8 @@ RUN cd /opt/spack-environment \
 RUN cd /opt/spack-environment \
  && spack env activate . \
  && ( for N in {2..${PARALLELISM}} \
-    ; do spack install ${SPACK_INSTALL_ARGS} \
+    ; do spack install ${SPACK_INSTALL_ARGS} --reuse \
     & done \
-   && spack install ${SPACK_INSTALL_ARGS} \
+   && spack install ${SPACK_INSTALL_ARGS} --reuse \
     ) \
  || tail -n +1 -- /tmp/root/spack-stage/spack-stage-*/spack-*-out.txt

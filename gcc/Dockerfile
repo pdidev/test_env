@@ -13,9 +13,9 @@ SHELL ["/usr/local/bin/spack-env", "/bin/bash", "-c"]
 
 RUN set -ex \
  && for N in {2..${PARALLELISM}} \
-  ; do spack install ${SPACK_INSTALL_ARGS}  "${COMPILER}" \
+  ; do spack install ${SPACK_INSTALL_ARGS} --reuse "${COMPILER}" target=x86_64 \
   & done \
- && spack install ${SPACK_INSTALL_ARGS} "${COMPILER}" \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "${COMPILER}" target=x86_64 \
  && spack load ${COMPILER} \
  && spack compiler find \
  && spack unload ${COMPILER} \
