@@ -11,4 +11,4 @@ ENV CMAKE=cmake${CMAKE_VERSION}
 SHELL ["/usr/local/bin/spack-env", "/bin/bash", "-c"]
 
 RUN set -ex \
- && spack install "${CMAKE}%${COMPILER}"
+ && spack install ${SPACK_INSTALL_ARGS} "${CMAKE}%${COMPILER}"
