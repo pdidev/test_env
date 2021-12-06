@@ -10,7 +10,8 @@ ENV COMPILER=gcc${GCC_VERSION}
 
 SHELL ["/usr/local/bin/spack-env", "/bin/bash", "-c"]
 
-RUN spack install ${COMPILER} \
+RUN set -ex \
+ && spack install ${COMPILER} \
  && spack load ${COMPILER} \
  && spack compiler find \
  && spack unload ${COMPILER}

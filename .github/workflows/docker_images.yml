@@ -37,6 +37,9 @@ jobs:
         docker push pdidevel/bionic
         docker push pdidevel/bionic:${image_version}
   build_bionic_gcc_7_4_0:
+    strategy:
+      matrix:
+        gcc_version: ['latest', '7.4.0']
     runs-on: ubuntu-latest
     needs: build_bionic
     steps:
@@ -44,22 +47,31 @@ jobs:
     - name: detect current version
       run: . .github/detect_version.sh
     - name: build
+      env:
+        GCC_VERSION: "${{ matrix.gcc_version }}"
       run: |
         set -ex
+        if [ latest = "${GCC_VERSION}" ] 
+        then
+          DOCKER_GCC_VERSION=""
+        else 
+          DOCKER_GCC_VERSION="@${GCC_VERSION}"
+        fi
         docker build \
-          --build-arg "GCC_VERSION=@7.4.0" \
+          --build-arg "GCC_VERSION=${DOCKER_GCC_VERSION}" \
           --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
-          -t pdidevel/bionic_gcc-7.4.0 \
-          -t pdidevel/bionic_gcc-7.4.0:${image_version} \
+          -t pdidevel/bionic_gcc-${GCC_VERSION} \
+          -t pdidevel/bionic_gcc-${GCC_VERSION}:${image_version} \
           gcc
     - name: publish
       env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GCC_VERSION: "${{ matrix.gcc_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_gcc-7.4.0
-        docker push pdidevel/bionic_gcc-7.4.0:${image_version}
+        docker push pdidevel/bionic_gcc-${GCC_VERSION}
+        docker push pdidevel/bionic_gcc-${GCC_VERSION}:${image_version}
   build_bionic_gcc_latest:
     runs-on: ubuntu-latest
     needs: build_bionic

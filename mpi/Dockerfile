@@ -10,4 +10,5 @@ ENV MPI=${MPI}
 
 SHELL ["/usr/local/bin/spack-env", "/bin/bash", "-c"]
 
-RUN spack install "${MPI}%${COMPILER}" "^${CMAKE}"
+RUN set -ex \
+ && spack install "${MPI}%${COMPILER}" "^${CMAKE}"
