@@ -35,7 +35,7 @@ jobs:
   build_gcc_2:
     strategy:
       matrix:
-        gcc_version: ['latest', '7.5.0']
+        gcc_version: ['11.2.0', '7.5.0']
     needs: build_bionic_1
     runs-on: ubuntu-latest
     steps:
