@@ -11,7 +11,7 @@ defaults:
   run:
     shell: bash
 jobs:
-  build_bionic_1:
+  step1_build_bionic:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -32,11 +32,11 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/bionic
         docker push pdidevel/bionic:${image_version}
-  build_gcc_2:
+  step2_build_gcc:
     strategy:
       matrix:
         gcc_version: ['11.2.0', '7.5.0']
-    needs: build_bionic_1
+    needs: step1_build_bionic
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -62,12 +62,12 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/bionic_gcc-${GCC_VERSION}
         docker push pdidevel/bionic_gcc-${GCC_VERSION}:${image_version}
-  build_cmake_3:
+  step3_build_cmake:
     strategy:
       matrix:
         compiler:  ['gcc-latest', 'gcc-7.5.0']
         cmake_version: ['latest', '3.10.2']
-    needs: build_gcc_2
+    needs: step2_build_gcc
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -95,13 +95,13 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}
         docker push pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}:${image_version}
-  build_openmpi_4:
+  step4_build_openmpi:
     strategy:
       matrix:
         compiler:  ['gcc-latest', 'gcc-7.5.0']
         cmake: ['cmake-latest', 'cmake-3.10.2']
         openmpi_version: ['latest', '2.1.1']
-    needs: build_cmake_3
+    needs: step3_build_cmake
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -131,14 +131,14 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}
         docker push pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}:${image_version}
-  build_optlibs_5:
+  step5_build_optlibs:
     strategy:
       matrix:
         compiler:  ['gcc-latest', 'gcc-7.5.0']
         cmake: ['cmake-latest', 'cmake-3.10.2']
         mpi: ['openmpi-latest', 'openmpi-2.1.1']
         optlibs_version: [ 'oldest' ]
-    needs: build_openmpi_4
+    needs: step4_build_openmpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
