@@ -22,23 +22,26 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
-        build-essential \
-        ca-certificates \
-        curl \
-        file \
-        g++ \
-        gcc \
-        gfortran \
-        git \
-        gnupg2 \
-        iproute2 \
-        locales \
-        make \
-        python3 \
-        python3-pip \
-        python3-setuptools \
-        tcl \
-        unzip \
+            build-essential \
+            ca-certificates \
+            curl \
+            file \
+            g++ \
+            gcc \
+            gfortran \
+            git \
+            gnupg2 \
+            iproute2 \
+            libssl-dev \
+            locales \
+            make \
+            python3 \
+            python3-dev \
+            python3-pip \
+            python3-setuptools \
+            python3-venv \
+            tcl \
+            unzip \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
@@ -59,8 +62,8 @@ SHELL ["docker-shell"]
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
-RUN spack solve --reuse patchelf target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse patchelf target=x86_64 \
+RUN spack external find --not-buildable \
  && spack spec hdf5+mpi \
  && spack reindex \
+ && spack config add "packages:all:compiler:[${COMPILER}]" \
  && sed 's/target:.*/target: x86_64/' -i /root/.spack/linux/compilers.yaml

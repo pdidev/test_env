@@ -1,0 +1,15 @@
+spack:
+  concretization: together
+  specs:
+  - matrix:
+    - [ '%@COMPILER@' ]
+    - [ 'target=x86_64' ]
+    -
+      - freeglut
+      - glew
+      - hwloc
+      - libxml2
+      - libxmu
+      - libxslt
+      - mesa~glx~llvm~opengl
+      - swig
