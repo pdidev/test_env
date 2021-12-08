@@ -18,6 +18,7 @@ RUN mkdir /opt/baselibs-env
 COPY baselibs.yaml /opt/baselibs-env/spack.yaml
 RUN sed -i "s/@COMPILER@/${COMPILER}/" /opt/baselibs-env/spack.yaml \
  && spack env activate /opt/baselibs-env \
+ && spack config add "packages:all:target:[x86_64]" \
  && spack config add "packages:all:compiler:[${COMPILER}]" \
  && spack concretize --test=all --reuse \
  && spack install ${SPACK_INSTALL_ARGS}

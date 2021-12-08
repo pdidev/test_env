@@ -11,5 +11,5 @@ spack:
       - libxml2
       - libxmu
       - libxslt
-      - mesa~glx~llvm~opengl
+      - mesa~llvm
       - swig

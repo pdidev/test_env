@@ -35,7 +35,7 @@ jobs:
   step2_build_gcc:
     strategy:
       matrix:
-        gcc_version: ['11.2.0', '7.5.0']
+        gcc_version: ['latest', '7.5.0']
     needs: step1_build_bionic
     runs-on: ubuntu-latest
     steps:
@@ -66,7 +66,7 @@ jobs:
     strategy:
       matrix:
         compiler:  ['gcc-latest', 'gcc-7.5.0']
-        cmake_version: ['latest', '3.10.2']
+        cmake_version: ['latest', '3.10.0']
     needs: step2_build_gcc
     runs-on: ubuntu-latest
     steps:
@@ -99,7 +99,7 @@ jobs:
     strategy:
       matrix:
         compiler:  ['gcc-latest', 'gcc-7.5.0']
-        cmake: ['cmake-latest', 'cmake-3.10.2']
+        cmake: ['cmake-latest', 'cmake-3.10.0']
         openmpi_version: ['latest', '2.1.1']
     needs: step3_build_cmake
     runs-on: ubuntu-latest
@@ -135,7 +135,7 @@ jobs:
     strategy:
       matrix:
         compiler:  ['gcc-latest', 'gcc-7.5.0']
-        cmake: ['cmake-latest', 'cmake-3.10.2']
+        cmake: ['cmake-latest', 'cmake-3.10.0']
         mpi: ['openmpi-latest', 'openmpi-2.1.1']
         optlibs_version: [ 'oldest' ]
     needs: step4_build_openmpi

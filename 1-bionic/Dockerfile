@@ -65,5 +65,5 @@ CMD ["interactive-shell"]
 RUN spack external find --not-buildable \
  && spack spec hdf5+mpi \
  && spack reindex \
- && spack config add "packages:all:compiler:[${COMPILER}]" \
+ && spack config add "packages:all:target:[x86_64]" \
  && sed 's/target:.*/target: x86_64/' -i /root/.spack/linux/compilers.yaml
