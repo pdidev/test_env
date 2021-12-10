@@ -18,6 +18,9 @@ The parameters are as follow:
   - `gcc_7.5.0`  the oldest version of GCC supported by PDI,
   - `gcc_latest` the latest version of GCC available in spack at the time of
     generation,
+  - `clang_8.0.0`  the oldest version of clang supported by PDI,
+  - `clang_latest` the latest version of clang available in spack at the time
+    of generation,
 * mpi:
   - `openmpi_2.1.1`  the oldest version of OpenMPI supported by PDI,
   - `openmpi_latest` the latest version of OpenMPI available in spack at the

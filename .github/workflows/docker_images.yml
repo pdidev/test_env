@@ -34,10 +34,10 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nocompiler-nobaselibs-nompi
         docker push pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}
-  step2_build_gcc:
+  step2_build_compiler:
     strategy:
       matrix:
-        gcc_version: ['latest', '7.5.0']
+        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
     needs: step1_build_base
     runs-on: ubuntu-latest
     steps:
@@ -46,31 +46,31 @@ jobs:
       run: . .github/detect_version.sh
     - name: build
       env:
-        GCC_VERSION: "${{ matrix.gcc_version }}"
+        COMPILER: "${{ matrix.compiler }}"
       run: |
         set -ex
-        docker pull pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi || true
+        docker pull pdidevel/pditst:${COMPILER}-nobaselibs-nompi || true
         docker build --pull \
-          --cache-from pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi \
-          --build-arg "GCC_VERSION=$([ latest = "${GCC_VERSION}" ] || echo "@${GCC_VERSION}")" \
+          --cache-from pdidevel/pditst:${COMPILER}-nobaselibs-nompi \
+          --build-arg "COMPILER=$(echo -n ${COMPILER} | sed -e s/_/@/ -e s/@latest//)" \
           --build-arg "BASE_IMAGE=pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}" \
-          -t pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi \
-          -t pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi-${image_version} \
-          2-gcc
+          -t pdidevel/pditst:${COMPILER}-nobaselibs-nompi \
+          -t pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version} \
+          2-compiler
     - name: publish
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
-        GCC_VERSION: "${{ matrix.gcc_version }}"
+        COMPILER: "${{ matrix.compiler }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi
-        docker push pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi-${image_version}
+        docker push pdidevel/pditst:${COMPILER}-nobaselibs-nompi
+        docker push pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version}
   step3_build_baselibs:
     strategy:
       matrix:
-        compiler:  ['gcc_latest', 'gcc_7.5.0']
-    needs: step2_build_gcc
+        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
+    needs: step2_build_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -100,8 +100,8 @@ jobs:
   step4_build_openmpi:
     strategy:
       matrix:
-        compiler:        ['gcc_latest', 'gcc_7.5.0']
-        openmpi_version: ['latest',     '2.1.1']
+        compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
+        openmpi_version: ['latest', '2.1.1']
     needs: step3_build_baselibs
     runs-on: ubuntu-latest
     steps:
@@ -135,9 +135,9 @@ jobs:
   step5_build-libs:
     strategy:
       matrix:
-        compiler:        ['gcc_latest',     'gcc_7.5.0']
+        compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:             ['openmpi_latest', 'openmpi_2.1.1']
-        optlibs_version: ['latest',         'oldest']
+        optlibs_version: ['latest', 'oldest']
     needs: step4_build_openmpi
     runs-on: ubuntu-latest
     steps:
