@@ -22,6 +22,7 @@ jobs:
         set -ex
         docker pull pdidevel/pditst:nocompiler-nobaselibs-nompi || true
         docker build --pull \
+          --cache-from pdidevel/pditst:nocompiler-nobaselibs-nompi \
           -t pdidevel/pditst:nocompiler-nobaselibs-nompi \
           -t pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version} \
           1-bionic
@@ -50,6 +51,7 @@ jobs:
         set -ex
         docker pull pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi || true
         docker build --pull \
+          --cache-from pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi \
           --build-arg "GCC_VERSION=$([ latest = "${GCC_VERSION}" ] || echo "@${GCC_VERSION}")" \
           --build-arg "BASE_IMAGE=pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}" \
           -t pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi \
@@ -81,6 +83,7 @@ jobs:
         set -ex
         docker pull pdidevel/pditst:${COMPILER}-nompi || true
         docker build --pull \
+          --cache-from pdidevel/pditst:${COMPILER}-nompi \
           --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version}" \
           -t pdidevel/pditst:${COMPILER}-nompi \
           -t pdidevel/pditst:${COMPILER}-nompi-${image_version} \
@@ -113,6 +116,7 @@ jobs:
         set -ex
         docker pull pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} || true
         docker build --pull \
+          --cache-from pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} \
           --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nompi-${image_version}" \
           --build-arg "MPI=openmpi$([ latest = "${OPENMPI_VERSION}" ] || echo "@${OPENMPI_VERSION}")" \
           -t pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} \
@@ -149,6 +153,7 @@ jobs:
         set -ex
         docker pull pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} || true
         docker build --pull \
+          --cache-from pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
           --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-${MPI}-${image_version}" \
           --build-arg "OPTLIBS_VERSION=${OPTLIBS_VERSION}" \
           -t pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
