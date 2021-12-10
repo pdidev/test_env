@@ -14,6 +14,6 @@ spack:
       - netcdf-c
       - py-pybind11
       - py-pyyaml
-      - sionlib~fortran
+      - sionlib
       - spdlog
       - hdf5

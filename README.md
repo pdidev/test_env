@@ -23,9 +23,8 @@ The parameters are as follow:
   - `openmpi_latest` the latest version of OpenMPI available in spack at the
     time of generation,
 * libs:
-  - The version without `_${optlibs}` is the version where the "vendored"
-    libraries from PDI are used,
-  - `optlibs_oldest` the oldest versions of "vendored" libraries supported by
-    PDI,
-  - `optlibs_latest` the latest versions of "vendored" libraries supported by
-    PDI.
+  - without `-${libs}`: libraries "vendored" in PDI are not included,
+  - `libs_oldest` the oldest versions of the libraries "vendored" in PDI are
+    included,
+  - `libs_latest` the latest versions of the libraries "vendored" in PDI are
+    included,
