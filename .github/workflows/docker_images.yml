@@ -11,7 +11,7 @@ defaults:
   run:
     shell: bash
 jobs:
-  step1_build_bionic:
+  step1_build_base:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -20,9 +20,10 @@ jobs:
     - name: build
       run: |
         set -ex
-        docker build \
-          -t pdidevel/bionic \
-          -t pdidevel/bionic:${image_version} \
+        docker pull pdidevel/pditst:nocompiler-nobaselibs-nompi || true
+        docker build --pull \
+          -t pdidevel/pditst:nocompiler-nobaselibs-nompi \
+          -t pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version} \
           1-bionic
     - name: publish
       env:
@@ -30,13 +31,13 @@ jobs:
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic
-        docker push pdidevel/bionic:${image_version}
+        docker push pdidevel/pditst:nocompiler-nobaselibs-nompi
+        docker push pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}
   step2_build_gcc:
     strategy:
       matrix:
         gcc_version: ['latest', '7.5.0']
-    needs: step1_build_bionic
+    needs: step1_build_base
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -47,11 +48,12 @@ jobs:
         GCC_VERSION: "${{ matrix.gcc_version }}"
       run: |
         set -ex
-        docker build \
+        docker pull pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi || true
+        docker build --pull \
           --build-arg "GCC_VERSION=$([ latest = "${GCC_VERSION}" ] || echo "@${GCC_VERSION}")" \
-          --build-arg "BASE_IMAGE=pdidevel/bionic:${image_version}" \
-          -t pdidevel/bionic_gcc-${GCC_VERSION} \
-          -t pdidevel/bionic_gcc-${GCC_VERSION}:${image_version} \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}" \
+          -t pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi \
+          -t pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi-${image_version} \
           2-gcc
     - name: publish
       env:
@@ -60,13 +62,12 @@ jobs:
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_gcc-${GCC_VERSION}
-        docker push pdidevel/bionic_gcc-${GCC_VERSION}:${image_version}
-  step3_build_cmake:
+        docker push pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi
+        docker push pdidevel/pditst:gcc_${GCC_VERSION}-nobaselibs-nompi-${image_version}
+  step3_build_baselibs:
     strategy:
       matrix:
-        compiler:  ['gcc-latest', 'gcc-7.5.0']
-        cmake_version: ['latest', '3.10.0']
+        compiler:  ['gcc_latest', 'gcc_7.5.0']
     needs: step2_build_gcc
     runs-on: ubuntu-latest
     steps:
@@ -76,32 +77,29 @@ jobs:
     - name: build
       env:
         COMPILER: "${{ matrix.compiler }}"
-        CMAKE_VERSION: "${{ matrix.cmake_version }}"
       run: |
         set -ex
-        docker build \
-          --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}:${image_version}" \
-          --build-arg "CMAKE_VERSION=$([ latest = "${CMAKE_VERSION}" ] || echo "@${CMAKE_VERSION}")" \
-          -t pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION} \
-          -t pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}:${image_version} \
-          3-cmake
+        docker pull pdidevel/pditst:${COMPILER}-nompi || true
+        docker build --pull \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version}" \
+          -t pdidevel/pditst:${COMPILER}-nompi \
+          -t pdidevel/pditst:${COMPILER}-nompi-${image_version} \
+          3-baselibs
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         COMPILER: "${{ matrix.compiler }}"
-        CMAKE_VERSION: "${{ matrix.cmake_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}
-        docker push pdidevel/bionic_${COMPILER}_cmake-${CMAKE_VERSION}:${image_version}
+        docker push pdidevel/pditst:${COMPILER}-nompi
+        docker push pdidevel/pditst:${COMPILER}-nompi-${image_version}
   step4_build_openmpi:
     strategy:
       matrix:
-        compiler:  ['gcc-latest', 'gcc-7.5.0']
-        cmake: ['cmake-latest', 'cmake-3.10.0']
-        openmpi_version: ['latest', '2.1.1']
-    needs: step3_build_cmake
+        compiler:        ['gcc_latest', 'gcc_7.5.0']
+        openmpi_version: ['latest',     '2.1.1']
+    needs: step3_build_baselibs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -110,34 +108,32 @@ jobs:
     - name: build
       env:
         COMPILER: "${{ matrix.compiler }}"
-        CMAKE: "${{ matrix.cmake }}"
         OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
       run: |
         set -ex
-        docker build \
-          --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}_${CMAKE}:${image_version}" \
+        docker pull pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} || true
+        docker build --pull \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nompi-${image_version}" \
           --build-arg "MPI=openmpi$([ latest = "${OPENMPI_VERSION}" ] || echo "@${OPENMPI_VERSION}")" \
-          -t pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION} \
-          -t pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}:${image_version} \
+          -t pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} \
+          -t pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION}-${image_version} \
           4-mpi
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         COMPILER: "${{ matrix.compiler }}"
-        CMAKE: "${{ matrix.cmake }}"
         OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}
-        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_openmpi-${OPENMPI_VERSION}:${image_version}
-  step5_build_optlibs:
+        docker push pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION}
+        docker push pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION}-${image_version}
+  step5_build-libs:
     strategy:
       matrix:
-        compiler:  ['gcc-latest', 'gcc-7.5.0']
-        cmake: ['cmake-latest', 'cmake-3.10.0']
-        mpi: ['openmpi-latest', 'openmpi-2.1.1']
-        optlibs_version: [ 'oldest' ]
+        compiler:        ['gcc_latest',     'gcc_7.5.0']
+        mpi:             ['openmpi_latest', 'openmpi_2.1.1']
+        optlibs_version: ['latest',         'oldest']
     needs: step4_build_openmpi
     runs-on: ubuntu-latest
     steps:
@@ -147,26 +143,25 @@ jobs:
     - name: build
       env:
         COMPILER: "${{ matrix.compiler }}"
-        CMAKE: "${{ matrix.cmake }}"
         MPI: "${{ matrix.mpi }}"
         OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"
       run: |
         set -ex
-        docker build \
-          --build-arg "BASE_IMAGE=pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}:${image_version}" \
+        docker pull pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} || true
+        docker build --pull \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-${MPI}-${image_version}" \
           --build-arg "OPTLIBS_VERSION=${OPTLIBS_VERSION}" \
-          -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_optlibs-${OPTLIBS_VERSION} \
-          -t pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_optlibs-${OPTLIBS_VERSION}:${image_version} \
+          -t pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
+          -t pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version} \
           5-optlibs
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         COMPILER: "${{ matrix.compiler }}"
-        CMAKE: "${{ matrix.cmake }}"
         MPI: "${{ matrix.mpi }}"
         OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_optlibs-${OPTLIBS_VERSION}
-        docker push pdidevel/bionic_${COMPILER}_${CMAKE}_${MPI}_optlibs-${OPTLIBS_VERSION}:${image_version}
+        docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}
+        docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version}

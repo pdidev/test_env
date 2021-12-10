@@ -2,8 +2,9 @@ spack:
   concretization: together
   specs:
   - matrix:
-    - [ '%@COMPILER@' ]
     - [ 'target=x86_64' ]
+    - [ '%@COMPILER@' ]
+    - [ '^cmake~ncurses~ownlibs' ]
     -
       - freeglut
       - glew

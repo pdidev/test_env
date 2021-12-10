@@ -10,8 +10,8 @@ ENV COMPILER=gcc${GCC_VERSION}
 
 RUN set -ex \
  && ( [ "@7.5.0" = "${GCC_VERSION}" ] || spack config remove packages:gcc ) \
- && spack solve --reuse "${COMPILER}" target=x86_64 ~bootstrap \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "${COMPILER}" target=x86_64 ~bootstrap \
+ && spack solve                         --reuse "${COMPILER}" "~bootstrap" target=x86_64 \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "${COMPILER}" "~bootstrap" target=x86_64 \
  && spack load ${COMPILER} \
  && spack compiler find \
  && spack unload ${COMPILER} \

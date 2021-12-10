@@ -9,10 +9,10 @@ ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--verbose --test=all --fail-fast"}
 ENV CMAKE=cmake${CMAKE_VERSION}
 
 RUN set -ex \
- && spack solve --reuse "cmake%${COMPILER}~ncurses~ownlibs" target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake%${COMPILER}" target=x86_64 \
- && spack solve --reuse "${CMAKE}%${COMPILER}~ncurses~ownlibs" target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "${CMAKE}%${COMPILER}" target=x86_64
+ && spack solve                         --reuse "cmake"    "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}" \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake"    "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}" \
+ && spack solve                         --reuse "${CMAKE}" "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}" \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "${CMAKE}" "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}"
 
 RUN mkdir /opt/baselibs-env
 COPY baselibs.yaml /opt/baselibs-env/spack.yaml

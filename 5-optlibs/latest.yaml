@@ -1,0 +1,19 @@
+spack:
+  concretization: together
+  specs:
+  - matrix:
+    - [ 'target=x86_64' ]
+    - [ '%@COMPILER@' ]
+    - [ '^cmake~ncurses~ownlibs' ]
+    - [ '^@MPI@' ]
+    - [ '^python@3.6.9' ]
+    -
+      - libyaml
+      - flowvr
+      - fti
+      - netcdf-c
+      - py-pybind11
+      - py-pyyaml
+      - sionlib~fortran
+      - spdlog
+      - hdf5

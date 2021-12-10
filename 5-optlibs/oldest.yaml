@@ -2,9 +2,10 @@ spack:
   concretization: together
   specs:
   - matrix:
-    - [ '%@COMPILER@' ]
-    - [ '^@MPI@' ]
     - [ 'target=x86_64' ]
+    - [ '%@COMPILER@' ]
+    - [ '^cmake~ncurses~ownlibs' ]
+    - [ '^@MPI@' ]
     - [ '^python@3.6.9' ]
     -
       - libyaml@0.2.2
