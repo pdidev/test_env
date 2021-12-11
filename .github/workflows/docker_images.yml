@@ -101,7 +101,7 @@ jobs:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-        openmpi_version: ['latest', '2.1.1']
+        mpi:             ['openmpi_latest', 'openmpi_2.1.1']
     needs: step3_build_baselibs
     runs-on: ubuntu-latest
     steps:
@@ -111,27 +111,27 @@ jobs:
     - name: build
       env:
         COMPILER: "${{ matrix.compiler }}"
-        OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
+        MPI: "${{ matrix.mpi }}"
       run: |
         set -ex
-        docker pull pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} || true
+        docker pull pdidevel/pditst:${COMPILER}-${MPI} || true
         docker build --pull \
-          --cache-from pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} \
+          --cache-from pdidevel/pditst:${COMPILER}-${MPI} \
           --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nompi-${image_version}" \
-          --build-arg "MPI=openmpi$([ latest = "${OPENMPI_VERSION}" ] || echo "@${OPENMPI_VERSION}")" \
-          -t pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION} \
-          -t pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION}-${image_version} \
+          --build-arg "MPI=$(echo -n ${MPI} | sed -e s/_/@/ -e s/@latest//)" \
+          -t pdidevel/pditst:${COMPILER}-${MPI} \
+          -t pdidevel/pditst:${COMPILER}-${MPI}-${image_version} \
           4-mpi
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         COMPILER: "${{ matrix.compiler }}"
-        OPENMPI_VERSION: "${{ matrix.openmpi_version }}"
+        MPI: "${{ matrix.mpi }}"
       run: |
         set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION}
-        docker push pdidevel/pditst:${COMPILER}-openmpi_${OPENMPI_VERSION}-${image_version}
+        docker push pdidevel/pditst:${COMPILER}-${MPI}
+        docker push pdidevel/pditst:${COMPILER}-${MPI}-${image_version}
   step5_build-libs:
     strategy:
       matrix:
