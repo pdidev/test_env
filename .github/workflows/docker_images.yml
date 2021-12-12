@@ -19,7 +19,6 @@ jobs:
       run: . .github/detect_version.sh
     - name: build
       run: |
-        set -ex
         docker pull pdidevel/pditst:nocompiler-nobaselibs-nompi || true
         docker build --pull \
           --cache-from pdidevel/pditst:nocompiler-nobaselibs-nompi \
@@ -30,7 +29,6 @@ jobs:
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       run: |
-        set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nocompiler-nobaselibs-nompi
         docker push pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}
@@ -48,7 +46,6 @@ jobs:
       env:
         COMPILER: "${{ matrix.compiler }}"
       run: |
-        set -ex
         docker pull pdidevel/pditst:${COMPILER}-nobaselibs-nompi || true
         docker build --pull \
           --cache-from pdidevel/pditst:${COMPILER}-nobaselibs-nompi \
@@ -62,7 +59,6 @@ jobs:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
       run: |
-        set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nobaselibs-nompi
         docker push pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version}
@@ -80,7 +76,6 @@ jobs:
       env:
         COMPILER: "${{ matrix.compiler }}"
       run: |
-        set -ex
         docker pull pdidevel/pditst:${COMPILER}-nompi || true
         docker build --pull \
           --cache-from pdidevel/pditst:${COMPILER}-nompi \
@@ -93,11 +88,10 @@ jobs:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         COMPILER: "${{ matrix.compiler }}"
       run: |
-        set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nompi
         docker push pdidevel/pditst:${COMPILER}-nompi-${image_version}
-  step4_build_openmpi:
+  step4_build_mpi:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
@@ -113,7 +107,6 @@ jobs:
         COMPILER: "${{ matrix.compiler }}"
         MPI: "${{ matrix.mpi }}"
       run: |
-        set -ex
         docker pull pdidevel/pditst:${COMPILER}-${MPI} || true
         docker build --pull \
           --cache-from pdidevel/pditst:${COMPILER}-${MPI} \
@@ -128,17 +121,16 @@ jobs:
         COMPILER: "${{ matrix.compiler }}"
         MPI: "${{ matrix.mpi }}"
       run: |
-        set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-${image_version}
-  step5_build-libs:
+  step5_build_libs:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:             ['openmpi_latest', 'openmpi_2.1.1']
         optlibs_version: ['latest', 'oldest']
-    needs: step4_build_openmpi
+    needs: step4_build_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -150,7 +142,6 @@ jobs:
         MPI: "${{ matrix.mpi }}"
         OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"
       run: |
-        set -ex
         docker pull pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} || true
         docker build --pull \
           --cache-from pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
@@ -166,7 +157,6 @@ jobs:
         MPI: "${{ matrix.mpi }}"
         OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"
       run: |
-        set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version}

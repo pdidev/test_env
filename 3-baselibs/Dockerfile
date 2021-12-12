@@ -1,27 +1,35 @@
 ARG BASE_IMAGE
 
-FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE} AS builder
 
-ARG CMAKE_VERSION
 ARG SPACK_INSTALL_ARGS
 
-ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--verbose --test=all --fail-fast"}
-ENV CMAKE=cmake${CMAKE_VERSION}
+ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--show-log-on-error --test=all --fail-fast"}
 
-RUN set -ex \
- && spack solve -I                      --reuse "cmake"    "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}" \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake"    "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}" \
- && spack solve -I                      --reuse "${CMAKE}" "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}" \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "${CMAKE}" "~ncurses" "~ownlibs" target=x86_64 "%${COMPILER}"
+RUN spack solve -I                      --reuse "cmake~ncurses~ownlibs target=x86_64 ^curl tls=openssl" \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake~ncurses~ownlibs target=x86_64 ^curl tls=openssl"
 
-RUN mkdir /opt/baselibs-env
-COPY baselibs.yaml /opt/baselibs-env/spack.yaml
-RUN sed -i "s/@COMPILER@/${COMPILER}/" /opt/baselibs-env/spack.yaml \
- && spack env activate /opt/baselibs-env \
+RUN spack solve -I                      --reuse "cmake@3.10.0~ncurses~ownlibs target=x86_64 ^curl tls=openssl" \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake@3.10.0~ncurses~ownlibs target=x86_64 ^curl tls=openssl"
+
+RUN mkdir -p ${SPACK_ROOT}/var/environments/baselibs
+COPY baselibs.yaml ${SPACK_ROOT}/var/environments/baselibs/spack.yaml
+RUN sed -i "s/@COMPILER@/${COMPILER}/" ${SPACK_ROOT}/var/environments/baselibs/spack.yaml
+
+RUN spack env activate ${SPACK_ROOT}/var/environments/baselibs \
  && spack config add "packages:all:target:[x86_64]" \
  && spack config add "packages:all:compiler:[${COMPILER}]" \
  && spack concretize --test=all --reuse \
- && spack install ${SPACK_INSTALL_ARGS} \
- && find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
+ && spack install ${SPACK_INSTALL_ARGS}
+
+RUN spack clean -a
+
+RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
   | xargs file -i | awk -F: '/(x-executable|x-archive|x-sharedlib); charset=binary/ {print $1}' \
-  | xargs -r strip -s || true
+  | xargs -r strip -s || echo "Failed strip"
+
+
+FROM ${BASE_IMAGE}
+
+COPY --from=builder ${SPACK_HOME} ${SPACK_HOME}
+COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}

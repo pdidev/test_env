@@ -5,7 +5,10 @@ spack:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
     - [ '^cmake~ncurses~ownlibs' ]
+    - [ '^curl tls=openssl' ]
     -
+      - python@3.6.9
+      - @COMPILER@
       - freeglut
       - glew
       - hwloc

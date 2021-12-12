@@ -4,16 +4,28 @@ spack:
   - matrix:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
-    - [ '^cmake~ncurses~ownlibs' ]
-    - [ '^@MPI@' ]
     - [ '^python@3.6.9' ]
+    - [ '^cmake~ncurses~ownlibs' ]
+    - [ '^curl tls=openssl' ]
+    - [ '^@MPI@' ]
     -
-      - libyaml@0.2.2
+      - python@3.6.9
+      - @COMPILER@
+      - freeglut
+      - glew
+      - hwloc
+      - libxml2
+      - libxmu
+      - libxslt
+      - mesa~llvm
+      - swig
+      - @MPI@
       - flowvr@2.3.2
       - fti@1.5
+      - hdf5@1.8.10
+      - libyaml@0.2.2
       - netcdf-c@4.3.3
       - py-pybind11@2.3.0
       - py-pyyaml@3.11
       - sionlib@1.7.6~fortran
       - spdlog@1.4.1
-      - hdf5@1.8.10
