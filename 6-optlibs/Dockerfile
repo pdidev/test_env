@@ -1,12 +1,11 @@
 ARG BASE_IMAGE
 
-FROM ${BASE_IMAGE} AS builder
+FROM ${BASE_IMAGE}
 
 ARG OPTLIBS_VERSION
-ARG SPACK_INSTALL_ARGS
+ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-ENV SPACK_INSTALL_ARGS=${SPACK_INSTALL_ARGS:-"--show-log-on-error --test=all --fail-fast"}
-ENV OPTLIBS_VERSION=${OPTLIBS_VERSION}
+ENV LIBS_ENV=${SPACK_ROOT}/var/spack/environments/baselibs/optlibs
 
 RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git
@@ -20,18 +19,12 @@ RUN git clone --depth 1 https://github.com/pdidev/spack ${SPACK_ROOT}/var/spack/
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/pdi/.git
 RUN spack repo add ${SPACK_ROOT}/var/spack/repos/pdi
 
-RUN mkdir ${SPACK_ROOT}/var/environments/optlibs
-COPY ${OPTLIBS_VERSION}.yaml ${SPACK_ROOT}/var/environments/optlibs/spack.yaml
-RUN sed -i -e "s/@COMPILER@/${COMPILER}/" -e "s/@MPI@/${MPI}/" ${SPACK_ROOT}/var/environments/optlibs/spack.yaml
+RUN mkdir -p ${LIBS_ENV}
+COPY ${OPTLIBS_VERSION}.yaml ${LIBS_ENV}/spack.yaml
+RUN sed -i -e "s/@COMPILER@/${COMPILER}/" -e "s/@MPI@/${MPI}/" ${LIBS_ENV}/spack.yaml
 
-RUN spack env activate ${SPACK_ROOT}/var/environments/optlibs \
+RUN spack env activate ${LIBS_ENV} \
  && spack config add "packages:all:target:[x86_64]" \
  && spack config add "packages:all:compiler:[${COMPILER}]" \
- && spack concretize --test=all --reuse \
+ && spack concretize --reuse \
  && spack install ${SPACK_INSTALL_ARGS} --reuse
-
-RUN spack clean -a
-
-RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
-  | xargs file -i | awk -F: '/(x-executable|x-archive|x-sharedlib); charset=binary/ {print $1}' \
-  | xargs -r strip -s || echo "Failed strip"

@@ -1,14 +1,16 @@
 spack:
   concretization: together
   specs:
+  - python@3.6.9
+  - @COMPILER@
   - matrix:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
+    - [ '^python@3.6.9' ]
     - [ '^cmake~ncurses~ownlibs' ]
     - [ '^curl tls=openssl' ]
+    - [ '^@MPI@' ]
     -
-      - python@3.6.9
-      - @COMPILER@
       - freeglut
       - glew
       - hwloc
@@ -17,3 +19,13 @@ spack:
       - libxslt
       - mesa~llvm
       - swig
+      - @MPI@
+      - flowvr@2.3.2
+      - fti@1.5
+      - hdf5@1.8.10
+      - libyaml@0.2.2
+      - netcdf-c@4.3.3
+      - py-pybind11@2.3.0
+      - py-pyyaml@3.11
+      - sionlib@1.7.6~fortran
+      - spdlog@1.4.1

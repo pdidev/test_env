@@ -19,24 +19,47 @@ jobs:
       run: . .github/detect_version.sh
     - name: build
       run: |
-        docker pull pdidevel/pditst:nocompiler-nobaselibs-nompi || true
+        docker pull pdidevel/pditst:nodask || true
         docker build --pull \
-          --cache-from pdidevel/pditst:nocompiler-nobaselibs-nompi \
-          -t pdidevel/pditst:nocompiler-nobaselibs-nompi \
-          -t pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version} \
+          --cache-from pdidevel/pditst:nodask \
+          -t pdidevel/pditst:nodask \
+          -t pdidevel/pditst:nodask-${image_version} \
           1-bionic
     - name: publish
       env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/pditst:nocompiler-nobaselibs-nompi
-        docker push pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}
-  step2_build_compiler:
+        docker push pdidevel/pditst:nodask
+        docker push pdidevel/pditst:nodask-${image_version}
+  step2_build_spack:
+    needs: step1_build_base
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: detect current version
+      run: . .github/detect_version.sh
+    - name: build
+      run: |
+        docker pull pdidevel/pditst:nocompiler || true
+        docker build --pull \
+          --cache-from pdidevel/pditst:nocompiler \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:nodask-${image_version}" \
+          -t pdidevel/pditst:nocompiler \
+          -t pdidevel/pditst:nocompiler-${image_version} \
+          2-spack
+    - name: publish
+      env:
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+      run: |
+        docker login -u jbigot -p "${DOCKER_TOKEN}"
+        docker push pdidevel/pditst:nocompiler
+        docker push pdidevel/pditst:nocompiler-${image_version}
+  step3_build_compiler:
     strategy:
       matrix:
         compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-    needs: step1_build_base
+    needs: step2_build_spack
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -46,27 +69,27 @@ jobs:
       env:
         COMPILER: "${{ matrix.compiler }}"
       run: |
-        docker pull pdidevel/pditst:${COMPILER}-nobaselibs-nompi || true
+        docker pull pdidevel/pditst:${COMPILER}-nobaselibs || true
         docker build --pull \
-          --cache-from pdidevel/pditst:${COMPILER}-nobaselibs-nompi \
+          --cache-from pdidevel/pditst:${COMPILER}-nobaselibs \
           --build-arg "COMPILER=$(echo -n ${COMPILER} | sed -e s/_/@/ -e s/@latest//)" \
-          --build-arg "BASE_IMAGE=pdidevel/pditst:nocompiler-nobaselibs-nompi-${image_version}" \
-          -t pdidevel/pditst:${COMPILER}-nobaselibs-nompi \
-          -t pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version} \
-          2-compiler
+          --build-arg "BASE_IMAGE=pdidevel/pditst:nocompiler-${image_version}" \
+          -t pdidevel/pditst:${COMPILER}-nobaselibs \
+          -t pdidevel/pditst:${COMPILER}-nobaselibs-${image_version} \
+          3-compiler
     - name: publish
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
-        docker push pdidevel/pditst:${COMPILER}-nobaselibs-nompi
-        docker push pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version}
-  step3_build_baselibs:
+        docker push pdidevel/pditst:${COMPILER}-nobaselibs
+        docker push pdidevel/pditst:${COMPILER}-nobaselibs-${image_version}
+  step4_build_baselibs:
     strategy:
       matrix:
         compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-    needs: step2_build_compiler
+    needs: step3_build_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -79,10 +102,10 @@ jobs:
         docker pull pdidevel/pditst:${COMPILER}-nompi || true
         docker build --pull \
           --cache-from pdidevel/pditst:${COMPILER}-nompi \
-          --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nobaselibs-nompi-${image_version}" \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:${COMPILER}-nobaselibs-${image_version}" \
           -t pdidevel/pditst:${COMPILER}-nompi \
           -t pdidevel/pditst:${COMPILER}-nompi-${image_version} \
-          3-baselibs
+          4-baselibs
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -91,12 +114,12 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nompi
         docker push pdidevel/pditst:${COMPILER}-nompi-${image_version}
-  step4_build_mpi:
+  step5_build_mpi:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:             ['openmpi_latest', 'openmpi_2.1.1']
-    needs: step3_build_baselibs
+    needs: step4_build_baselibs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -114,7 +137,7 @@ jobs:
           --build-arg "MPI=$(echo -n ${MPI} | sed -e s/_/@/ -e s/@latest//)" \
           -t pdidevel/pditst:${COMPILER}-${MPI} \
           -t pdidevel/pditst:${COMPILER}-${MPI}-${image_version} \
-          4-mpi
+          5-mpi
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -124,13 +147,13 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-${image_version}
-  step5_build_libs:
+  step6_build_libs:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:             ['openmpi_latest', 'openmpi_2.1.1']
         optlibs_version: ['latest', 'oldest']
-    needs: step4_build_mpi
+    needs: step5_build_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -149,7 +172,7 @@ jobs:
           --build-arg "OPTLIBS_VERSION=${OPTLIBS_VERSION}" \
           -t pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
           -t pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version} \
-          5-optlibs
+          6-optlibs
     - name: publish
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
