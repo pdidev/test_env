@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: detect current version
       run: . .github/detect_version.sh
-    - name: build
+    - name: build nodask
       run: |
         docker pull pdidevel/pditst:nodask || true
         docker build --pull \
@@ -25,21 +25,14 @@ jobs:
           -t pdidevel/pditst:nodask \
           -t pdidevel/pditst:nodask-${image_version} \
           1-bionic
-    - name: publish
+    - name: publish nodask
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nodask
         docker push pdidevel/pditst:nodask-${image_version}
-  step2_build_spack:
-    needs: step1_build_base
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
-    - name: build
+    - name: build dask
       run: |
         docker pull pdidevel/pditst:nocompiler || true
         docker build --pull \
@@ -48,18 +41,18 @@ jobs:
           -t pdidevel/pditst:nocompiler \
           -t pdidevel/pditst:nocompiler-${image_version} \
           2-spack
-    - name: publish
+    - name: publish dask
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nocompiler
         docker push pdidevel/pditst:nocompiler-${image_version}
-  step3_build_compiler:
+  step2_build_compiler:
     strategy:
       matrix:
         compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-    needs: step2_build_spack
+    needs: step1_build_base
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -85,11 +78,11 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nobaselibs
         docker push pdidevel/pditst:${COMPILER}-nobaselibs-${image_version}
-  step4_build_baselibs:
+  step3_build_baselibs:
     strategy:
       matrix:
         compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-    needs: step3_build_compiler
+    needs: step2_build_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -114,12 +107,12 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nompi
         docker push pdidevel/pditst:${COMPILER}-nompi-${image_version}
-  step5_build_mpi:
+  step4_build_mpi:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:             ['openmpi_latest', 'openmpi_2.1.1']
-    needs: step4_build_baselibs
+    needs: step3_build_baselibs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -147,13 +140,13 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-${image_version}
-  step6_build_libs:
+  step5_build_libs:
     strategy:
       matrix:
         compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:             ['openmpi_latest', 'openmpi_2.1.1']
         optlibs_version: ['latest', 'oldest']
-    needs: step5_build_mpi
+    needs: step4_build_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

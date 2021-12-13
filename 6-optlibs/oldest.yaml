@@ -2,7 +2,7 @@ spack:
   concretization: together
   specs:
   - python@3.6.9
-  - @COMPILER@
+  - @COMPSPEC@
   - matrix:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]

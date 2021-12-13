@@ -3,8 +3,7 @@ ARG SPACK_IMAGE
 FROM ${SPACK_IMAGE} AS builder
 
 RUN spack mark -a -i
-RUN spack mark -e ${COMPILER}
-RUN spack mark -e ${CMAKE}
+RUN spack mark -e ${CMAKE} %${COMPILER} target=x86_64
 RUN spack env activate ${LIBS_ENV} \
  && spack gc -y
 
