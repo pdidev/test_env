@@ -1,13 +1,11 @@
 spack:
   concretization: together
   specs:
-  - python@3.6.9
-  - @COMPSPEC@
+  - cmake~ownlibs^curl tls=openssl
   - matrix:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
-    - [ '^python@3.6.9' ]
-    - [ '^cmake~ncurses~ownlibs' ]
+    - [ '^cmake~ownlibs' ]
     - [ '^curl tls=openssl' ]
     -
       - freeglut

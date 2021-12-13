@@ -24,3 +24,5 @@ RUN DEFAULT_F77="$(grep '\bf77\b' ~/.spack/linux/compilers.yaml | grep -v '\bnul
  && sed -i "s#f77\s*:\s*null#f77: ${DEFAULT_F77}#I" ~/.spack/linux/compilers.yaml
 RUN DEFAULT_FC="$(grep '\bfc\b' ~/.spack/linux/compilers.yaml | grep -v '\bnull\b' | head -n 1 | sed 's/.*:\s*//')" \
  && sed -i "s#fc\s*:\s*null#fc: ${DEFAULT_FC}#I" ~/.spack/linux/compilers.yaml
+
+RUN ( [ "gcc@7.5.0" = "${COMPILER}" ] || spack compiler remove gcc@7.5.0 )
