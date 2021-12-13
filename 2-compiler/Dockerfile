@@ -34,12 +34,3 @@ RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
   | xargs -r strip -s || echo "Failed strip"
 
 RUN spack clean -a
-
-
-FROM ${BASE_IMAGE}
-
-ARG COMPILER
-ENV COMPILER=${COMPILER}
-
-COPY --from=builder ${SPACK_HOME} ${SPACK_HOME}
-COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}

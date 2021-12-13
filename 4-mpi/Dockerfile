@@ -18,12 +18,3 @@ RUN spack clean -a
 RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
   | xargs file -i | awk -F: '/(x-executable|x-archive|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s || echo "Failed strip"
-
-
-FROM ${BASE_IMAGE}
-
-ARG MPI
-ENV MPI=${MPI}
-
-COPY --from=builder ${SPACK_HOME} ${SPACK_HOME}
-COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
