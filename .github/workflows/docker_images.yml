@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: detect current version
       run: . .github/detect_version.sh
-    - name: build
+    - name: build compiler
       env:
         COMPILER: "${{ matrix.compiler }}"
       run: |
@@ -70,7 +70,7 @@ jobs:
           -t pdidevel/pditst:${COMPILER}-nobaselibs \
           -t pdidevel/pditst:${COMPILER}-nobaselibs-${image_version} \
           3-compiler
-    - name: publish
+    - name: publish compiler
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
@@ -78,17 +78,7 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nobaselibs
         docker push pdidevel/pditst:${COMPILER}-nobaselibs-${image_version}
-  step3_build_baselibs:
-    strategy:
-      matrix:
-        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-    needs: step2_build_compiler
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
-    - name: build
+    - name: build baselibs
       env:
         COMPILER: "${{ matrix.compiler }}"
       run: |
@@ -99,7 +89,7 @@ jobs:
           -t pdidevel/pditst:${COMPILER}-nompi \
           -t pdidevel/pditst:${COMPILER}-nompi-${image_version} \
           4-baselibs
-    - name: publish
+    - name: publish baselibs
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         COMPILER: "${{ matrix.compiler }}"
@@ -110,9 +100,9 @@ jobs:
   step4_build_mpi:
     strategy:
       matrix:
-        compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-        mpi:             ['openmpi_latest', 'openmpi_2.1.1']
-    needs: step3_build_baselibs
+        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
+        mpi:      ['openmpi_latest', 'openmpi_2.1.1']
+    needs: step2_build_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

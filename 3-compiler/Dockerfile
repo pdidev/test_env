@@ -14,12 +14,12 @@ RUN COMPSPEC=${COMPILER/clang/llvm} \
  && spack solve -I                      --reuse ${COMPSPEC} target=x86_64 \
  && spack install ${SPACK_INSTALL_ARGS} --reuse ${COMPSPEC} target=x86_64
 
-RUN [[ "gcc@7.5.0" = "${COMPILER}" ]] || spack compiler remove gcc@7.5.0
-
 RUN COMPSPEC=${COMPILER/clang/llvm} \
  && COMPSPEC="${COMPSPEC} $([[ ! ${COMPILER} =~ ^gcc ]] || echo -n "~bootstrap")" \
  && spack load ${COMPSPEC} \
  && spack compiler find
+
+RUN [[ "gcc@7.5.0" = "${COMPILER}" ]] || spack compiler remove gcc@7.5.0
 
 # This is likely only required for openmpi, but this is a workaround until solving
 # https://github.com/spack/spack/issues/4610
