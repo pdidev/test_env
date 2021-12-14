@@ -15,7 +15,7 @@ RUN spack solve -I                      --reuse "cmake@3.10.0~ownlibs^curl" tls=
 
 RUN mkdir -p ${LIBS_ENV}
 COPY baselibs.yaml ${LIBS_ENV}/spack.yaml
-RUN sed -i -e "s/@COMPILER@/${COMPILER}/" -e "s/@COMPSPEC@/${COMPILER/clang/llvm}/" ${LIBS_ENV}/spack.yaml
+RUN sed -i -e "s/@COMPILER@/${COMPILER}/" ${LIBS_ENV}/spack.yaml
 
 RUN spack env activate ${LIBS_ENV} \
  && spack config add "packages:all:target:[x86_64]" \
