@@ -1,7 +1,6 @@
 spack:
   concretization: together
   specs:
-  - cmake~ownlibs^curl tls=openssl
   - matrix:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
@@ -26,4 +25,4 @@ spack:
       - py-pybind11@2.3.0
       - py-pyyaml@3.11
       - sionlib@1.7.6~fortran
-      - spdlog@1.4.1
+      - spdlog@1.4.2

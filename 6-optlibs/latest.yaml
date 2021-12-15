@@ -1,7 +1,6 @@
 spack:
   concretization: together
   specs:
-  - cmake~ownlibs^curl tls=openssl
   - matrix:
     - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
