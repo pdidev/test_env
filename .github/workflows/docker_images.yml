@@ -166,3 +166,28 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version}
+  step6_finalize:
+    strategy:
+      matrix:
+        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
+        mpi:      ['openmpi_latest', 'openmpi_2.1.1']
+        libs:     ['', '-libs_latest', '-libs_oldest']
+        cmake:    ['cmake@3.21', 'cmake@3.10']
+    needs: step5_build_libs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: detect current version
+      run: . .github/detect_version.sh
+    - name: build
+      env:
+        COMPILER: "${{ matrix.compiler }}"
+        MPI: "${{ matrix.mpi }}"
+        LIBS: "${{ matrix.libs }}"
+        CMAKE: "${{ matrix.cmake }}"
+      run: |
+        docker build --pull \
+          --build-arg "BASE_IMAGE=pdidevel/pditst:nodask-${image_version}" \
+          --build-arg "SPACK_IMAGE=pdidevel/pditst:${COMPILER}-${MPI}${LIBS}-${image_version}" \
+          --build-arg "CMAKE=${CMAKE}" \
+          7-finalize

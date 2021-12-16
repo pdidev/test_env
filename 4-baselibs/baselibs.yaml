@@ -8,9 +8,12 @@ spack:
     - [ '^cmake~ownlibs' ]
     - [ '^curl tls=openssl' ]
     -
+      - bison
+      - flex
       - freeglut
       - glew
       - hwloc
+      - iconv
       - libxml2
       - libxmu
       - libxslt

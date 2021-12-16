@@ -8,15 +8,19 @@ spack:
     - [ '^curl tls=openssl' ]
     - [ '^@MPI@' ]
     -
+      - bison
+      - flex
       - freeglut
       - glew
       - hwloc
+      - iconv
       - libxml2
       - libxmu
       - libxslt
       - mesa~llvm
       - swig
       - @MPI@
+      - doxygen@1.8.15
       - flowvr@2.3.2
       - fti@1.5
       - hdf5@1.8.10
