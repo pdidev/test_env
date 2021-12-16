@@ -168,6 +168,7 @@ jobs:
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version}
   step6_finalize:
     strategy:
+      fail-fast: false
       matrix:
         compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:      ['openmpi_latest', 'openmpi_2.1.1']

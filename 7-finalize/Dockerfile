@@ -9,10 +9,12 @@ ARG CMAKE
 RUN spack mark -a -i
 
 RUN COMPSPEC=${COMPILER/clang/llvm} \
- && COMPSPEC=${COMPSPEC} $([[ ! ${COMPILER} =~ ^gcc ]] || echo -n "~bootstrap") \
+ && COMPSPEC="${COMPSPEC} $([[ ! ${COMPILER} =~ ^gcc ]] || echo -n "~bootstrap")" \
  && spack mark -e ${COMPSPEC}
 
 RUN spack mark -e ${CMAKE} %${COMPILER}
+
+RUN spack mark -e ${MPI} %${COMPILER}
 
 RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
   ; do \
@@ -35,6 +37,8 @@ RUN COMPSPEC=${COMPILER/clang/llvm} \
 
 RUN echo "spack load ${CMAKE} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh
 
+RUN echo "spack load ${MPI} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh
+
 RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
   ; do \
       spack load $N %${COMPILER} \
@@ -52,6 +56,9 @@ FROM ${BASE_IMAGE} AS main
 COPY --from=builder ${SPACK_HOME} ${SPACK_HOME}
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
+ENV OMPI_ALLOW_RUN_AS_ROOT=1 \
+    OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+
 SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
 CMD ["interactive-shell"]
@@ -64,7 +71,7 @@ RUN tar -xf pdi-fix_398.tar.gz
 
 RUN cmake -DDIST_PROFILE=Devel -DBUILD_DOCUMENTATION=OFF -DBUILD_FLOWVR_PLUGIN=OFF -DBUILD_FTI_PLUGIN=OFF pdi-fix_398
 
-RUN make -j
+RUN make
 
 RUN ctest --output-on-failure
 
