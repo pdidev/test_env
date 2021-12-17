@@ -7,7 +7,8 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 ENV LIBS_ENV=${SPACK_ROOT}/var/spack/environments/optlibs
 
-RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti
+RUN git clone https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti
+RUN git -C ${SPACK_ROOT}/var/spack/repos/fti reset --hard 5efb3f89150e74261912b27ac8baaaf5b3c6884d
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git
 RUN spack repo add ${SPACK_ROOT}/var/spack/repos/fti
 
