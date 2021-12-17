@@ -18,4 +18,5 @@ spack:
       - libxmu
       - libxslt
       - mesa~llvm
+      - pkgconf
       - swig

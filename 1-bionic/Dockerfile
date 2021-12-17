@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 
+LABEL org.opencontainers.image.source = "https://github.com/pdidev/dockerfiles"
+
 ENV DOCKERFILE_BASE=ubuntu            \
     DOCKERFILE_DISTRO=ubuntu          \
     DOCKERFILE_DISTRO_VERSION=18.04   \

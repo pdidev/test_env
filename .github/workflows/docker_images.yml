@@ -12,6 +12,8 @@ defaults:
     shell: bash
 jobs:
   step1_build_base:
+    permissions:
+        packages: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -28,7 +30,10 @@ jobs:
     - name: publish nodask
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        ACTOR: "${{ github.actor }}"
       run: |
+        set -ex
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nodask
         docker push pdidevel/pditst:nodask-${image_version}
@@ -44,6 +49,7 @@ jobs:
     - name: publish dask
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nocompiler
@@ -73,6 +79,7 @@ jobs:
     - name: publish compiler
       env:
         DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
@@ -91,7 +98,8 @@ jobs:
           4-baselibs
     - name: publish baselibs
       env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
       run: |
         docker login -u jbigot -p "${DOCKER_TOKEN}"
@@ -123,7 +131,8 @@ jobs:
           5-mpi
     - name: publish
       env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
         MPI: "${{ matrix.mpi }}"
       run: |
@@ -158,7 +167,8 @@ jobs:
           6-optlibs
     - name: publish
       env:
-        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         COMPILER: "${{ matrix.compiler }}"
         MPI: "${{ matrix.mpi }}"
         OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"

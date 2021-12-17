@@ -53,15 +53,20 @@ RUN sed -i \
 
 FROM ${BASE_IMAGE} AS main
 
-COPY --from=builder ${SPACK_HOME} ${SPACK_HOME}
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
-ENV OMPI_ALLOW_RUN_AS_ROOT=1 \
-    OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+RUN useradd -d /home/ci -m -U ci
+
+ENV HOME=/home/ci
+COPY --from=builder ${SPACK_HOME} ${HOME}/.spack
+ENV SPACK_HOME=${HOME}/.spack
+
+USER ci:ci
 
 SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
 CMD ["interactive-shell"]
+
 
 FROM main AS test
 
@@ -75,5 +80,5 @@ RUN make
 
 RUN ctest --output-on-failure
 
-FROM main
 
+FROM main

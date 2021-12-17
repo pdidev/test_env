@@ -18,6 +18,7 @@ spack:
       - libxmu
       - libxslt
       - mesa~llvm
+      - pkgconf
       - swig
       - @MPI@
       - doxygen
