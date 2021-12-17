@@ -26,6 +26,8 @@ jobs:
           --cache-from pdidevel/pditst:nodask \
           -t pdidevel/pditst:nodask \
           -t pdidevel/pditst:nodask-${image_version} \
+          -t ghcr.io/pdidevel/dockerfiles/centos_libs:nodask \
+          -t ghcr.io/pdidevel/dockerfiles/centos_libs:nodask-${image_version} \
           1-bionic
     - name: publish nodask
       env:
@@ -37,6 +39,9 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nodask
         docker push pdidevel/pditst:nodask-${image_version}
+        echo "$GITHUB_TOKEN" | docker login ghcr.io -u ${ACTOR} --password-stdin
+        docker push ghcr.io/pdidevel/dockerfiles/centos_libs:nodask
+        docker push ghcr.io/pdidevel/dockerfiles/centos_libs:nodask-${image_version}
     - name: build dask
       run: |
         docker pull pdidevel/pditst:nocompiler || true
@@ -54,6 +59,9 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:nocompiler
         docker push pdidevel/pditst:nocompiler-${image_version}
+        echo "$GITHUB_TOKEN" | docker login ghcr.io -u pdidevel --password-stdin
+        docker push ghcr.io/pdidevel/pditst:nocompiler
+        docker push ghcr.io/pdidevel/pditst:nocompiler-${image_version}
   step2_build_compiler:
     strategy:
       matrix:
@@ -85,6 +93,9 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nobaselibs
         docker push pdidevel/pditst:${COMPILER}-nobaselibs-${image_version}
+        echo "$GITHUB_TOKEN" | docker login ghcr.io -u pdidevel --password-stdin
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-nobaselibs
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-nobaselibs-${image_version}
     - name: build baselibs
       env:
         COMPILER: "${{ matrix.compiler }}"
@@ -105,6 +116,9 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-nompi
         docker push pdidevel/pditst:${COMPILER}-nompi-${image_version}
+        echo "$GITHUB_TOKEN" | docker login ghcr.io -u pdidevel --password-stdin
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-nompi
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-nompi-${image_version}
   step4_build_mpi:
     strategy:
       matrix:
@@ -139,6 +153,9 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-${image_version}
+        echo "$GITHUB_TOKEN" | docker login ghcr.io -u pdidevel --password-stdin
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-${MPI}
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-${MPI}-${image_version}
   step5_build_libs:
     strategy:
       matrix:
@@ -176,6 +193,9 @@ jobs:
         docker login -u jbigot -p "${DOCKER_TOKEN}"
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}
         docker push pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version}
+        echo "$GITHUB_TOKEN" | docker login ghcr.io -u pdidevel --password-stdin
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}
+        docker push ghcr.io/pdidevel/pditst:${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}-${image_version}
   step6_finalize:
     strategy:
       fail-fast: false
