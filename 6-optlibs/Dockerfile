@@ -5,7 +5,7 @@ FROM ${BASE_IMAGE}
 ARG OPTLIBS_VERSION
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-ENV LIBS_ENV=${SPACK_ROOT}/var/spack/environments/baselibs/optlibs
+ENV LIBS_ENV=${SPACK_ROOT}/var/spack/environments/optlibs
 
 RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git
@@ -27,4 +27,4 @@ RUN spack env activate ${LIBS_ENV} \
  && spack config add "packages:all:target:[x86_64]" \
  && spack config add "packages:all:compiler:[${COMPILER}]" \
  && spack concretize --reuse \
- && spack install ${SPACK_INSTALL_ARGS} --reuse
+ && spack install ${SPACK_INSTALL_ARGS}
