@@ -9,7 +9,7 @@ RUN git clone --depth 1 https://github.com/spack/spack.git ${SPACK_ROOT}
 RUN rm -rf ${SPACK_ROOT}/.git
  
 SHELL ["docker-shell"]
-ENTRYPOINT ["/bin/bash", "${SPACK_ROOT}/share/spack/docker/entrypoint.bash"]
+ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
 RUN mkdir -p ${SPACK_HOME}

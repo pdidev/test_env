@@ -2,8 +2,8 @@ spack:
   concretization: together
   specs:
   - matrix:
-    - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
+    - [ 'target=x86_64' ]
     - [ '^cmake~ownlibs' ]
     - [ '^curl tls=openssl' ]
     - [ '^@MPI@' ]
@@ -21,6 +21,7 @@ spack:
       - pkgconf
       - swig
       - @MPI@
+      - astyle
       - doxygen
       - flowvr
       - fti
@@ -28,6 +29,7 @@ spack:
       - hdf5@1.12.1
       - libyaml
       - netcdf-c
+      - paraconf
       - py-pybind11
       - py-pyyaml
       - sionlib

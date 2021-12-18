@@ -75,10 +75,18 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
-RUN spack find --loaded \
- && cmake -DDIST_PROFILE=Devel -DBUILD_DOCUMENTATION=OFF -DBUILD_FLOWVR_PLUGIN=OFF -DBUILD_FTI_PLUGIN=OFF pdi-fix_398
+RUN USE_DEFAULT=SYSTEM \
+ && spack find flowvr || USE_DEFAULT=EMBEDDED \
+ && spack find --loaded \
+ && cmake \
+          -DDIST_PROFILE=Devel \
+          -DBUILD_DOCUMENTATION=OFF \
+          -DBUILD_FLOWVR_PLUGIN=OFF \
+          -DBUILD_FTI_PLUGIN=OFF \
+          -DUSE_DEFAULT=${USE_DEFAULT} \
+          pdi-fix_398
 
-RUN make
+RUN make VERBOSE=1
 
 RUN pip3 install --user mpi4py \
  && pip3 install --user numpy
