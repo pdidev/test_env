@@ -61,8 +61,11 @@ ENV HOME=/home/ci
 COPY --from=builder ${SPACK_HOME} ${HOME}/.spack
 ENV SPACK_HOME=${HOME}/.spack
 
+RUN chown -R ci:ci ${HOME}
+
 USER ci:ci
 
+WORKDIR ${HOME}
 SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
 CMD ["interactive-shell"]
