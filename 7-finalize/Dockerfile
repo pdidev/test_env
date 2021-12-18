@@ -80,6 +80,9 @@ RUN spack find --loaded \
 
 RUN make
 
+RUN pip3 install --user mpi4py \
+ && pip3 install --user numpy
+
 RUN ctest --output-on-failure
 
 

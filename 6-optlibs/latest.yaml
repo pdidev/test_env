@@ -23,9 +23,9 @@ spack:
       - @MPI@
       - doxygen
       - flowvr
-      #TODO: Workaround FTI issue, HDF5 fails to build
-      - fti~hdf5
-      - hdf5
+      - fti
+      #TODO: Workaround https://github.com/spack/spack/issues/28074
+      - hdf5@1.12.1
       - libyaml
       - netcdf-c
       - py-pybind11
