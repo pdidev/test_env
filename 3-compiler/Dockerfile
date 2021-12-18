@@ -27,7 +27,7 @@ RUN DEFAULT_FC="$(grep '\bfc\b' ~/.spack/linux/compilers.yaml | grep -v '\bnull\
 
 RUN [[ "gcc@7.5.0" = "${COMPILER}" ]] || spack compiler remove gcc@7.5.0
 
-# This is likely only required for openmpi, but this is a workaround until solving
+# TODO: This is likely only required for openmpi, but this is a workaround until solving
 # https://github.com/spack/spack/issues/4610
 RUN [[ ! "${COMPILER}" =~ ^clang ]] || sed 's/flags\s*:.*/flags: { fflags: "-fPIC", cflags: "-fPIC", cxxflags: "-fPIC" }/' -i ~/.spack/linux/compilers.yaml
 
