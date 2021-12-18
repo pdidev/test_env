@@ -23,7 +23,7 @@ spack:
       - @MPI@
       - doxygen
       - flowvr
-      - fti
+      - fti~fortran
       - hdf5
       - libyaml
       - netcdf-c
