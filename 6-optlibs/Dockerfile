@@ -21,6 +21,7 @@ RUN spack repo add ${SPACK_ROOT}/var/spack/repos/pdi
 
 RUN mkdir -p ${LIBS_ENV}
 COPY ${OPTLIBS_VERSION}.yaml ${LIBS_ENV}/spack.yaml
+RUN [[ ! "${COMPILER}" =~ ^clang ]] || sed 's/.*\bfti\b.*//' -i ${LIBS_ENV}/spack.yaml
 RUN sed -i -e "s/@COMPILER@/${COMPILER}/" -e "s/@MPI@/${MPI}/" ${LIBS_ENV}/spack.yaml
 
 RUN spack env activate ${LIBS_ENV} \
