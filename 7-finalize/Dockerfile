@@ -9,12 +9,11 @@ ARG CMAKE
 RUN spack mark -a -i
 
 RUN COMPSPEC=${COMPILER/clang/llvm} \
- && COMPSPEC="${COMPSPEC} $([[ ! ${COMPILER} =~ ^gcc ]] || echo -n "~bootstrap")" \
  && spack mark -e ${COMPSPEC}
 
 RUN spack mark -e ${CMAKE} %${COMPILER}
 
-RUN spack mark -e ${MPI} %${COMPILER}
+RUN spack mark --all -e ${MPI} %${COMPILER}
 
 RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
   ; do \
@@ -32,7 +31,6 @@ RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
   | xargs -r strip -s
 
 RUN COMPSPEC=${COMPILER/clang/llvm} \
- && COMPSPEC=${COMPSPEC} $([[ ! ${COMPILER} =~ ^gcc ]] || echo -n "~bootstrap") \
  && echo "spack load ${COMPSPEC}" > ${SPACK_ROOT}/share/spack/pdi-env.sh
 
 RUN echo "spack load ${CMAKE} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh
@@ -77,7 +75,8 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
-RUN cmake -DDIST_PROFILE=Devel -DBUILD_DOCUMENTATION=OFF -DBUILD_FLOWVR_PLUGIN=OFF -DBUILD_FTI_PLUGIN=OFF pdi-fix_398
+RUN spack find --loaded \
+ && cmake -DDIST_PROFILE=Devel -DBUILD_DOCUMENTATION=OFF -DBUILD_FLOWVR_PLUGIN=OFF -DBUILD_FTI_PLUGIN=OFF pdi-fix_398
 
 RUN make
 
