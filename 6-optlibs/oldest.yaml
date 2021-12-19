@@ -28,7 +28,7 @@ spack:
       - hdf5@1.8.10
       - libyaml@0.2.2
       - netcdf-c@4.3.3
-      - paraconf
+      - paraconf@0.4.14
       - py-pybind11@2.3.0
       - py-pyyaml@3.11
       - sionlib@1.7.6~fortran

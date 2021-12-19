@@ -7,12 +7,13 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 ENV LIBS_ENV=${SPACK_ROOT}/var/spack/environments/optlibs
 
-#TODO: Workaround FTI issue, python required for Fortran build
-RUN ln -s /usr/bin/python3 /usr/bin/python
 #TODO: Workaround FTI issue, fails to build, branch hotfix/fortran required
 RUN git clone -b hotfix/fortran --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git
 RUN spack repo add ${SPACK_ROOT}/var/spack/repos/fti
+
+#TODO: Workaround FTI issue, python required for Fortran build
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN git clone --depth 1 https://gitlab.version.fz-juelich.de/SIONlib/spack-repository.git ${SPACK_ROOT}/var/spack/repos/SIONlib
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/SIONlib/.git
