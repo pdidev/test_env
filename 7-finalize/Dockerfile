@@ -82,6 +82,7 @@ RUN USE_DEFAULT=SYSTEM \
           -DDIST_PROFILE=Devel \
           -DBUILD_DOCUMENTATION=OFF \
           -DBUILD_FLOWVR_PLUGIN=OFF \
+          -DBUILD_CFG_VALIDATOR=ON \
           -DBUILD_FTI_PLUGIN=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           pdi-fix_398
