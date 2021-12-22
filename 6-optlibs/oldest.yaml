@@ -31,7 +31,7 @@ spack:
       - netcdf-c@4.3.3
       - paraconf@0.4.14
       - py-mpi4py@2.0.0
-      - py-numpy@1.13.3
+      - py-numpy@1.13.3 ^intel-mkl
       - py-pybind11@2.3.0
       - py-pyyaml@3.11
       - sionlib@1.7.6~fortran
