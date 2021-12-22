@@ -25,10 +25,13 @@ spack:
       - doxygen@1.8.15
       - flowvr@2.3.2
       - fti@1.5
+      #
       - hdf5@1.8.10
       - libyaml@0.2.2
       - netcdf-c@4.3.3
       - paraconf@0.4.14
+      - py-mpi4py@2.0.0
+      - py-numpy@1.13.3
       - py-pybind11@2.3.0
       - py-pyyaml@3.11
       - sionlib@1.7.6~fortran

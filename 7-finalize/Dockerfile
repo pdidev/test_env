@@ -44,6 +44,13 @@ RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yam
       || true \
   ; done
 
+RUN for N in $(grep '^\s*\(-\s\+\)\+py-[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
+  ; do \
+      spack activate $N  \
+      && echo "spack activate $N" >> ${SPACK_ROOT}/share/spack/pdi-env.sh \
+      || true \
+  ; done
+
 RUN sed -i \
     's%unset _sp_initializing%. ${SPACK_ROOT}/share/spack/pdi-env.sh; unset _sp_initializing%' \
     ${SPACK_ROOT}/share/spack/setup-env.sh
@@ -75,32 +82,17 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
-#TODO: add to base image
-RUN set -ex \
- && apt-get update -y \
- && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends \
-            python3-wheel \
- && apt-get autoremove -y \
- && apt-get clean -y \
- && apt-get autoclean -y \
- && rm -rf /var/lib/apt/lists/*
-
-#TODO: add to baselibs
-RUN pip3 install --user mpi4py \
- && pip3 install --user numpy \
- && pip3 install --user PyYAML
-
 RUN USE_DEFAULT=SYSTEM \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
-          -DBUILD_DOCUMENTATION=OFF \
+          -DBUILD_CFG_VALIDATOR=OFF \
           -DBUILD_FLOWVR_PLUGIN=OFF \
-          -DBUILD_CFG_VALIDATOR=ON \
           -DBUILD_FTI_PLUGIN=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
+          -DUSE_Zpp=${USE_DEFAULT} \
+          -DUSE_GTest=${USE_DEFAULT} \
           pdi-fix_398
 
 RUN make VERBOSE=1
