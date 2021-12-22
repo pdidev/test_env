@@ -92,7 +92,6 @@ RUN USE_DEFAULT=SYSTEM \
           -DBUILD_FTI_PLUGIN=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \
-          -DUSE_GTest=${USE_DEFAULT} \
           pdi-fix_398
 
 RUN make VERBOSE=1
