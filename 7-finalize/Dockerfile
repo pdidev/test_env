@@ -75,6 +75,18 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
+#TODO: add to base image
+RUN set -ex \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+            python3-wheel \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && rm -rf /var/lib/apt/lists/*
+
+#TODO: add to baselibs
 RUN pip3 install --user mpi4py \
  && pip3 install --user numpy \
  && pip3 install --user PyYAML
