@@ -75,6 +75,10 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
+RUN pip3 install --user mpi4py \
+ && pip3 install --user numpy \
+ && pip3 install --user PyYAML
+
 RUN USE_DEFAULT=SYSTEM \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find --loaded \
@@ -88,9 +92,6 @@ RUN USE_DEFAULT=SYSTEM \
           pdi-fix_398
 
 RUN make VERBOSE=1
-
-RUN pip3 install --user mpi4py \
- && pip3 install --user numpy
 
 RUN ctest --output-on-failure
 
