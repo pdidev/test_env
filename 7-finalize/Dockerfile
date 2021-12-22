@@ -13,11 +13,11 @@ RUN COMPSPEC=${COMPILER/clang/llvm} \
 
 RUN spack mark -e ${CMAKE} %${COMPILER}
 
-RUN spack mark --all -e ${MPI} %${COMPILER}
+RUN spack mark -e ${MPI} %${COMPILER}
 
 RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
   ; do \
-      spack mark --all -e $N %${COMPILER} || true \
+      spack mark -e $N %${COMPILER} || true \
   ; done
 
 RUN spack compiler find

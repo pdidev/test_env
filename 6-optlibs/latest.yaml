@@ -20,6 +20,7 @@ spack:
       - mesa~llvm
       - pkgconf
       - swig
+      - zpp
       - @MPI@
       - astyle
       - doxygen
