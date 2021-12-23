@@ -26,7 +26,7 @@ spack:
       - doxygen
       - flowvr
       - fti
-      - googletest
+      - googletest+gmock
       #TODO: Workaround https://github.com/spack/spack/issues/28074
       - hdf5@1.12.1
       - libyaml

@@ -26,7 +26,7 @@ spack:
       - doxygen@1.8.15
       - flowvr@2.3.2
       - fti@1.5
-      - googletest
+      - googletest+gmock
       #
       - hdf5@1.8.10
       - libyaml@0.2.2
