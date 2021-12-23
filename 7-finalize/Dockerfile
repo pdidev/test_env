@@ -15,7 +15,7 @@ RUN spack mark -e ${CMAKE} %${COMPILER}
 
 RUN spack mark -e ${MPI} %${COMPILER} || true
 
-RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
+RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z\^:~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
   ; do \
       spack mark -e $N %${COMPILER} || true \
   ; done
@@ -37,14 +37,14 @@ RUN echo "spack load ${CMAKE} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env
 
 RUN echo "spack load ${MPI} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh
 
-RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
+RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z\^:~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
   ; do \
       spack load $N %${COMPILER} \
       && echo "spack load $N %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh \
       || true \
   ; done
 
-RUN for N in $(grep '^\s*\(-\s\+\)\+py-[0-9a-zA-Z~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | sed 's/\s*\(-\s*\)*//') \
+RUN for N in $(grep '^\s*\(-\s\+\)\+py-[0-9a-zA-Z\^:~@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
   ; do \
       spack activate $N  \
       && echo "spack activate $N" >> ${SPACK_ROOT}/share/spack/pdi-env.sh \
@@ -75,6 +75,8 @@ SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
 CMD ["interactive-shell"]
 
+ENV OMPI_MCA_rmaps_base_oversubscribe=1
+
 
 FROM main AS test
 
@@ -92,6 +94,7 @@ RUN USE_DEFAULT=SYSTEM \
           -DBUILD_FTI_PLUGIN=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \
+          -DUSE_GTest=${USE_DEFAULT} \
           pdi-fix_398
 
 RUN make VERBOSE=1

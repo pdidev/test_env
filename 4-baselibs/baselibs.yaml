@@ -3,8 +3,8 @@ spack:
   specs:
   - cmake~ownlibs^curl tls=openssl
   - matrix:
-    - [ 'target=x86_64' ]
     - [ '%@COMPILER@' ]
+    - [ 'target=x86_64' ]
     - [ '^cmake~ownlibs' ]
     - [ '^curl tls=openssl' ]
     -
@@ -13,7 +13,7 @@ spack:
       - freeglut
       - glew
       - hwloc
-      - iconv
+      - libiconv
       - libxml2
       - libxmu
       - libxslt
