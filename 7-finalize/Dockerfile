@@ -84,6 +84,8 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
+#TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
+#          -DUSE_GTest=${USE_DEFAULT}
 RUN USE_DEFAULT=SYSTEM \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find --loaded \
@@ -94,7 +96,7 @@ RUN USE_DEFAULT=SYSTEM \
           -DBUILD_FTI_PLUGIN=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \
-          -DUSE_GTest=${USE_DEFAULT} \
+          -DUSE_GTest=EMBEDDED \
           pdi-fix_398
 
 RUN make VERBOSE=1

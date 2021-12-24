@@ -26,7 +26,8 @@ spack:
       - doxygen@1.8.15
       - flowvr@2.3.2
       - fti@1.5
-      - googletest+gmock
+      #TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
+      #- googletest+gmock
       #
       - hdf5@1.8.10
       - libyaml@0.2.2
