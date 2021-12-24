@@ -198,8 +198,35 @@ jobs:
         LIBS: "${{ matrix.libs }}"
         CMAKE: "${{ matrix.cmake }}"
       run: |
+        df -h
         docker build --pull \
           --build-arg "BASE_IMAGE=ghcr.io/pdidev/dockerfiles/pditst:nodask-${image_version}" \
           --build-arg "SPACK_IMAGE=ghcr.io/pdidev/dockerfiles/pditst:${COMPILER}-${MPI}${LIBS}-${image_version}" \
           --build-arg "CMAKE=${CMAKE}" \
+          -t ghcr.io/pdidev/dockerfiles/pditst:${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS} \
+          -t ghcr.io/pdidev/dockerfiles/pditst:${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}-${image_version} \
+          -t pdidev/pditst:${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}-${image_version} \
           7-finalize
+    - name: publish
+      env:
+        ACTOR: "${{ github.actor }}"
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        COMPILER: "${{ matrix.compiler }}"
+        MPI: "${{ matrix.mpi }}"
+        LIBS: "${{ matrix.libs }}"
+        CMAKE: "${{ matrix.cmake }}"
+      run: |
+        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
+        docker push ghcr.io/pdidev/dockerfiles/pditst:${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}
+        docker push ghcr.io/pdidev/dockerfiles/pditst:${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}-${image_version}
+    - name: public publish
+      if: "${{ github.event_name == 'push' }}"
+      env:
+        DOCKER_TOKEN: "${{ secrets.DOCKERHUB_TOKEN }}"
+        COMPILER: "${{ matrix.compiler }}"
+        MPI: "${{ matrix.mpi }}"
+        LIBS: "${{ matrix.libs }}"
+        CMAKE: "${{ matrix.cmake }}"
+      run: |
+        echo ${DOCKER_TOKEN} | docker login -u jbigot --password-stdin
+        docker push pdidev/pditst:${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}-${image_version}

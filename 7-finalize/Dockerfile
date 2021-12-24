@@ -60,16 +60,15 @@ FROM ${BASE_IMAGE} AS main
 
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
-RUN useradd -d /home/ci -m -U ci
+RUN . ${SPACK_ROOT}/share/spack/pdi-env.sh \
+ && useradd -d /home/ci -m -U ci
 
 ENV HOME=/home/ci
 COPY --from=builder ${SPACK_HOME} ${HOME}/.spack
 ENV SPACK_HOME=${HOME}/.spack
-
 RUN chown -R ci:ci ${HOME}
 
 USER ci:ci
-
 WORKDIR ${HOME}
 SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
@@ -86,6 +85,12 @@ RUN tar -xf pdi-fix_398.tar.gz
 
 #TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
 #          -DUSE_GTest=${USE_DEFAULT}
+#TODO: FTI embedded build fails du to missing dependency on zlib
+#          -DBUILD_FTI_PLUGIN=OFF
+#TODO: FlowVR fails to build due to missing include dir for GL/glu.h
+#          -DBUILD_FLOWVR_PLUGIN=OFF
+#TODO: Doxygen badly detects iconv
+#          -DICONV_IN_GLIBC=OFF
 RUN USE_DEFAULT=SYSTEM \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find --loaded \
@@ -97,6 +102,7 @@ RUN USE_DEFAULT=SYSTEM \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \
           -DUSE_GTest=EMBEDDED \
+          -DICONV_IN_GLIBC=OFF \
           pdi-fix_398
 
 RUN make VERBOSE=1
