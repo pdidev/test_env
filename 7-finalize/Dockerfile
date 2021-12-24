@@ -24,12 +24,6 @@ RUN spack compiler find
 
 RUN spack gc -y
 
-RUN spack clean -a 
-
-RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
-  | xargs file -i | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
-  | xargs -r strip -s
-
 RUN COMPSPEC=${COMPILER/clang/llvm} \
  && echo "spack load ${COMPSPEC}" > ${SPACK_ROOT}/share/spack/pdi-env.sh
 
@@ -55,13 +49,22 @@ RUN sed -i \
     's%unset _sp_initializing%. ${SPACK_ROOT}/share/spack/pdi-env.sh; unset _sp_initializing%' \
     ${SPACK_ROOT}/share/spack/setup-env.sh
 
+RUN spack clean -a
+
+RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
+  | xargs file -i | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
+  | xargs -r strip -s
+
 
 FROM ${BASE_IMAGE} AS main
 
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
-RUN . ${SPACK_ROOT}/share/spack/pdi-env.sh \
- && useradd -d /home/ci -m -U ci
+SHELL ["docker-shell"]
+ENTRYPOINT ["spack-env"]
+CMD ["interactive-shell"]
+
+RUN useradd -d /home/ci -m -U ci
 
 ENV HOME=/home/ci
 COPY --from=builder ${SPACK_HOME} ${HOME}/.spack
@@ -70,9 +73,6 @@ RUN chown -R ci:ci ${HOME}
 
 USER ci:ci
 WORKDIR ${HOME}
-SHELL ["docker-shell"]
-ENTRYPOINT ["spack-env"]
-CMD ["interactive-shell"]
 
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
@@ -85,24 +85,28 @@ RUN tar -xf pdi-fix_398.tar.gz
 
 #TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
 #          -DUSE_GTest=${USE_DEFAULT}
-#TODO: FTI embedded build fails du to missing dependency on zlib
-#          -DBUILD_FTI_PLUGIN=OFF
+#TODO: FTI embedded build fails due to missing dependency on zlib
+#          -DBUILD_FTI_PLUGIN=ON
 #TODO: FlowVR fails to build due to missing include dir for GL/glu.h
-#          -DBUILD_FLOWVR_PLUGIN=OFF
+#          -DBUILD_FLOWVR_PLUGIN=ON
 #TODO: Doxygen badly detects iconv
-#          -DICONV_IN_GLIBC=OFF
+#          remove -DICONV_IN_GLIBC=OFF
+#TODO: Netcdf fails to detect zlib
+#          -DBUILD_DECL_NETCDF=ON
 RUN USE_DEFAULT=SYSTEM \
+ && NO_EMBEDDED=ON \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
+ && spack find flowvr || NO_EMBEDDED=OFF \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
-          -DBUILD_CFG_VALIDATOR=OFF \
-          -DBUILD_FLOWVR_PLUGIN=OFF \
-          -DBUILD_FTI_PLUGIN=OFF \
+          -DBUILD_DECL_NETCDF=${NO_EMBEDDED} \
+          -DBUILD_FLOWVR_PLUGIN=${NO_EMBEDDED} \
+          -DBUILD_FTI_PLUGIN=${NO_EMBEDDED} \
+          -DICONV_IN_GLIBC=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \
           -DUSE_GTest=EMBEDDED \
-          -DICONV_IN_GLIBC=OFF \
           pdi-fix_398
 
 RUN make VERBOSE=1
