@@ -94,13 +94,13 @@ RUN tar -xf pdi-fix_398.tar.gz
 #TODO: Doxygen badly detects iconv
 #          remove -DICONV_IN_GLIBC=OFF
 #TODO: Netcdf fails to detect zlib
-#          -DBUILD_DECL_NETCDF=ON
+#          -DBUILD_DECL_NETCDF_PLUGIN=ON
 RUN USE_DEFAULT=SYSTEM \
  && NO_EMBEDDED=ON \
+ && BUILD_FTI_PLUGIN=OFF \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find flowvr || NO_EMBEDDED=OFF \
- && BUILD_FTI_PLUGIN=${NO_EMBEDDED} \
- && spack find llvm || BUILD_FTI_PLUGIN=OFF \
+ && spack find llvm || BUILD_FTI_PLUGIN=${NO_EMBEDDED} \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
