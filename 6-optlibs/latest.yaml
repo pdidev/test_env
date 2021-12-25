@@ -25,11 +25,11 @@ spack:
       - astyle
       - doxygen
       - flowvr
-      - fti
+      - fti~hdf5
       #TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
       #- googletest+gmock
       #TODO: Workaround https://github.com/spack/spack/issues/28074
-      - hdf5@1.12.1~hdf5
+      - hdf5@1.12.1
       - libyaml
       - netcdf-c
       - paraconf
