@@ -45,11 +45,12 @@ RUN for N in $(grep '^\s*\(-\s\+\)\+py-[0-9a-zA-Z\^:~+@\.-]*\s*$' ${LIBS_ENV}/sp
       || true \
   ; done
 
+RUN spack clean -a \
+ && echo "spack clean -a" >> ${SPACK_ROOT}/share/spack/pdi-env.sh
+
 RUN sed -i \
     's%unset _sp_initializing%. ${SPACK_ROOT}/share/spack/pdi-env.sh; unset _sp_initializing%' \
     ${SPACK_ROOT}/share/spack/setup-env.sh
-
-RUN spack clean -a
 
 RUN find -L ${SPACK_ROOT}/opt/spack -type f -exec readlink -f '{}' \; \
   | xargs file -i | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
@@ -70,6 +71,9 @@ ENV HOME=/home/ci
 COPY --from=builder ${SPACK_HOME} ${HOME}/.spack
 ENV SPACK_HOME=${HOME}/.spack
 RUN chown -R ci:ci ${HOME}
+
+#TODO: Workaround cfgtest, python required
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 USER ci:ci
 WORKDIR ${HOME}
