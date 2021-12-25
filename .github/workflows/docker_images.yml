@@ -184,7 +184,7 @@ jobs:
         compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
         mpi:      ['openmpi_latest', 'openmpi_2.1.1']
         libs:     ['', '-libs_latest', '-libs_oldest']
-        cmake:    ['cmake@3.21', 'cmake@3.10']
+        cmake:    ['cmake@3.21'] #, 'cmake@3.10'
     needs: step5_build_libs
     runs-on: ubuntu-latest
     steps:

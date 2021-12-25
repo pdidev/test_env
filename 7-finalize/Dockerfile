@@ -87,6 +87,8 @@ RUN tar -xf pdi-fix_398.tar.gz
 #          -DUSE_GTest=${USE_DEFAULT}
 #TODO: FTI embedded build fails due to missing dependency on zlib
 #          -DBUILD_FTI_PLUGIN=ON
+#TODO: FTI unavailable in mixed clang/gfortran setup
+#          -DBUILD_FTI_PLUGIN=ON
 #TODO: FlowVR fails to build due to missing include dir for GL/glu.h
 #          -DBUILD_FLOWVR_PLUGIN=ON
 #TODO: Doxygen badly detects iconv
@@ -97,12 +99,15 @@ RUN USE_DEFAULT=SYSTEM \
  && NO_EMBEDDED=ON \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find flowvr || NO_EMBEDDED=OFF \
+ && BUILD_FTI_PLUGIN=${NO_EMBEDDED} \
+ && spack find llvm || BUILD_FTI_PLUGIN=OFF \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
+          -DBUILD_CFG_VALIDATOR=${NO_EMBEDDED} \
           -DBUILD_DECL_NETCDF=${NO_EMBEDDED} \
           -DBUILD_FLOWVR_PLUGIN=${NO_EMBEDDED} \
-          -DBUILD_FTI_PLUGIN=${NO_EMBEDDED} \
+          -DBUILD_FTI_PLUGIN=${BUILD_FTI_PLUGIN} \
           -DICONV_IN_GLIBC=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \
