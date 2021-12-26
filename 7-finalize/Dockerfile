@@ -83,22 +83,25 @@ ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
 FROM main AS test
 
+#TODO: Integrate into main branch
 RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
 
 RUN tar -xf pdi-fix_398.tar.gz
 
-#TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
-#          -DUSE_GTest=${USE_DEFAULT}
-#TODO: FTI embedded build fails due to missing dependency on zlib
-#          -DBUILD_FTI_PLUGIN=ON
-#TODO: FTI unavailable in mixed clang/gfortran setup
-#          -DBUILD_FTI_PLUGIN=ON
-#TODO: FlowVR fails to build due to missing include dir for GL/glu.h
-#          -DBUILD_FLOWVR_PLUGIN=ON
-#TODO: Doxygen badly detects iconv
-#          remove -DICONV_IN_GLIBC=OFF
+#TODO: cfg_validator unable to load self compiled pyyaml
+#          -DBUILD_CFG_VALIDATOR=ON
 #TODO: Netcdf fails to detect zlib
 #          -DBUILD_DECL_NETCDF_PLUGIN=ON
+#TODO: FlowVR fails to build due to missing include dir for GL/glu.h
+#          -DBUILD_FLOWVR_PLUGIN=ON
+#TODO: FTI embedded build fails due to missing dependency on zlib
+#          -DBUILD_FTI_PLUGIN=ON
+#TODO: FTI unavailable in mixed clang/gfortran setup https://github.com/leobago/fti/issues/405
+#          -DBUILD_FTI_PLUGIN=ON
+#TODO: Doxygen badly detects iconv
+#          remove -DICONV_IN_GLIBC=OFF
+#TODO: system googletest fails to compile with recent clang due to https://github.com/google/googletest/issues/3427
+#          -DUSE_GTest=${USE_DEFAULT}
 RUN USE_DEFAULT=SYSTEM \
  && NO_EMBEDDED=ON \
  && BUILD_FTI_PLUGIN=OFF \

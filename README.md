@@ -4,8 +4,8 @@ A set of related Docker images to build and test PDI
 [`pdidevel/pditst`](https://hub.docker.com/repository/docker/pdidevel/pditst).
 
 The images come in two categories of tags:
-* `pdidevel/pditst:${compiler}-${mpi}-${cmake}`
-* `pdidevel/pditst:${compiler}-${mpi}-${cmake}-${libs}`
+* `ghcr.io/pdidev/test_env/${compiler}-${mpi}-${cmake}`
+* `ghcr.io/pdidev/test_env/${compiler}-${mpi}-${cmake}-${libs}`
 
 All images are based on Ubuntu 18.08, with dependencies installed through
 spack.

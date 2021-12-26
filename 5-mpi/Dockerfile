@@ -7,7 +7,8 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 ENV MPI=${MPI}
 
-RUN spack solve   -I --reuse \
-                  "${MPI}%${COMPILER}^cmake~ownlibs^curl" tls=openssl target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse \
-                  "${MPI}%${COMPILER}^cmake~ownlibs^curl" tls=openssl target=x86_64
+RUN spack env activate ${LIBS_ENV} \
+ && spack add "${MPI} ~internal-hwloc ^cmake~ownlibs ^curl tls=openssl" \
+ && spack add py-mpi4py \
+ && spack concretize --reuse \
+ && spack install ${SPACK_INSTALL_ARGS}

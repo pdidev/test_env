@@ -3,8 +3,6 @@ spack:
   specs:
   - cmake~ownlibs^curl tls=openssl
   - matrix:
-    - [ '%@COMPILER@' ]
-    - [ 'target=x86_64' ]
     - [ '^cmake~ownlibs' ]
     - [ '^curl tls=openssl' ]
     -
@@ -19,4 +17,5 @@ spack:
       - libxslt
       - mesa~llvm
       - pkgconf
+      - py-numpy^intel-mkl
       - swig

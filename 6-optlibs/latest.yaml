@@ -3,8 +3,6 @@ spack:
   specs:
   - cmake~ownlibs^curl tls=openssl
   - matrix:
-    - [ '%@COMPILER@' ]
-    - [ 'target=x86_64' ]
     - [ '^cmake~ownlibs' ]
     - [ '^curl tls=openssl' ]
     - [ '^@MPI@' ]
@@ -20,8 +18,10 @@ spack:
       - libxslt
       - mesa~llvm
       - pkgconf
+      - py-numpy^intel-mkl
       - swig
       - @MPI@
+      - py-mpi4py
       - astyle
       - doxygen
       - flowvr
@@ -33,8 +33,6 @@ spack:
       - libyaml
       - netcdf-c
       - paraconf
-      - py-mpi4py
-      - py-numpy^intel-mkl
       - py-pybind11
       - py-pyyaml
       - sionlib@1.7.6:1.999
