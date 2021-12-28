@@ -88,12 +88,8 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
-#TODO: Netcdf fails to detect zlib
-#          -DBUILD_DECL_NETCDF_PLUGIN=ON
 #TODO: FlowVR fails to build due to missing include dir for GL/glu.h
 #          -DBUILD_FLOWVR_PLUGIN=ON
-#TODO: FTI embedded build fails due to missing dependency on zlib
-#          -DBUILD_FTI_PLUGIN=ON
 #TODO: FTI unavailable in mixed clang/gfortran setup https://github.com/leobago/fti/issues/405
 #          -DBUILD_FTI_PLUGIN=ON
 #TODO: Doxygen badly detects iconv
@@ -105,11 +101,10 @@ RUN USE_DEFAULT=SYSTEM \
  && BUILD_FTI_PLUGIN=OFF \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find flowvr || NO_EMBEDDED=OFF \
- && spack find llvm || BUILD_FTI_PLUGIN=${NO_EMBEDDED} \
+ && spack find llvm || BUILD_FTI_PLUGIN=ON \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
-          -DBUILD_DECL_NETCDF_PLUGIN=${NO_EMBEDDED} \
           -DBUILD_FLOWVR_PLUGIN=OFF \
           -DBUILD_FTI_PLUGIN=${BUILD_FTI_PLUGIN} \
           -DICONV_IN_GLIBC=OFF \

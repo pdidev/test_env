@@ -20,3 +20,4 @@ spack:
       - py-pyyaml~libyaml
       - py-numpy^intel-mkl
       - swig
+      - zlib

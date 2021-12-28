@@ -20,6 +20,7 @@ spack:
       - pkgconf
       - py-numpy@1.13.3^intel-mkl
       - swig
+      - zlib
       - @MPI@
       - py-mpi4py@2.0.0
       - astyle
