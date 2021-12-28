@@ -15,7 +15,8 @@ RUN spack mark -e ${CMAKE} %${COMPILER}
 
 RUN spack mark -e ${MPI} %${COMPILER} || true
 
-RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z\^:~+@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
+RUN [[ gcc != "${COMPILER}" ]] || COMPILER="gcc@7.6:" \
+ && for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z\^:~+@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
   ; do \
       spack mark -e $N %${COMPILER} || true \
   ; done
@@ -92,6 +93,8 @@ RUN tar -xf pdi-fix_398.tar.gz
 #          -DBUILD_FLOWVR_PLUGIN=ON
 #TODO: FTI unavailable in mixed clang/gfortran setup https://github.com/leobago/fti/issues/405
 #          -DBUILD_FTI_PLUGIN=ON
+#TODO: FTI does not correctly add zlib include path where required when building
+#          -DBUILD_FTI_PLUGIN=ON
 #TODO: Doxygen badly detects iconv
 #          remove -DICONV_IN_GLIBC=OFF
 #TODO: system googletest fails to compile with recent clang due to https://github.com/google/googletest/issues/3427
@@ -101,7 +104,7 @@ RUN USE_DEFAULT=SYSTEM \
  && BUILD_FTI_PLUGIN=OFF \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find flowvr || NO_EMBEDDED=OFF \
- && spack find llvm || BUILD_FTI_PLUGIN=ON \
+ && spack find llvm || BUILD_FTI_PLUGIN=${NO_EMBEDDED} \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
