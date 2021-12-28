@@ -42,9 +42,9 @@ RUN [[ gcc != "${COMPILER}" ]] || COMPILER="gcc@7.6:" \
 
 RUN for N in $(grep '^\s*\(-\s\+\)\+py-[0-9a-zA-Z\^:~+@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
   ; do \
-      spack activate $N  \
-      && echo "spack activate $N" >> ${SPACK_ROOT}/share/spack/pdi-env.sh \
-      || true \
+      spack activate $N \
+   && echo "spack activate $N" >> ${SPACK_ROOT}/share/spack/pdi-activate.sh \
+   || true \
   ; done
 
 RUN spack clean -a \
@@ -67,16 +67,17 @@ SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
 CMD ["interactive-shell"]
 
-RUN useradd -d /home/ci -m -U ci
+COPY --from=builder ${SPACK_HOME} ${SPACK_HOME}
+RUN . ${SPACK_ROOT}/share/spack/pdi-activate.sh
 
-ENV HOME=/home/ci
-COPY --from=builder ${SPACK_HOME} ${HOME}/.spack
-ENV SPACK_HOME=${HOME}/.spack
-RUN chown -R ci:ci ${HOME}
-
-#TODO: Workaround cfgtest, python required
+#TODO: Workaround cfgtest, python required https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/issues/399
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
+ENV HOME=/home/ci
+RUN useradd -d ${HOME} -m -U ci
+COPY --from=builder --chown=ci:ci ${SPACK_HOME} ${HOME}/.spack
+RUN chown -R ci:ci ${HOME}
+ENV SPACK_HOME=${HOME}/.spack
 USER ci:ci
 WORKDIR ${HOME}
 
@@ -90,6 +91,8 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
+#TODO: NetCDF fails to build because it doesn't find zlib
+#          -DBUILD_DECL_NETCDF_PLUGIN=ON
 #TODO: FlowVR fails to build due to missing include dir for GL/glu.h
 #          -DBUILD_FLOWVR_PLUGIN=ON
 #TODO: FTI unavailable in mixed clang/gfortran setup https://github.com/leobago/fti/issues/405
@@ -109,6 +112,7 @@ RUN USE_DEFAULT=SYSTEM \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
+          -DBUILD_DECL_NETCDF_PLUGIN=${NO_EMBEDDED} \
           -DBUILD_FLOWVR_PLUGIN=OFF \
           -DBUILD_FTI_PLUGIN=${BUILD_FTI_PLUGIN} \
           -DICONV_IN_GLIBC=OFF \
