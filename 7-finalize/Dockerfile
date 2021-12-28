@@ -32,7 +32,8 @@ RUN echo "spack load ${CMAKE} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env
 
 RUN echo "spack load ${MPI} %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh
 
-RUN for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z\^:~+@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
+RUN [[ gcc != "${COMPILER}" ]] || COMPILER="gcc@7.6:" \
+ && for N in $(grep '^\s*\(-\s\+\)\+[0-9a-zA-Z\^:~+@\.-]*\s*$' ${LIBS_ENV}/spack.yaml | grep -v '\bmatrix\b' | sed 's/\s*\(-\s*\)*//') \
   ; do \
       spack load $N %${COMPILER} \
       && echo "spack load $N %${COMPILER}" >> ${SPACK_ROOT}/share/spack/pdi-env.sh \
