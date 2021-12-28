@@ -88,8 +88,6 @@ RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdid
 
 RUN tar -xf pdi-fix_398.tar.gz
 
-#TODO: cfg_validator unable to load self compiled pyyaml
-#          -DBUILD_CFG_VALIDATOR=ON
 #TODO: Netcdf fails to detect zlib
 #          -DBUILD_DECL_NETCDF_PLUGIN=ON
 #TODO: FlowVR fails to build due to missing include dir for GL/glu.h
@@ -111,7 +109,6 @@ RUN USE_DEFAULT=SYSTEM \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
-          -DBUILD_CFG_VALIDATOR=${NO_EMBEDDED} \
           -DBUILD_DECL_NETCDF_PLUGIN=${NO_EMBEDDED} \
           -DBUILD_FLOWVR_PLUGIN=OFF \
           -DBUILD_FTI_PLUGIN=${BUILD_FTI_PLUGIN} \
