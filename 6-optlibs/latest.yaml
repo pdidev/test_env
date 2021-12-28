@@ -19,6 +19,7 @@ spack:
       - mesa~llvm
       - pkgconf
       - py-numpy^intel-mkl
+      - py-pyyaml~libyaml
       - swig
       - zlib
       - @MPI@
@@ -35,7 +36,6 @@ spack:
       - netcdf-c
       - paraconf
       - py-pybind11
-      - py-pyyaml
       - sionlib@1.7.6:1.999
       - spdlog
       - zpp
