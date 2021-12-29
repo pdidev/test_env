@@ -9,6 +9,6 @@ ENV MPI=${MPI}
 
 RUN spack env activate ${LIBS_ENV} \
  && spack add "${MPI} ~internal-hwloc ^cmake~ownlibs ^curl tls=openssl" \
- && spack add py-mpi4py \
+ && spack add "py-mpi4py ^${MPI} ~internal-hwloc ^cmake~ownlibs ^curl tls=openssl"\
  && spack concretize --reuse \
  && spack install ${SPACK_INSTALL_ARGS}

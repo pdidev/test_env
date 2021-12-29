@@ -26,16 +26,14 @@ spack:
       - py-mpi4py
       - astyle
       - doxygen
-      - flowvr
-      - fti~hdf5
-      #TODO: fails with recent clang due to https://github.com/google/googletest/issues/3427
-      #- googletest+gmock
-      #TODO: Workaround https://github.com/spack/spack/issues/28074
-      - hdf5@1.12.1
-      - libyaml
-      - netcdf-c
-      - paraconf
-      - py-pybind11
-      - sionlib@1.7.6:1.999
-      - spdlog
-      - zpp
+      - flowvr@2.3.2
+      #TODO: Workaround invalid HDF5 inclusion by FTI
+      - fti@1.6~hdf5
+      - 'hdf5@:1.999.999'
+      - 'libyaml@:0.999.999'
+      - 'netcdf-c@:4.999.999'
+      - 'paraconf@:0.999.999'
+      - 'py-pybind11@:2.999.999'
+      - sionlib@1.7.6~fortran
+      - 'spdlog@:1.999.999'
+      - 'zpp@:1.999.999'

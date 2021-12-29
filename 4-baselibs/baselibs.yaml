@@ -17,7 +17,7 @@ spack:
       - libxslt
       - mesa~llvm
       - pkgconf
-      - py-pyyaml~libyaml
       - py-numpy^intel-mkl
+      - py-pyyaml~libyaml
       - swig
       - zlib
