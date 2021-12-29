@@ -1,16 +1,11 @@
-if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]
-then
-	BRANCH_NAME="${GITHUB_HEAD_REF}"
-else
-	BRANCH_NAME="${GITHUB_REF/*\/}"
-fi
-echo "BRANCH_NAME=${BRANCH_NAME}"
-set +e
-if echo "${BRANCH_NAME}" | grep -qs '^v[0-9]*$' &> /dev/null
-then
-	image_version="v$(echo "${BRANCH_NAME}" | sed 's%^v\([0-9]*\)$%\1%')"
-else
-	image_version="v$(( 0$(git branch -r --merged | grep '^\s*origin/v[0-9]*\s*$' | sed 's%^\s*origin/v\([0-9]*\)\s*$%\1%' | sort -nu | head -n 1 ) +1 ))_pre_${GITHUB_SHA:0:7}"
-fi
-echo "image_version=${image_version}"
-echo "image_version=${image_version}" >> $GITHUB_ENV
+echo "VERSION=${VERSION}"
+echo "export VERSION=${VERSION}" >> $GITHUB_ENV
+echo "COMPILER=${COMPILER}"
+echo "export COMPILER=${COMPILER}" >> $GITHUB_ENV
+echo "MPI=${MPI}"
+echo "export MPI=${MPI}" >> $GITHUB_ENV
+echo "LIBS=${LIBS}"
+echo "export LIBS=${LIBS}" >> $GITHUB_ENV
+echo "IMAGE_TAG=${GITHUB_SHA:0:7}"
+echo "export IMAGE_TAG=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin

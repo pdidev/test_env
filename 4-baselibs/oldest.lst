@@ -1,0 +1,15 @@
+bison@3.0.4
+flex@2.6.4
+freeglut
+glew@2.0.0
+hwloc@1.11.9
+iconv
+libxml2@2.9.4
+libxmu@1.1.2
+libxslt@1.1.29
+mesa~llvm
+pkgconfig
+py-numpy@1.13.3^intel-mkl
+py-pyyaml@3.12.1~libyaml
+swig@3.0.12
+zlib@1.2.11

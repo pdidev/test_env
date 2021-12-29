@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-LABEL org.opencontainers.image.source = "https://github.com/pdidev/dockerfiles"
+LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ENV DOCKERFILE_BASE=ubuntu            \
     DOCKERFILE_DISTRO=ubuntu          \

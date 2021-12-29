@@ -17,205 +17,155 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
-    - name: build nodask
+    - name: build base
       run: |
-        docker pull ghcr.io/pdidev/test_env/base-nodask || true
-        docker build --pull \
-          --cache-from ghcr.io/pdidev/test_env/base-nodask \
-          -t ghcr.io/pdidev/test_env/base-nodask \
-          -t ghcr.io/pdidev/test_env/base-nodask:${image_version} \
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/test_env/base || true
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/base \
+          -t ghcr.io/pdidev/test_env/base \
+          -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
           1-bionic
-    - name: publish nodask
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    - name: publish base
       run: |
-        set -ex
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/base-nodask
-        docker push ghcr.io/pdidev/test_env/base-nodask:${image_version}
+        docker push ghcr.io/pdidev/test_env/base
+        docker push ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7}
     - name: build dask
       run: |
-        docker pull ghcr.io/pdidev/test_env/base-nocompiler || true
-        docker build --pull \
-          --cache-from ghcr.io/pdidev/test_env/base-nocompiler \
-          --build-arg "BASE_IMAGE=ghcr.io/pdidev/test_env/base-nodask:${image_version}" \
-          -t ghcr.io/pdidev/test_env/base-nocompiler \
-          -t ghcr.io/pdidev/test_env/base-nocompiler:${image_version} \
+        docker pull ghcr.io/pdidev/test_env/builder || true
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder \
+          -t ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7} \
           2-spack
     - name: publish dask
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       run: |
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/base-nocompiler
-        docker push ghcr.io/pdidev/test_env/base-nocompiler:${image_version}
+        docker push ghcr.io/pdidev/test_env/builder
+        docker push ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7}
   step2_build_compiler:
     strategy:
       matrix:
-        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
     needs: step1_build_base
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
     - name: build compiler
-      env:
-        COMPILER: "${{ matrix.compiler }}"
       run: |
-        docker pull ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs || true
-        docker build --pull \
-          --cache-from ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs \
-          --build-arg "COMPILER=$(echo -n ${COMPILER} | sed -e s/_/@/ -e s/@latest//)" \
-          --build-arg "BASE_IMAGE=ghcr.io/pdidev/test_env/base-nocompiler:${image_version}" \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs:${image_version} \
-          3-compiler
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs || true
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7} \
+          3-${{ matrix.compiler }}
     - name: publish compiler
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        COMPILER: "${{ matrix.compiler }}"
       run: |
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs:${image_version}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7}
     - name: build baselibs
-      env:
-        COMPILER: "${{ matrix.compiler }}"
       run: |
-        docker pull ghcr.io/pdidev/test_env/${COMPILER}-nompi || true
-        docker build --pull \
-          --cache-from ghcr.io/pdidev/test_env/${COMPILER}-nompi \
-          --build-arg "BASE_IMAGE=ghcr.io/pdidev/test_env/${COMPILER}-nobaselibs:${image_version}" \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-nompi \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-nompi:${image_version} \
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} || true
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7} \
           4-baselibs
     - name: publish baselibs
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        COMPILER: "${{ matrix.compiler }}"
       run: |
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-nompi
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-nompi:${image_version}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7}
   step4_build_mpi:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-        mpi:      ['openmpi_latest', 'openmpi_2.1.1']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
+        mpi:      ['openmpi']
     needs: step2_build_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
     - name: build
-      env:
-        COMPILER: "${{ matrix.compiler }}"
-        MPI: "${{ matrix.mpi }}"
       run: |
-        docker pull ghcr.io/pdidev/test_env/${COMPILER}-${MPI} || true
-        docker build --pull \
-          --cache-from ghcr.io/pdidev/test_env/${COMPILER}-${MPI} \
-          --build-arg "BASE_IMAGE=ghcr.io/pdidev/test_env/${COMPILER}-nompi:${image_version}" \
-          --build-arg "MPI=$(echo -n ${MPI} | sed -e s/_/@/ -e s/@latest//)" \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-${MPI} \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-${MPI}:${image_version} \
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} || true
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg MPI=${{ matrix.mpi }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs-${GITHUB_SHA:0:7} \
           5-mpi
     - name: publish
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        COMPILER: "${{ matrix.compiler }}"
-        MPI: "${{ matrix.mpi }}"
       run: |
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-${MPI}
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-${MPI}:${image_version}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs-${GITHUB_SHA:0:7}
   step5_build_libs:
     strategy:
       matrix:
-        compiler:        ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-        mpi:             ['openmpi_latest', 'openmpi_2.1.1']
-        optlibs_version: ['latest', 'oldest']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
+        mpi:      ['openmpi']
     needs: step4_build_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
     - name: build
-      env:
-        COMPILER: "${{ matrix.compiler }}"
-        MPI: "${{ matrix.mpi }}"
-        OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"
       run: |
-        docker pull ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} || true
-        docker build --pull \
-          --cache-from ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
-          --build-arg "BASE_IMAGE=ghcr.io/pdidev/test_env/${COMPILER}-${MPI}:${image_version}" \
-          --build-arg "OPTLIBS_VERSION=${OPTLIBS_VERSION}" \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION} \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}:${image_version} \
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs || true
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg MPI=${{ matrix.mpi }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs-${GITHUB_SHA:0:7} \
           6-optlibs
     - name: publish
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        COMPILER: "${{ matrix.compiler }}"
-        MPI: "${{ matrix.mpi }}"
-        OPTLIBS_VERSION: "${{ matrix.optlibs_version }}"
       run: |
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-libs_${OPTLIBS_VERSION}:${image_version}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs-${GITHUB_SHA:0:7}
   step6_finalize:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ['gcc_latest', 'gcc_7.5.0', 'clang_latest', 'clang_8.0.0']
-        mpi:      ['openmpi_latest', 'openmpi_2.1.1']
-        libs:     ['', '-libs_latest', '-libs_oldest']
-        cmake:    ['cmake@3.22', 'cmake@3.10']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
+        mpi:      ['openmpi']
+        libs:     ['nolibs', 'libs']
     needs: step5_build_libs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: detect current version
-      run: . .github/detect_version.sh
     - name: build
-      env:
-        COMPILER: "${{ matrix.compiler }}"
-        MPI: "${{ matrix.mpi }}"
-        LIBS: "${{ matrix.libs }}"
-        CMAKE: "${{ matrix.cmake }}"
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
-        docker build --pull \
-          --build-arg "BASE_IMAGE=ghcr.io/pdidev/test_env/base-nodask:${image_version}" \
-          --build-arg "SPACK_IMAGE=ghcr.io/pdidev/test_env/${COMPILER}-${MPI}${LIBS}:${image_version}" \
-          --build-arg "CMAKE=${CMAKE}" \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS} \
-          -t ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}:${image_version} \
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker build \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg MPI=${{ matrix.mpi }} \
+          --build-arg LIBS=${{ matrix.libs }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }} \
+          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }}:${GITHUB_SHA:0:7} \
           7-finalize
     - name: publish
-      env:
-        ACTOR: "${{ github.actor }}"
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        COMPILER: "${{ matrix.compiler }}"
-        MPI: "${{ matrix.mpi }}"
-        LIBS: "${{ matrix.libs }}"
-        CMAKE: "${{ matrix.cmake }}"
       run: |
-        echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${ACTOR} --password-stdin
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}
-        docker push ghcr.io/pdidev/test_env/${COMPILER}-${MPI}-${CMAKE/@/_}${LIBS}:${image_version}
+        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }}
+        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }}:${GITHUB_SHA:0:7}

@@ -1,24 +1,21 @@
-ARG BASE_IMAGE
+ARG VERSION
+ARG COMPILER
+ARG IMAGE_TAG
 
-FROM ${BASE_IMAGE}
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-nolibs-${IMAGE_TAG}
 
+LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
+ARG VERSION
+ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-ENV LIBS_ENV=${SPACK_ROOT}/var/spack/environments/baselibs
+COPY cmake-${VERSION}.lst cmake.lst
+RUN spack solve -I --reuse $(cat cmake.lst) \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat cmake.lst) target=x86_64
 
-RUN spack solve -I                      --reuse "cmake%${COMPILER}~ownlibs^curl" tls=openssl target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake%${COMPILER}~ownlibs^curl" tls=openssl target=x86_64
-
-RUN spack solve -I                      --reuse "cmake@3.10.0%${COMPILER}~ownlibs^curl" tls=openssl target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse "cmake@3.10.0%${COMPILER}~ownlibs^curl" tls=openssl target=x86_64
-
-RUN mkdir -p ${LIBS_ENV}
-COPY baselibs.yaml ${LIBS_ENV}/spack.yaml
-RUN sed -i -e "s/@COMPILER@/${COMPILER}/" ${LIBS_ENV}/spack.yaml
-
-RUN spack env activate ${LIBS_ENV} \
- && spack config add "packages:all:target:[x86_64]" \
- && spack config add "packages:all:compiler:[${COMPILER}]" \
- && spack concretize --reuse \
- && spack install ${SPACK_INSTALL_ARGS}
+COPY ${VERSION}.lst baselibs.lst
+RUN spack -e pdienv add -l baselibs $(cat baselibs.lst)
+RUN spack -e pdienv concretize --reuse \
+ || spack -e pdienv concretize --reuse -f
+RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
