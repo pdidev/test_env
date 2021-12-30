@@ -63,6 +63,10 @@ RUN spack clean -a \
  && echo "spack clean -a" >> ${SPACK_ROOT}/share/spack/pdi-env.sh \
  && echo "spack clean -a" >> ${SPACK_ROOT}/share/spack/pdi-activate.sh
 
+RUN echo 'if spack find flowvr &> /dev/null; then export PDI_LIBS=provided; fi' >> ${SPACK_ROOT}/share/spack/pdi-env.sh
+RUN echo 'if spack find mpich &> /dev/null; then export MPI_LIB=mpich; fi' >> ${SPACK_ROOT}/share/spack/pdi-env.sh
+RUN echo 'if spack find openmpi &> /dev/null; then export MPI_LIB=openmpi; fi' >> ${SPACK_ROOT}/share/spack/pdi-env.sh
+
 RUN sed -i \
     's%unset _sp_initializing%. ${SPACK_ROOT}/share/spack/pdi-env.sh; unset _sp_initializing%' \
     ${SPACK_ROOT}/share/spack/setup-env.sh
@@ -93,8 +97,6 @@ WORKDIR ${HOME}
 
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PDI_SYSTEM=docker-ubuntu-spack
-#ENV PDI_LIBS=provided
-#ENV MPI_LIB=openmpi
 
 
 FROM main AS test
