@@ -25,7 +25,7 @@ jobs:
           --cache-from ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
-          1-bionic
+          spack/1-bionic
     - name: publish base
       run: |
         docker push ghcr.io/pdidev/test_env/base
@@ -38,7 +38,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder \
           -t ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7} \
-          2-spack
+          spack/2-spack
     - name: publish dask
       run: |
         docker push ghcr.io/pdidev/test_env/builder
@@ -63,7 +63,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7} \
-          3-${{ matrix.compiler }}
+          spack/3-${{ matrix.compiler }}
     - name: publish compiler
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs
@@ -78,7 +78,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7} \
-          4-baselibs
+          spack/4-baselibs
     - name: publish baselibs
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}
@@ -106,7 +106,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7} \
-          5-mpi
+          spack/5-mpi
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}
@@ -133,7 +133,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs-${GITHUB_SHA:0:7} \
-          6-optlibs
+          spack/6-optlibs
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-libs
@@ -168,7 +168,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS} \
           -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7} \
-          7-finalize
+          spack/7-finalize
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}

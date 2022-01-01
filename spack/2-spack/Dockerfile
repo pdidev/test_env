@@ -22,6 +22,7 @@ RUN mkdir -p ${SPACK_HOME}
 RUN spack external find --not-buildable
 RUN spack spec hdf5+mpi
 RUN spack reindex
+RUN spack config add "packages:all:target:[x86_64]"
 
 COPY spack.yaml spack.yaml
 RUN spack env create pdienv spack.yaml
