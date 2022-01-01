@@ -12,8 +12,6 @@ defaults:
     shell: bash
 jobs:
   step1_build_base:
-    permissions:
-        packages: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -45,6 +43,7 @@ jobs:
         docker push ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7}
   step2_build_compiler:
     strategy:
+      fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
@@ -113,6 +112,7 @@ jobs:
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7}
   step5_build_libs:
     strategy:
+      fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']

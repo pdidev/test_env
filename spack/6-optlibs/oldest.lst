@@ -1,8 +1,8 @@
 astyle@3.1
 doxygen@1.8.12
 flowvr@2.3.2
-fti@1.6~hdf5
-hdf5@1.8.10
+fti@1.6~hdf5~fortran
+hdf5@1.10.0
 libyaml@0.2.2
 netcdf-c@4.6.0
 paraconf@0.4.14
