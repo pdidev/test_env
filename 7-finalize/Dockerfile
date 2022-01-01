@@ -117,8 +117,6 @@ USER ci:ci
 #          remove -DBUILD_FLOWVR_PLUGIN / OFF
 #TODO: FlowVR fails to build due to missing include dir for GL/glu.h
 #          remove -DBUILD_FLOWVR_PLUGIN / ${NO_EMBEDDED}
-#TODO: FTI unavailable in mixed clang/gfortran setup https://github.com/leobago/fti/issues/405
-#          remove -DBUILD_FTI_PLUGIN / spack find llvm
 #TODO: FTI does not correctly add zlib include path where required when building
 #          remove -DBUILD_FTI_PLUGIN / ${NO_EMBEDDED}
 #TODO: Doxygen badly detects iconv
@@ -127,16 +125,14 @@ USER ci:ci
 #          switch to forced embedded googletest upstream
 RUN USE_DEFAULT=SYSTEM \
  && NO_EMBEDDED=ON \
- && BUILD_FTI_PLUGIN=OFF \
  && spack find flowvr || USE_DEFAULT=EMBEDDED \
  && spack find flowvr || NO_EMBEDDED=OFF \
- && spack find llvm || BUILD_FTI_PLUGIN=${NO_EMBEDDED} \
  && spack find --loaded \
  && cmake \
           -DDIST_PROFILE=Devel \
           -DBUILD_DECL_NETCDF_PLUGIN=${NO_EMBEDDED} \
           -DBUILD_FLOWVR_PLUGIN=OFF \
-          -DBUILD_FTI_PLUGIN=${BUILD_FTI_PLUGIN} \
+          -DBUILD_FTI_PLUGIN=${NO_EMBEDDED} \
           -DICONV_IN_GLIBC=OFF \
           -DUSE_DEFAULT=${USE_DEFAULT} \
           -DUSE_Zpp=${USE_DEFAULT} \

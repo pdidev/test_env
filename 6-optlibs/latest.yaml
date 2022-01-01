@@ -27,8 +27,9 @@ spack:
       - astyle
       - doxygen
       - flowvr@2.3.2
+      #TODO: FTI Fortran unavailable in mixed clang/gfortran setup https://github.com/leobago/fti/issues/405
       #TODO: Workaround invalid HDF5 inclusion by FTI
-      - fti@1.6~hdf5
+      - fti@1.6~hdf5~fortran
       - 'hdf5@:1.999.999'
       - 'libyaml@:0.999.999'
       - 'netcdf-c@:4.999.999'
