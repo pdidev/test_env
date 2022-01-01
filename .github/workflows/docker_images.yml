@@ -104,13 +104,13 @@ jobs:
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs-${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7} \
           5-mpi
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-nolibs-${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7}
   step5_build_libs:
     strategy:
       matrix:
@@ -145,7 +145,7 @@ jobs:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-        libs:     ['nolibs', 'libs']
+        libs:     ['', 'libs']
     needs: step5_build_libs
     runs-on: ubuntu-latest
     steps:
@@ -156,16 +156,20 @@ jobs:
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        DASH_LIBS="-${{ matrix.libs }}"
+        if [[ "x-" = "x${DASH_LIBS}" ]]; then DASH_LIBS=""; fi
+        SLASH_LIBS="/${{ matrix.libs }}"
+        if [[ "x/" = "x${SLASH_LIBS}" ]]; then SLASH_LIBS=""; fi
         docker build \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
-          --build-arg LIBS=${{ matrix.libs }} \
+          --build-arg LIBS=${DASH_LIBS} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }} \
-          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }}:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS} \
+          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7} \
           7-finalize
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }}
-        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.libs }}:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}
+        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7}

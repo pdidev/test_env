@@ -10,6 +10,6 @@ libxslt@1.1.29
 mesa~llvm
 pkgconfig
 py-numpy@1.13.3^intel-mkl
-py-pyyaml@3.12.1~libyaml
+py-pyyaml@3.12~libyaml
 swig@3.0.12
 zlib@1.2.11
