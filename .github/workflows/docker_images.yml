@@ -171,5 +171,7 @@ jobs:
           spack/7-finalize
     - name: publish
       run: |
+        SLASH_LIBS="/${{ matrix.libs }}"
+        if [[ "x/" = "x${SLASH_LIBS}" ]]; then SLASH_LIBS=""; fi
         docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}
         docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7}
