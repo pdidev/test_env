@@ -7,7 +7,8 @@ All images are based on Ubuntu 18.08, with dependencies installed through
 spack.
 
 The images are named as:
-`ghcr.io/pdidev/test_env/${deps_version}/${compiler}/${mpi}/${vendored}`
+- `ghcr.io/pdidev/test_env/${deps_version}/${compiler}/${mpi}`
+- `ghcr.io/pdidev/test_env/${deps_version}/${compiler}/${mpi}/libs`
 
 The parameters are as follow:
 * deps_version:
@@ -19,6 +20,6 @@ The parameters are as follow:
   - `clang`: using clang for C/C++ and gfortran for Fortran,
 * mpi:
   - `openmpi`: using openmpi implementation of MPI,
-* vendored:
-  - `nolibs`: dependencies "vendored" in PDI are not included in the image,
-  - `libs`: dependencies "vendored" in PDI are included in the image.
+* `libs`:
+  - version without `libs`: dependencies "vendored" in PDI are not included in the image,
+  - version with `libs`: dependencies "vendored" in PDI are included in the image.
