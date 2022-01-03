@@ -4,8 +4,8 @@ flowvr@2.3.2:2.999.999
 fti@1.6:1.999~hdf5~fortran
 hdf5@1.12.0:1.999.999
 libyaml@0.2.2:0.999.999
-netcdf-c@4.6.0:4.999.999
-paraconf@0.4.14:0.999.999
+netcdf-c@4.6.1:4.999.999
+paraconf@0.4.15:0.999.999
 py-pybind11@2.3.0:2.999.999
 sionlib@1.7.6:1.999.999~fortran
 spdlog@1.5.0:1.999.999
