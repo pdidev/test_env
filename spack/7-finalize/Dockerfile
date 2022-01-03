@@ -14,7 +14,7 @@ ARG LIBS
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 RUN spack mark -e $(cat cmake.lst)
-RUN spack mark -e $(cat compiler.lst)
+RUN spack mark -e $(sed 's/clang/llvm/' compiler.lst)
 RUN spack compiler find
 RUN spack gc -y
 
@@ -37,7 +37,7 @@ RUN if [[ -n "${LIBS}" ]] \
   ; fi
 
 RUN echo "spack load $(cat cmake.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh \
- && echo "spack load $(cat compiler.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh \
+ && echo "spack load $(sed 's/clang/llvm/' compiler.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh \
  && echo "spack env activate pdienv" >> $SPACK_ROOT/etc/env/pdienv.env.sh \
  && spack clean -a
 
@@ -47,12 +47,12 @@ FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
 RUN useradd -d /home/ci -m -U ci
+ENV HOME=/home/ci
 
 COPY --from=builder --chown=ci:ci ${SPACK_HOME} ${HOME}/.spack
+ENV SPACK_HOME=${HOME}/.spack
 
 USER ci:ci
-ENV HOME=/home/ci
-ENV SPACK_HOME=${HOME}/.spack
 WORKDIR ${HOME}
 
 SHELL ["docker-shell"]
@@ -63,7 +63,7 @@ CMD ["interactive-shell"]
 FROM main AS test
 
 #TODO: Integrate into main branch
-RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
+RUN curl  --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
 RUN tar -xf pdi-fix_398.tar.gz
 
 #TODO: cfgtest, python required https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/issues/399
