@@ -72,9 +72,8 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
  && spack clean -a
 USER ci:ci
 
-RUN cd pdi-fix_398 \
- && export MAKEFLAGS="-j 1" \
- && bash tools/build_scripts/build_and_run.sh
+RUN export MAKEFLAGS="-j 1" \
+ && bash pdi-fix_398/tools/build_scripts/build_and_run.sh
 
 
 FROM main
