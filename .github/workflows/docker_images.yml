@@ -166,15 +166,15 @@ jobs:
           --build-arg MPI=${{ matrix.mpi }} \
           --build-arg LIBS=${DASH_LIBS} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS} \
-          -t ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS} \
+          -t ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7} \
           spack/7-finalize
     - name: publish
       run: |
         SLASH_LIBS="/${{ matrix.libs }}"
         if [[ "x/" = "x${SLASH_LIBS}" ]]; then SLASH_LIBS=""; fi
-        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}
-        docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}
+        docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7}
   system_bionic:
     strategy:
       fail-fast: false
@@ -188,13 +188,13 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }} \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}:${GITHUB_SHA:0:7} \
           system/bionic-base
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}
-        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}:${GITHUB_SHA:0:7}
   system_bionic_libs:
     strategy:
       fail-fast: false
@@ -208,13 +208,13 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs \
-          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7} \
           system/bionic-libs
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs
-        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7}
   system_bionic_pdi:
     strategy:
       fail-fast: false
@@ -228,10 +228,10 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi \
-          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
           system/bionic-pdi
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi
-        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7}
