@@ -57,7 +57,7 @@ WORKDIR ${HOME}
 
 SHELL ["docker-shell"]
 ENTRYPOINT ["spack-env"]
-CMD ["interactive-shell"]
+CMD ["bash", "-i"]
 
 
 FROM main AS test
@@ -65,12 +65,6 @@ FROM main AS test
 #TODO: Integrate into main branch
 RUN curl  --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
 RUN tar -xf pdi-fix_398.tar.gz
-
-#TODO: cfgtest, python required https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/issues/399
-USER 0
-RUN ln -s /usr/bin/python3 /usr/bin/python \
- && spack clean -a
-USER ci:ci
 
 RUN export MAKEFLAGS="-j 1" \
  && bash pdi-fix_398/tools/build_scripts/build_and_run.sh

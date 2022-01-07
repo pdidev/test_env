@@ -175,3 +175,43 @@ jobs:
         if [[ "x/" = "x${SLASH_LIBS}" ]]; then SLASH_LIBS=""; fi
         docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}
         docker push ghcr.io/pdidev/test_env/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}${SLASH_LIBS}:${GITHUB_SHA:0:7}
+  system_bionic:
+    strategy:
+      fail-fast: false
+      matrix:
+        mpi: ['openmpi', 'mpich']
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker build \
+          --build-arg MPI=${{ matrix.mpi }} \
+          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }} \
+          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}:${GITHUB_SHA:0:7} \
+          system/bionic
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}
+        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}:${GITHUB_SHA:0:7}
+  system_bionic_libs:
+    strategy:
+      fail-fast: false
+      matrix:
+        mpi: ['openmpi', 'mpich']
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker build \
+          --build-arg MPI=${{ matrix.mpi }} \
+          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs \
+          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7} \
+          system/bionic-libs
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs
+        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7}
