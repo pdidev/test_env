@@ -32,11 +32,17 @@ RUN set -ex \
             gfortran \
             libpdi-dev \
             pdidev-archive-keyring \
-            pdiplugin-all \
             pdiplugin-decl-hdf5-${MPI} \
+            pdiplugin-decl-netcdf \
             pdiplugin-decl-sion-${MPI} \
+            pdiplugin-flowvr \
             pdiplugin-fti-${MPI} \
             pdiplugin-mpi-${MPI} \
+            pdiplugin-pycall \
+            pdiplugin-serialize \
+            pdiplugin-set-value \
+            pdiplugin-trace \
+            pdiplugin-user-code \
             pkg-config \
  && apt-get autoremove -y \
  && apt-get clean -y \
