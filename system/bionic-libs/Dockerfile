@@ -12,13 +12,15 @@ ENV DOCKERFILE_BASE=ubuntu            \
 
 WORKDIR ${HOME}
 
+SHELL ["/bin/bash", "-c"]
+ENTRYPOINT ["/bin/bash_run"]
+CMD ["bash", "-i"]
+
 COPY bash_run /bin/
 
 RUN set -ex \
  && chmod +x /bin/bash_run \
  && DEBIAN_FRONTEND=noninteractive \
- && MPI_IMPL="${MPI}" \
- && MPI_IMPL="${MPI_IMPL/openmpi/openmpi-bin}" \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -42,7 +44,7 @@ RUN set -ex \
             libsion-${MPI}-dev \
             libspdlog-dev \
             libyaml-dev \
-            "${MPI_IMPL}" \
+            "${MPI/openmpi/openmpi-bin}" \
             pdidev-archive-keyring \
             pkg-config \
             pybind11-dev \
@@ -72,9 +74,6 @@ USER ci:ci
 WORKDIR ${HOME}
 
 ENV BASH_ENV=/etc/profile
-SHELL ["/bin/bash", "-c"]
-ENTRYPOINT ["/bin/bash_run"]
-CMD ["bash", "-i"]
 
 
 FROM main AS test
