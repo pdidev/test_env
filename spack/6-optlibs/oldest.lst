@@ -3,7 +3,7 @@ doxygen@1.8.12
 flowvr@2.3.2
 fti@1.6~hdf5~fortran
 hdf5@1.10.0-patch1
-libyaml@0.2.2
+libyaml@0.1.7
 netcdf-c@4.6.1
 paraconf@0.4.15
 py-pybind11@2.3.0

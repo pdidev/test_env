@@ -190,7 +190,7 @@ jobs:
           --build-arg MPI=${{ matrix.mpi }} \
           -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }} \
           -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}:${GITHUB_SHA:0:7} \
-          system/bionic
+          system/bionic-base
     - name: publish
       run: |
         docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}
@@ -215,3 +215,23 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs
         docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7}
+  system_bionic_pdi:
+    strategy:
+      fail-fast: false
+      matrix:
+        mpi: ['openmpi', 'mpich']
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker build \
+          --build-arg MPI=${{ matrix.mpi }} \
+          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi \
+          -t ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
+          system/bionic-pdi
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi
+        docker push ghcr.io/pdidev/ubuntu/xenial/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7}

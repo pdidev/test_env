@@ -27,26 +27,17 @@ RUN set -ex \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu/pdidev-archive-keyring.gpg \
  && apt-get update -y \
  && apt-get install -y --no-install-recommends \
-            astyle \
             build-essential \
             cmake \
-            doxygen \
-            flowvr \
             gfortran \
-            libfti-${MPI}-dev \
-            libhdf5-${MPI}-dev \
-            libnetcdf-dev \
-            libparaconf-dev \
-            libsion-${MPI}-dev \
-            libspdlog-dev \
-            libyaml-dev \
+            libpdi-dev \
             pdidev-archive-keyring \
+            pdiplugin-all \
+            pdiplugin-decl-hdf5-${MPI} \
+            pdiplugin-decl-sion-${MPI} \
+            pdiplugin-fti-${MPI} \
+            pdiplugin-mpi-${MPI} \
             pkg-config \
-            pybind11-dev \
-            python3-dev \
-            python3-numpy \
-            python3-yaml \
-            zpp \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
@@ -72,16 +63,3 @@ ENV BASH_ENV=/etc/profile
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash_run"]
 CMD ["bash", "-i"]
-
-
-FROM main AS test
-
-#TODO: Integrate into main branch
-RUN curl  --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
-RUN tar -xf pdi-fix_398.tar.gz
-
-RUN export MAKEFLAGS="-j 1" \
- && bash pdi-fix_398/tools/build_scripts/build_and_run.sh
-
-
-FROM main

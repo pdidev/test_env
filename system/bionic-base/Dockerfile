@@ -1,9 +1,8 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ARG MPI
-ARG PDI_VERSION
 
 ENV DOCKERFILE_BASE=ubuntu            \
     DOCKERFILE_DISTRO=ubuntu          \
@@ -22,11 +21,12 @@ RUN set -ex \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             apt-transport-https \
+            bison \
             build-essential \
             ca-certificates \
             cmake \
             curl \
-            doxygen \
+            flex \
             freeglut3-dev \
             gfortran \
             graphviz \
@@ -41,7 +41,7 @@ RUN set -ex \
             libxml2-dev \
             libxmu-dev \
             libxslt1-dev \
-            libyaml-dev \
+            m4 \
             mesa-common-dev \
             pkg-config \
             pybind11-dev \
@@ -49,6 +49,7 @@ RUN set -ex \
             python3-dev \
             python3-numpy \
             python3-setuptools \
+            python3-venv \
             python3-yaml \
             swig \
  && apt-get autoremove -y \
@@ -60,11 +61,8 @@ RUN set -ex \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
 ENV PDI_SYSTEM=ubuntu-bionic
-ENV PDI_DEPS=${VERSION}
-ENV PDI_COMPILER=${COMPILER}
-ENV MPI_LIB=${MPI}
+ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
-ENV PDI_LIBS=provided
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
@@ -78,3 +76,16 @@ ENV BASH_ENV=/etc/profile
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash_run"]
 CMD ["bash", "-i"]
+
+
+FROM main AS test
+
+#TODO: Integrate into main branch
+RUN curl  --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
+RUN tar -xf pdi-fix_398.tar.gz
+
+RUN export MAKEFLAGS="-j 1" \
+ && bash pdi-fix_398/tools/build_scripts/build_and_run.sh
+
+
+FROM main

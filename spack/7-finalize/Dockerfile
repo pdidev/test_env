@@ -27,7 +27,6 @@ RUN touch $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_SYSTEM=spack" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_DEPS=${VERSION}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_COMPILER=${COMPILER}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-RUN echo "export MPI_LIB=${MPI}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_MPI=${MPI}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN if [[ openmpi = "${MPI}" ]] \
   ; then echo 'export OMPI_MCA_rmaps_base_oversubscribe=1' >> $SPACK_ROOT/etc/env/pdienv.env.sh \
