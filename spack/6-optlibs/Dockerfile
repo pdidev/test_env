@@ -8,8 +8,6 @@ FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-${IMAGE_TAG}
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ARG VERSION
-ARG COMPILER
-ARG MPI
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti

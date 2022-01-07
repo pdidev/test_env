@@ -16,7 +16,9 @@ COPY bash_run /bin/
 
 RUN set -ex \
  && chmod +x /bin/bash_run \
- && DEBIAN_FRONTEND=noninteractive    \
+ && DEBIAN_FRONTEND=noninteractive \
+ && MPI_IMPL="${MPI}" \
+ && MPI_IMPL="${MPI_IMPL/openmpi/openmpi-bin}" \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -43,6 +45,7 @@ RUN set -ex \
             libxslt1-dev \
             m4 \
             mesa-common-dev \
+            "${MPI_IMPL}" \
             pkg-config \
             pybind11-dev \
             python3-all \
