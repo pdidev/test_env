@@ -30,6 +30,7 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu bionic main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu/pdidev-archive-keyring.gpg \
  && apt-get update -y \
+ && if [[ "${MPI}" = openmpi ]]; then PDIPLUGIN_FLOWVR=pdiplugin-flowvr; fi\
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -40,7 +41,7 @@ RUN set -ex \
             pdiplugin-decl-hdf5-${MPI} \
             pdiplugin-decl-netcdf \
             pdiplugin-decl-sion-${MPI} \
-            pdiplugin-flowvr \
+            ${PDIPLUGIN_FLOWVR} \
             pdiplugin-fti-${MPI} \
             pdiplugin-mpi-${MPI} \
             pdiplugin-pycall \

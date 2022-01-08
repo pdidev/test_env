@@ -30,12 +30,13 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu bionic main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu/pdidev-archive-keyring.gpg \
  && apt-get update -y \
+ && if [[ "${MPI}" = openmpi ]]; then FLOWVR=flowvr; fi\
  && apt-get install -y --no-install-recommends \
             astyle \
             build-essential \
             cmake \
             doxygen \
-            flowvr \
+            ${FLOWVR} \
             gfortran \
             libfti-${MPI}-dev \
             libhdf5-${MPI}-dev \

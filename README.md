@@ -11,7 +11,7 @@ We provide images based on:
 These images are based on a minimal Ubuntu 18.08, with spack and all dependencies installed through
 spack.
 
-The images are named as: `ghcr.io/pdidev/spack/${deps_version}/${compiler}/${mpi}/${included}`
+The images are named as: `ghcr.io/pdidev/spack/${deps_version}/${compiler}/${mpi}/${level}`
 With the following parameters:
 * `deps_version`:
   - `oldest`: dependencies use the oldest versions supported by PDI,
@@ -21,7 +21,7 @@ With the following parameters:
   - `clang`: using clang for C/C++ and gfortran for Fortran,
 * `mpi`:
   - `openmpi`: using openmpi implementation of MPI,
-* `included`:
+* `level`:
   - `mini`: dependencies "vendored" in PDI are not included in the image,
   - `all`: dependencies "vendored" in PDI are included in the image.
 
@@ -30,12 +30,12 @@ With the following parameters:
 
 These images are based on Ubuntu 18.08, with all dependencies installed through packages.
 
-The images are named as: `ghcr.io/pdidev/ubuntu/bionic/${mpi}/${included}`
+The images are named as: `ghcr.io/pdidev/ubuntu/bionic/${mpi}/${level}`
 With the following parameters:
 * `mpi`:
   - `mpich`: using mpich implementation of MPI,
   - `openmpi`: using openmpi implementation of MPI,
-* `included`:
+* `level`:
   - `mini`: dependencies "vendored" in PDI are not included in the image,
   - `all`: dependencies "vendored" in PDI are included in the image,
   - `pdi`: PDI is included in the image.
