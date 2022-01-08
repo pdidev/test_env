@@ -12,11 +12,11 @@ ENV DOCKERFILE_BASE=ubuntu            \
 
 WORKDIR ${HOME}
 
+COPY bash_run /bin/
+
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash_run"]
 CMD ["bash", "-i"]
-
-COPY bash_run /bin/
 
 RUN set -ex \
  && chmod +x /bin/bash_run \
@@ -50,7 +50,10 @@ RUN set -ex \
             pybind11-dev \
             python3-dev \
             python3-numpy \
+            python3-pip \
+            python3-setuptools \
             python3-yaml \
+            ssh-client \
             zpp \
  && apt-get autoremove -y \
  && apt-get clean -y \
@@ -58,7 +61,9 @@ RUN set -ex \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /run/nologin \
  && rm -rf /root/* \
- && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
+ && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true ) \
+ && pip3 install --no-cache-dir mpi4py \
+ && ldconfig
 
 ENV PDI_SYSTEM=ubuntu-bionic
 ENV PDI_COMPILER=gcc
@@ -73,13 +78,11 @@ ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
-ENV BASH_ENV=/etc/profile
-
 
 FROM main AS test
 
 #TODO: Integrate into main branch
-RUN curl  --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
+RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
 RUN tar -xf pdi-fix_398.tar.gz
 
 RUN export MAKEFLAGS="-j 1" \

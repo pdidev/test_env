@@ -188,13 +188,13 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7} \
           system/bionic-base
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7}
   system_bionic_libs:
     strategy:
       fail-fast: false
@@ -208,13 +208,13 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all \
+          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7} \
           system/bionic-libs
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/libs:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7}
   system_bionic_pdi:
     strategy:
       fail-fast: false

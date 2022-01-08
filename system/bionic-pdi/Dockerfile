@@ -12,11 +12,11 @@ ENV DOCKERFILE_BASE=ubuntu            \
 
 WORKDIR ${HOME}
 
+COPY bash_run /bin/
+
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash_run"]
 CMD ["bash", "-i"]
-
-COPY bash_run /bin/
 
 RUN set -ex \
  && chmod +x /bin/bash_run \
@@ -49,6 +49,7 @@ RUN set -ex \
             pdiplugin-trace \
             pdiplugin-user-code \
             pkg-config \
+            ssh-client \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
@@ -69,5 +70,3 @@ ENV HOME=/home/ci
 
 USER ci:ci
 WORKDIR ${HOME}
-
-ENV BASH_ENV=/etc/profile
