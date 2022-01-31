@@ -53,6 +53,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: build compiler
       run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs || true
         docker build \
@@ -82,7 +85,7 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7}
-  step4_build_mpi:
+  step3_build_mpi:
     strategy:
       fail-fast: false
       matrix:
@@ -95,6 +98,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} || true
         docker build \
@@ -110,14 +116,14 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7}
-  step5_build_libs:
+  step4_build_libs:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-    needs: step4_build_mpi
+    needs: step3_build_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -138,7 +144,7 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all-${GITHUB_SHA:0:7}
-  step6_finalize:
+  step5_finalize:
     strategy:
       fail-fast: false
       matrix:
@@ -146,7 +152,7 @@ jobs:
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
         level:    ['mini', 'all']
-    needs: step5_build_libs
+    needs: step4_build_libs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

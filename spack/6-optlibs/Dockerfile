@@ -14,10 +14,6 @@ RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/s
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git
 RUN spack repo add ${SPACK_ROOT}/var/spack/repos/fti
 
-RUN git clone --depth 1 https://gitlab.jsc.fz-juelich.de/cstao-public/SIONlib/spack-repository.git ${SPACK_ROOT}/var/spack/repos/SIONlib
-RUN rm -rf ${SPACK_ROOT}/var/spack/repos/SIONlib/.git
-RUN spack repo add ${SPACK_ROOT}/var/spack/repos/SIONlib
-
 RUN git clone --depth 1 https://github.com/pdidev/spack ${SPACK_ROOT}/var/spack/repos/pdi
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/pdi/.git
 RUN spack repo add ${SPACK_ROOT}/var/spack/repos/pdi
