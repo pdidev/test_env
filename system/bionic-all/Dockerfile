@@ -83,11 +83,11 @@ WORKDIR ${HOME}
 FROM main AS test
 
 #TODO: Integrate into main branch
-RUN curl --output pdi-fix_398.tar.gz https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/fix_398/pdi-fix_398.tar.gz
-RUN tar -xf pdi-fix_398.tar.gz
+RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
+RUN tar -xf pdi-master.tar.bz2
 
 RUN export MAKEFLAGS="-j 1" \
- && bash pdi-fix_398/tools/build_scripts/build_and_run.sh
+ && bash pdi-master/tools/build_scripts/build_and_run.sh
 
 
 FROM main

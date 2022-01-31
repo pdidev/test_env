@@ -30,6 +30,7 @@ RUN set -ex \
             git \
             gnupg2 \
             iproute2 \
+            libcurl4-openssl-dev \
             libssl-dev \
             locales \
             make \
