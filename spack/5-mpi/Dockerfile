@@ -20,4 +20,5 @@ RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f
 RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  || ( cat /tmp/root/spack-stage/spack-stage-*/spack-build-out.txt && \
+      spack debug report && \
       false )
