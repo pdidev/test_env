@@ -18,4 +18,6 @@ RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv remove hwloc
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
+RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ || ( cat /tmp/root/spack-stage/spack-stage-*/spack-build-out.txt && \
+      false )
