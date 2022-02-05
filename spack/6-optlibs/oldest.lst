@@ -9,4 +9,4 @@ paraconf@0.4.15
 py-pybind11@2.3.0
 sionlib@1.7.6~fortran
 spdlog@1.5.0
-zpp@1.0.15
+zpp@1.0.16
