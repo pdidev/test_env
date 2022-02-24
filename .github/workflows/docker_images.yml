@@ -11,12 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: get cache
+      if: ${{ github.event_name != 'schedule' }}
+      run: |
+        docker pull ghcr.io/pdidev/test_env/base || true
+        echo "--cache-from ghcr.io/pdidev/test_env/base" > CACHE_INFO
     - name: build base
       run: |
+        touch CACHE_INFO
+        CACHE_INFO="$(cat CACHE_INFO)"
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/base || true
         docker build \
-          --cache-from ghcr.io/pdidev/test_env/base \
+          ${CACHE_INFO} \
           -t ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
           spack/1-bionic
@@ -47,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: build compiler
+    - name: build
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
@@ -62,12 +69,26 @@ jobs:
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7} \
           spack/3-${{ matrix.compiler }}
-    - name: publish compiler
+    - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7}
-    - name: build baselibs
+  step3_build_baselibs:
+    strategy:
+      fail-fast: false
+      matrix:
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
+    needs: step2_build_compiler
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
       run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} || true
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
@@ -77,18 +98,18 @@ jobs:
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7} \
           spack/4-baselibs
-    - name: publish baselibs
+    - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7}
-  step3_build_mpi:
+  step4_build_mpi:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-    needs: step2_build_compiler
+    needs: step3_build_baselibs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -112,14 +133,14 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7}
-  step4_build_libs:
+  step5_build_libs:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-    needs: step3_build_mpi
+    needs: step4_build_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -140,7 +161,7 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all-${GITHUB_SHA:0:7}
-  step5_finalize:
+  step6_finalize:
     strategy:
       fail-fast: false
       matrix:
@@ -148,7 +169,7 @@ jobs:
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
         level:    ['mini', 'all']
-    needs: step4_build_libs
+    needs: step5_build_libs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -172,6 +193,12 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${GITHUB_SHA:0:7}
+    - name: Publish tagged
+      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
+      run: |
+        DOCKER_TAG="${{github.ref_name}}"
+        docker tag ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }} ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${DOCKER_TAG}
+        docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${DOCKER_TAG}
   system_bionic:
     strategy:
       fail-fast: false
@@ -192,6 +219,12 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini
         docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7}
+    - name: Publish tagged
+      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
+      run: |
+        DOCKER_TAG="${{github.ref_name}}"
+        docker tag ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${DOCKER_TAG}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${DOCKER_TAG}
   system_bionic_libs:
     strategy:
       fail-fast: false
@@ -212,6 +245,12 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all
         docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7}
+    - name: Publish tagged
+      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
+      run: |
+        DOCKER_TAG="${{github.ref_name}}"
+        docker tag ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${DOCKER_TAG}
+        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${DOCKER_TAG}
   system_bionic_pdi:
     strategy:
       fail-fast: false
