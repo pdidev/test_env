@@ -8,8 +8,10 @@ ARG VERSION
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 COPY ${VERSION}.lst compiler.lst
-RUN spack solve -I --reuse $(cat compiler.lst) \
- && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compiler.lst) \
+# TODO: gold currently fails to build
+# https://github.com/spack/spack/issues/29350
+RUN spack solve -I --reuse $(cat compiler.lst) ~gold \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compiler.lst) ~gold \
  && spack gc -y
 
 RUN spack load $(cat compiler.lst) \
