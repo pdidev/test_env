@@ -12,5 +12,6 @@ mesa~llvm
 pkgconfig
 py-numpy@1.13.3^intel-mkl
 py-pyyaml@3.12~libyaml
+python@:3.6.999
 swig@3.0.12
 zlib@1.2.11
