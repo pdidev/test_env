@@ -12,10 +12,11 @@ ARG MPI
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 COPY ${MPI}-${VERSION}.lst mpi.lst
-RUN IFS=$'\n' \
+RUN DEFAULT_IFS="${IFS}" \
+  ; IFS=$'\n' \
   ; set -f \
   ; for LIB in $(cat mpi.lst)\
-  ; do spack -e pdienv add -l mpi "${LIB}" \
+  ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l mpi "${LIB}" \
   ; done
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f \

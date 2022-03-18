@@ -20,10 +20,11 @@ RUN spack repo add ${SPACK_ROOT}/var/spack/repos/pdi
 
 
 COPY ${VERSION}.lst optlibs.lst
-RUN IFS=$'\n' \
+RUN DEFAULT_IFS="${IFS}" \
+  ; IFS=$'\n' \
   ; set -f \
   ; for LIB in $(cat optlibs.lst)\
-  ; do spack -e pdienv add -l optlibs "${LIB}" \
+  ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l optlibs "${LIB}" \
   ; done
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f
