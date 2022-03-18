@@ -15,7 +15,11 @@ RUN spack solve -I --reuse $(cat cmake.lst) \
  && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat cmake.lst) target=x86_64
 
 COPY ${VERSION}.lst baselibs.lst
-RUN spack -e pdienv add -l baselibs $(cat baselibs.lst)
+RUN IFS=$'\n' \
+  ; set -f \
+  ; for LIB in $(cat baselibs.lst)\
+  ; do spack -e pdienv add -l baselibs "${LIB}" \
+  ; done
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f
 RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}

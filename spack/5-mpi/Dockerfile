@@ -12,7 +12,11 @@ ARG MPI
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 COPY ${MPI}-${VERSION}.lst mpi.lst
-RUN spack -e pdienv add -l mpi $(cat mpi.lst)
+RUN IFS=$'\n' \
+  ; set -f \
+  ; for LIB in $(cat mpi.lst)\
+  ; do spack -e pdienv add -l mpi "${LIB}" \
+  ; done
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f \
  || spack -e pdienv remove hwloc

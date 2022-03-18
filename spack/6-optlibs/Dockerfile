@@ -20,7 +20,11 @@ RUN spack repo add ${SPACK_ROOT}/var/spack/repos/pdi
 
 
 COPY ${VERSION}.lst optlibs.lst
-RUN spack -e pdienv add -l optlibs $(cat optlibs.lst)
+RUN IFS=$'\n' \
+  ; set -f \
+  ; for LIB in $(cat optlibs.lst)\
+  ; do spack -e pdienv add -l optlibs "${LIB}" \
+  ; done
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f
 RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
