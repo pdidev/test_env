@@ -38,6 +38,7 @@ RUN set -ex \
             doxygen \
             ${FLOWVR} \
             gfortran \
+            libfmt-dev \
             libfti-${MPI}-dev \
             libhdf5-${MPI}-dev \
             libnetcdf-dev \
