@@ -11,10 +11,10 @@ COPY ${VERSION}.lst compiler.lst
 # TODO: gold currently fails to build
 # https://github.com/spack/spack/issues/29350
 RUN spack solve -I --reuse $(cat compiler.lst) ~gold \
- && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compiler.lst) ~gold \
- && spack gc -y
+ && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compiler.lst) ~gold
 
 RUN spack load $(cat compiler.lst) \
+ && echo loaded \
  && spack compiler find
 RUN spack compiler remove -a gcc
 
