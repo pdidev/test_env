@@ -64,7 +64,6 @@ jobs:
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           --build-arg VERSION=${{ matrix.version }} \
-          --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7} \
