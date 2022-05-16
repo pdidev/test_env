@@ -14,7 +14,6 @@ RUN spack solve -I --reuse $(cat compiler.lst) target=x86_64 \
  && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compiler.lst) target=x86_64
 
 RUN spack load $(cat compiler.lst) \
- && echo loaded \
  && spack compiler find
 RUN [[ "oldest" = "${VERSION}" ]] || spack compiler remove gcc@7.5.0
 
