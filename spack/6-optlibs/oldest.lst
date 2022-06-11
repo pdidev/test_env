@@ -5,7 +5,7 @@ fmt@6.1.2
 fti@1.6~hdf5~fortran
 hdf5@1.10.0-patch1
 libyaml@0.1.7
-netcdf-c@4.6.1
+netcdf-c@4.6.2+mpi
 paraconf@0.4.15
 py-pybind11@2.3.0
 sionlib@1.7.6~fortran
