@@ -1,1 +1,1 @@
-cmake@3.10.0 ^curl tls=openssl
+cmake@3.10.0 +ownlibs
