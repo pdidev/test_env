@@ -22,12 +22,19 @@ RUN find -L ${SPACK_ROOT}/opt/spack -name 'intel-mkl-*' -prune -o -type f -exec 
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 
+RUN spack -e pdienv config add modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]
+RUN spack -e pdienv config add modules:prefix_inspections:lib:[LD_LIBRARY_PATH]
+
 RUN touch $SPACK_ROOT/etc/env/pdienv.env.sh
 
 RUN echo "export PDI_SYSTEM=spack" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_DEPS=${VERSION}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_COMPILER=${COMPILER}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "export PDI_MPI=${MPI}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
+
+RUN echo 'spack -e pdienv config add modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]' >> $SPACK_ROOT/etc/env/pdienv.env.sh 
+RUN echo 'spack -e pdienv config add modules:prefix_inspections:lib:[LD_LIBRARY_PATH]' >> $SPACK_ROOT/etc/env/pdienv.env.sh 
+
 RUN if [[ openmpi = "${MPI}" ]] \
   ; then echo 'export OMPI_MCA_rmaps_base_oversubscribe=1' >> $SPACK_ROOT/etc/env/pdienv.env.sh \
   ; fi
