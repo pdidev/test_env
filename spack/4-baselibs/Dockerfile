@@ -23,4 +23,6 @@ RUN DEFAULT_IFS="${IFS}" \
   ; done
 RUN spack -e pdienv concretize --reuse \
  || spack -e pdienv concretize --reuse -f
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
+ 
+# --deprecated for some versions of our old env (python 3.6)
+RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
