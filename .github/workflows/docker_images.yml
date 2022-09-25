@@ -20,13 +20,13 @@ jobs:
       run: |
         touch CACHE_INFO
         CACHE_INFO="$(cat CACHE_INFO)"
+        echo "Cache: ${CACHE_INFO}"
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/base || true
         docker build \
           ${CACHE_INFO} \
           -t ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
-          spack/1-bionic
+          spack/1a-bionic
     - name: publish base
       run: |
         docker push ghcr.io/pdidev/test_env/base
@@ -39,12 +39,12 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder \
           -t ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7} \
-          spack/2-spack
+          spack/1b-spack
     - name: publish dask
       run: |
         docker push ghcr.io/pdidev/test_env/builder
         docker push ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7}
-  step2_build_compiler:
+  step2_compiler:
     strategy:
       fail-fast: false
       matrix:
@@ -64,10 +64,11 @@ jobs:
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7} \
-          spack/3-${{ matrix.compiler }}
+          spack/2-compiler
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs
@@ -78,7 +79,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step2_build_compiler
+    needs: step2_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -96,7 +97,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${GITHUB_SHA:0:7} \
-          spack/4-baselibs
+          spack/3-baselibs
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}
@@ -127,7 +128,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-${GITHUB_SHA:0:7} \
-          spack/5-mpi
+          spack/4-mpi
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}
@@ -145,6 +146,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all || true
         docker build \
@@ -155,7 +159,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all-${GITHUB_SHA:0:7} \
-          spack/6-optlibs
+          spack/5-optlibs
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
@@ -187,7 +191,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }} \
           -t ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${GITHUB_SHA:0:7} \
-          spack/7-finalize
+          spack/6-finalize
     - name: publish
       run: |
         docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}

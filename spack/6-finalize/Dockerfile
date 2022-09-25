@@ -13,13 +13,12 @@ ARG LIBS
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-RUN spack mark -e $(sed 's/\(cmake\s*@[0-9\.:]*\)\(.*\)/\1/' cmake.lst) %$(cat compiler.lst) $(sed 's/cmake\s*\(@[0-9\.:]*\)\(.*\)/\2/' cmake.lst)
-RUN spack mark -e $(sed 's/clang/llvm/' compiler.lst)
-RUN spack compiler find
-RUN spack gc -y
+RUN spack mark -ia \
+ && spack -e pdienv mark -ea \
+ && spack gc -y
 
-RUN spack -e pdienv config add modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]
-RUN spack -e pdienv config add modules:prefix_inspections:lib:[LD_LIBRARY_PATH]
+RUN spack -e pdienv config --scope env:pdienv add modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]
+RUN spack -e pdienv config --scope env:pdienv add modules:prefix_inspections:lib:[LD_LIBRARY_PATH]
 
 RUN find -L ${SPACK_ROOT}/opt/spack -name 'intel-mkl-*' -prune -o -type f -exec file -i '{}' '+' \
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
@@ -39,8 +38,7 @@ RUN if [[ -n "${LIBS}" ]] \
   ; then echo 'export PDI_LIBS=provided' >> $SPACK_ROOT/etc/env/pdienv.env.sh \
   ; fi
 
-RUN echo "spack load $(cat cmake.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-RUN echo "spack load $(sed 's/clang/llvm/' compiler.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh
+RUN echo "spack load $(cat compiler.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 RUN echo "spack env activate pdienv" >> $SPACK_ROOT/etc/env/pdienv.env.sh
 
 RUN spack clean -a
@@ -50,11 +48,11 @@ FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
 
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
-RUN useradd -d /home/ci -m -U ci
+RUN useradd -d /home/ci -m -U ci \
+ && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
+ && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
+ && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env
 ENV HOME=/home/ci
-
-COPY --from=builder --chown=ci:ci ${SPACK_HOME} ${HOME}/.spack
-ENV SPACK_HOME=${HOME}/.spack
 
 USER ci:ci
 WORKDIR ${HOME}

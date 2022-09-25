@@ -1,0 +1,11 @@
+spack:
+  packages: { all: { target: [x86_64] } }
+  definitions:
+  - compiler: []
+  - pkgs: []
+  concretizer: { unify: true }
+  specs:
+  - matrix:
+    - ['$%compiler']
+    - ['target=x86_64']
+    - ['$pkgs']

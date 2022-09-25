@@ -1,4 +1,5 @@
 bison@3.0.4
+cmake@3.10.0
 flex@2.6.4
 freeglut
 glew
@@ -8,7 +9,7 @@ iconv
 libxml2@2.9.4
 libxmu@1.1.2
 libxslt@1.1.29
-mesa~llvm
+mesa ~llvm
 pkgconfig
 py-numpy@1.13.3^intel-mkl
 py-pyyaml@3.12~libyaml
