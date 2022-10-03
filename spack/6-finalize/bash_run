@@ -1,0 +1,5 @@
+#!/bin/bash
+. /usr/share/modules/init/bash
+. /etc/pdienv.env.sh
+. /etc/pdienv.modules.sh
+exec "$@"

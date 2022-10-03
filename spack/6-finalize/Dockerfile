@@ -13,58 +13,65 @@ ARG LIBS
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
+RUN spack -e pdienv add -l baselibs libiconv \
+ && spack -e pdienv concretize \
+ && spack -e pdienv install
 RUN spack mark -ia \
- && spack -e pdienv mark -ea \
+ && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
+  ; do spack mark -e "/$N" \
+  ; done \
  && spack gc -y
-
-RUN spack -e pdienv config --scope env:pdienv add modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]
-RUN spack -e pdienv config --scope env:pdienv add modules:prefix_inspections:lib:[LD_LIBRARY_PATH]
 
 RUN find -L ${SPACK_ROOT}/opt/spack -name 'intel-mkl-*' -prune -o -type f -exec file -i '{}' '+' \
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 
-RUN touch $SPACK_ROOT/etc/env/pdienv.env.sh
+RUN spack config --scope site add 'modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]'
+RUN spack config --scope site add 'modules:prefix_inspections:lib:[LD_LIBRARY_PATH]'
+RUN spack -e pdienv module tcl refresh -y --delete-tree
+RUN spack -e pdienv env loads
 
-RUN echo "export PDI_SYSTEM=spack" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-RUN echo "export PDI_DEPS=${VERSION}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-RUN echo "export PDI_COMPILER=${COMPILER}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-RUN echo "export PDI_MPI=${MPI}" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-
+RUN touch /etc/pdienv.env.sh
+RUN echo "export PDI_SYSTEM=spack" >> /etc/pdienv.env.sh
+RUN echo "export PDI_DEPS=${VERSION}" >> /etc/pdienv.env.sh
+RUN echo "export PDI_COMPILER=${COMPILER}" >> /etc/pdienv.env.sh
+RUN echo "export PDI_MPI=${MPI}" >> /etc/pdienv.env.sh
 RUN if [[ openmpi = "${MPI}" ]] \
-  ; then echo 'export OMPI_MCA_rmaps_base_oversubscribe=1' >> $SPACK_ROOT/etc/env/pdienv.env.sh \
+  ; then echo 'export OMPI_MCA_rmaps_base_oversubscribe=1' >> /etc/pdienv.env.sh \
   ; fi
 RUN if [[ -n "${LIBS}" ]] \
-  ; then echo 'export PDI_LIBS=provided' >> $SPACK_ROOT/etc/env/pdienv.env.sh \
+  ; then echo 'export PDI_LIBS=provided' >> /etc/pdienv.env.sh \
   ; fi
-
-RUN echo "spack load $(cat compiler.lst)" >> $SPACK_ROOT/etc/env/pdienv.env.sh
-RUN echo "spack env activate pdienv" >> $SPACK_ROOT/etc/env/pdienv.env.sh
+RUN echo "MODULEPATH=${MODULEPATH}" >> /etc/pdienv.env.sh
 
 RUN spack clean -a
 
 
 FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
 
-COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
+RUN mkdir -p ${SPACK_ROOT}/var/spack/environments \
+ && mkdir -p ${SPACK_ROOT}/opt/spack \
+ && mkdir -p ${SPACK_ROOT}/share/spack \
+ && useradd -d /home/ci -m -U ci
 
-RUN useradd -d /home/ci -m -U ci \
- && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
- && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
- && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env
-ENV HOME=/home/ci
+COPY --from=builder ${SPACK_ROOT}/opt/spack ${SPACK_ROOT}/opt/spack
+COPY --from=builder ${SPACK_ROOT}/share/spack/modules ${SPACK_ROOT}/share/spack/modules
+COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdienv.modules.sh
+COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
+COPY bash_run /bin/
 
 USER ci:ci
-WORKDIR ${HOME}
+WORKDIR /home/ci
+ENV HOME /home/ci
 
-SHELL ["docker-shell"]
-ENTRYPOINT ["spack-env"]
+ENTRYPOINT ["/bin/bash_run"]
+SHELL ["/bin/bash_run", "bash", "-c"]
 CMD ["bash", "-i"]
 
 
 FROM main AS test
 
-RUN curl  --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
+RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
 RUN tar -xf pdi-master.tar.bz2
 
 RUN export MAKEFLAGS="-j 1" \

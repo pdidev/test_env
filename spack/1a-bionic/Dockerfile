@@ -21,9 +21,13 @@ RUN set -ex \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             ca-certificates \
+            curl \
+            environment-modules \
             gfortran \
             git \
             locales \
+            make \
+            tcl \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
