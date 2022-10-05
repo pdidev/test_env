@@ -21,10 +21,10 @@ RUN DEFAULT_IFS="${IFS}" \
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l baselibs "${LIB}" \
   ; done
 
-RUN spack -e pdienv concretize -fU
- 
 # --deprecated for some versions of our old env (python 3.6)
-RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
+RUN spack -e pdienv concretize -fU
+RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
+ && spack gc -y
 
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true
@@ -49,3 +49,7 @@ RUN sed -i "s#fc\s*:\s*null#fc: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/com
 RUN grep -qs gcc compiler.lst \
  || sed 's/flags\s*:.*/flags: { fflags: "-fPIC", cflags: "-fPIC", cxxflags: "-fPIC" }/' \
         -i ${SPACK_ROOT}/etc/spack/compilers.yaml
+
+# --deprecated for some versions of our old env (python 3.6)
+RUN spack -e pdienv concretize -fU
+RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
