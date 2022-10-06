@@ -26,9 +26,6 @@ RUN find -L ${SPACK_ROOT}/opt/spack -name 'intel-mkl-*' -prune -o -type f -exec 
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 
-RUN spack config --scope site add 'modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]'
-RUN spack config --scope site add 'modules:prefix_inspections:lib:[LD_LIBRARY_PATH]'
-RUN spack -e pdienv module tcl refresh -y --delete-tree
 RUN spack -e pdienv env loads
 
 RUN touch /etc/pdienv.env.sh
@@ -54,8 +51,8 @@ RUN mkdir -p ${SPACK_ROOT}/var/spack/environments \
  && mkdir -p ${SPACK_ROOT}/share/spack \
  && useradd -d /home/ci -m -U ci
 
-COPY --from=builder ${SPACK_ROOT}/opt/spack ${SPACK_ROOT}/opt/spack
-COPY --from=builder ${SPACK_ROOT}/share/spack/modules ${SPACK_ROOT}/share/spack/modules
+COPY --from=builder /opt/install /opt/install
+COPY --from=builder /opt/modules /opt/modules
 COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdienv.modules.sh
 COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
 COPY bash_run /bin/

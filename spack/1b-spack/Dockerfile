@@ -40,10 +40,6 @@ RUN mkdir -p ${SPACK_ROOT}
 RUN git clone --depth 1 https://github.com/spack/spack.git ${SPACK_ROOT} \
  && rm -rf ${SPACK_ROOT}/.git
 
-RUN mv $SPACK_ROOT/share/spack/setup-env.sh $SPACK_ROOT/share/spack/setup-env-orig.sh
-RUN mkdir -p $SPACK_ROOT/etc/env
-COPY setup-env.sh ${SPACK_ROOT}/share/spack/setup-env.sh
-
 SHELL ["docker-shell"]
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
@@ -53,6 +49,10 @@ RUN spack compiler find --scope site
 RUN spack spec hdf5+mpi
 RUN spack reindex
 RUN spack config --scope site add "packages:all:target:[x86_64]"
+RUN spack config --scope site add 'config:install_tree:/opt/install'
+RUN spack config --scope site add 'modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]'
+RUN spack config --scope site add 'modules:prefix_inspections:lib:[LD_LIBRARY_PATH]'
+RUN spack config --scope site add 'modules:default:roots:tcl:/opt/modules'
 
 COPY spack.yaml spack.yaml
 RUN spack env create pdienv spack.yaml
