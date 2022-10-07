@@ -49,7 +49,7 @@ RUN spack compiler find --scope site
 RUN spack spec hdf5+mpi
 RUN spack reindex
 RUN spack config --scope site add "packages:all:target:[x86_64]"
-RUN spack config --scope site add 'config:install_tree:/opt/install'
+RUN spack config --scope site add 'config:install_tree:root:/opt/install'
 RUN spack config --scope site add 'modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]'
 RUN spack config --scope site add 'modules:prefix_inspections:lib:[LD_LIBRARY_PATH]'
 RUN spack config --scope site add 'modules:default:roots:tcl:/opt/modules'

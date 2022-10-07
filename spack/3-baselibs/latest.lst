@@ -6,6 +6,7 @@ glew@2.0.0:
 glu
 hwloc@1.11.9:
 iconv
+libiconv
 libxml2@2.9.4:
 libxmu@1.1.2:
 libxslt@1.1.29:

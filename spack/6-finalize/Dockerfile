@@ -13,9 +13,6 @@ ARG LIBS
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-RUN spack -e pdienv add -l baselibs libiconv \
- && spack -e pdienv concretize \
- && spack -e pdienv install
 RUN spack mark -ia \
  && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
   ; do spack mark -e "/$N" \
