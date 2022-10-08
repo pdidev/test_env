@@ -1,3 +1,4 @@
 pmix@1.0.0:1.999.999
 openmpi@2.1.1
+openssh@7
 py-mpi4py@2.0.0
