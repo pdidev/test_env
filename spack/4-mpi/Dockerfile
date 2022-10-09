@@ -18,12 +18,5 @@ RUN DEFAULT_IFS="${IFS}" \
   ; for LIB in $(cat mpi.lst)\
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l mpi "${LIB}" \
   ; done
-RUN spack -e pdienv concretize --reuse \
- || spack -e pdienv concretize --reuse -f \
- || spack -e pdienv remove hwloc
-RUN spack -e pdienv concretize --reuse \
- || spack -e pdienv concretize --reuse -f
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} \
- || ( cat /tmp/root/spack-stage/spack-stage-*/spack-build-out.txt && \
-      spack debug report && \
-      false )
+RUN spack -e pdienv concretize --reuse
+RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}

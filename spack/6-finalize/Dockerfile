@@ -23,6 +23,7 @@ RUN find -L ${SPACK_ROOT}/opt/spack -name 'intel-mkl-*' -prune -o -type f -exec 
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 
+RUN spack -e pdienv module tcl refresh --delete-tree -y
 RUN spack -e pdienv env loads
 
 RUN touch /etc/pdienv.env.sh
