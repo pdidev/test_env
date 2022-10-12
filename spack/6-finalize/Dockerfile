@@ -19,7 +19,7 @@ RUN spack mark -ia \
   ; done \
  && spack gc -y
 
-RUN find -L ${SPACK_ROOT}/opt/spack -name 'intel-mkl-*' -prune -o -type f -exec file -i '{}' '+' \
+RUN find -L /opt/install -type f -exec file -i '{}' '+' \
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 

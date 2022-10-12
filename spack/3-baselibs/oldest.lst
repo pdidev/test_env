@@ -1,5 +1,6 @@
 bison@3.0.4
 cmake@3.10.0
+file
 flex@2.6.4
 freeglut
 glew
