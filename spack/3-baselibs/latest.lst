@@ -11,6 +11,7 @@ libiconv
 libxml2@2.9.4:
 libxmu@1.1.2:
 libxslt@1.1.29:
+m4
 mesa ~llvm
 mesa-glu
 pkgconfig
