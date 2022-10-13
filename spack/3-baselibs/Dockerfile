@@ -23,6 +23,10 @@ RUN DEFAULT_IFS="${IFS}" \
 
 # --deprecated for some versions of our old env (python 3.6)
 RUN spack -e pdienv concretize -fU
+RUN spack -e pdienv fetch --deprecated \
+ || spack -e pdienv fetch --deprecated \
+ || spack -e pdienv fetch --deprecated \
+ || spack -e pdienv fetch --deprecated
 RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
  && spack mark -ia \
  && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
@@ -56,4 +60,8 @@ RUN grep -qs gcc compiler.lst \
 
 # --deprecated for some versions of our old env (python 3.6)
 RUN spack -e pdienv concretize -fU
+RUN spack -e pdienv fetch --deprecated \
+ || spack -e pdienv fetch --deprecated \
+ || spack -e pdienv fetch --deprecated \
+ || spack -e pdienv fetch --deprecated
 RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
