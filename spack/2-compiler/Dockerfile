@@ -36,6 +36,7 @@ RUN sed -i "s#fc\s*:\s*null#fc: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/com
 
 # TODO: This is likely only required for openmpi, but this is a workaround until solving
 # https://github.com/spack/spack/issues/4610
-RUN grep -qs gcc compiler.lst \
- || sed 's/flags\s*:.*/flags: { fflags: "-fPIC", cflags: "-fPIC", cxxflags: "-fPIC" }/' \
-        -i ${SPACK_ROOT}/etc/spack/compilers.yaml
+RUN if grep -qs clang compiler.lst \
+  ; then sed 's/flags\s*:.*/flags: { fflags: "-fPIC", cflags: "-fPIC", cxxflags: "-fPIC" }/' \
+             -i ${SPACK_ROOT}/etc/spack/compilers.yaml \
+  ; fi
