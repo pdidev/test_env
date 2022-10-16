@@ -13,10 +13,6 @@ ARG LIBS
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-ENV LANG=en_US.UTF-8     \
-    LANGUAGE=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
-
 RUN spack mark -ia \
  && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
   ; do spack mark -e "/$N" \
@@ -94,14 +90,7 @@ RUN set -ex \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             ca-certificates \
-            curl \
-            git \
-            locales \
- && locale-gen ${LC_ALL} \
- && apt-get autoremove -y \
- && apt-get clean -y \
- && apt-get autoclean -y \
- && rm -rf /var/lib/apt/lists/*
+            curl
 
 USER ci:ci
 WORKDIR /home/ci

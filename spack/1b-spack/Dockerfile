@@ -6,6 +6,10 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ENV CURRENTLY_BUILDING_DOCKER_IMAGE=1
 
+ENV LANG=en_US.UTF-8     \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
+
 RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
@@ -33,6 +37,7 @@ RUN set -ex \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
+ && locale-gen ${LC_ALL} \
  && rm -rf /var/lib/apt/lists/* /run/nologin \
  && pip3 --no-cache-dir install boto3 \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
