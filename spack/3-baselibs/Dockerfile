@@ -29,9 +29,7 @@ RUN spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated
 RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
  && spack mark -ia \
- && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
-  ; do spack mark -e "/$N" \
-  ; done \
+ && spack mark -e "/$(spack -e pdienv find --format '{name}' --no-groups -L $(cat compilerpkg.lst) | awk '{print $1}')" \
  && spack gc -y
 
 # switch to our new, just built, compiler
@@ -54,9 +52,10 @@ RUN sed -i "s#fc\s*:\s*null#fc: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/com
 
 # TODO: This is likely only required for openmpi, but this is a workaround until solving
 # https://github.com/spack/spack/issues/4610
-RUN grep -qs gcc compiler.lst \
- || sed 's/flags\s*:.*/flags: { fflags: "-fPIC", cflags: "-fPIC", cxxflags: "-fPIC" }/' \
-        -i ${SPACK_ROOT}/etc/spack/compilers.yaml
+RUN if grep -qs clang compiler.lst \
+  ; then sed 's/flags\s*:.*/flags: { fflags: "-fPIC", cflags: "-fPIC", cxxflags: "-fPIC" }/' \
+             -i ${SPACK_ROOT}/etc/spack/compilers.yaml \
+  ; fi
 
 # --deprecated for some versions of our old env (python 3.6)
 RUN spack -e pdienv concretize -fU
