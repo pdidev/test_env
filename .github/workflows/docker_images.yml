@@ -10,7 +10,7 @@ jobs:
   step1_build_base:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: get cache
       if: ${{ github.event_name != 'schedule' }}
       run: |
@@ -53,7 +53,7 @@ jobs:
     needs: step1_build_base
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -82,7 +82,7 @@ jobs:
     needs: step2_compiler
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -112,7 +112,7 @@ jobs:
     needs: step3_build_baselibs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -143,7 +143,7 @@ jobs:
     needs: step4_build_mpi
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -175,7 +175,7 @@ jobs:
     needs: step5_build_libs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -209,7 +209,7 @@ jobs:
         mpi: ['openmpi', 'mpich']
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -235,7 +235,7 @@ jobs:
         mpi: ['openmpi', 'mpich']
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -261,7 +261,7 @@ jobs:
         mpi: ['openmpi', 'mpich']
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: build
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
