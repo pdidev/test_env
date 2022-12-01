@@ -15,7 +15,7 @@ m4
 mesa ~llvm
 mesa-glu
 pkgconfig
-py-numpy@1.13.3
+py-numpy@1.14
 py-pyyaml@3.12~libyaml
 python@3.6
 swig@3.0.12
