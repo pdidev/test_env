@@ -7,7 +7,7 @@ defaults:
   run:
     shell: bash
 jobs:
-  step1_build_base:
+  step1_base:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -16,7 +16,7 @@ jobs:
       run: |
         docker pull ghcr.io/pdidev/test_env/base || true
         echo "--cache-from ghcr.io/pdidev/test_env/base" > CACHE_INFO
-    - name: build base
+    - name: build
       run: |
         touch CACHE_INFO
         CACHE_INFO="$(cat CACHE_INFO)"
@@ -27,30 +27,41 @@ jobs:
           -t ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
           spack/1a-bionic
-    - name: publish base
+    - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/base
         docker push ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7}
-    - name: build dask
+  step1b_dask:
+    strategy:
+      fail-fast: false
+      matrix:
+        version:  ['latest', 'oldest']
+    needs: step1_base
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: build
       run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder || true
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder \
+          --build-arg VERSION=${{ matrix.version }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/builder \
-          -t ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${GITHUB_SHA:0:7} \
           spack/1b-spack
-    - name: publish dask
+    - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/builder
-        docker push ghcr.io/pdidev/test_env/builder:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${GITHUB_SHA:0:7}
   step2_compiler:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step1_build_base
+    needs: step1b_dask
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

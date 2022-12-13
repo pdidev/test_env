@@ -4,6 +4,8 @@ FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
+ARG VERSION
+
 ENV CURRENTLY_BUILDING_DOCKER_IMAGE=1
 
 ENV LANG=en_US.UTF-8     \
@@ -44,8 +46,9 @@ RUN set -ex \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env
 
+COPY ${VERSION}.branch spack.branch
 RUN mkdir -p ${SPACK_ROOT}
-RUN git clone --depth 1 https://github.com/spack/spack.git ${SPACK_ROOT} \
+RUN git clone --depth 1 -b $(cat spack.branch) https://github.com/spack/spack.git ${SPACK_ROOT} \
  && rm -rf ${SPACK_ROOT}/.git
 
 SHELL ["docker-shell"]

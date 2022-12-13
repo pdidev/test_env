@@ -1,6 +1,7 @@
+ARG VERSION
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${IMAGE_TAG}
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
