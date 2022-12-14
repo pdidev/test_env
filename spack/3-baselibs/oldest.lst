@@ -5,14 +5,14 @@ flex@2.6.4
 freeglut
 glew
 glu
-hwloc@1.11.9
+hwloc@1.11
 iconv
 libiconv
 libxml2@2.9.4
 libxmu@1.1.2
 libxslt@1.1.29
 m4
-mesa ~llvm
+mesa~llvm
 mesa-glu
 pkgconfig
 py-numpy@1.13.3
