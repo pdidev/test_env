@@ -12,11 +12,12 @@ libxml2@2.9.4
 libxmu@1.1.2
 libxslt@1.1.29
 m4
-mesa~llvm
+mesa ~llvm
 mesa-glu
 pkgconfig
 py-numpy@1.13.3
-py-pyyaml@3.12~libyaml
+py-pyyaml@3.12 ~libyaml
 python@3.6
 swig@3.0.12
-zlib
+tar@1.19 zip=gzip
+zlib@1.2.11
