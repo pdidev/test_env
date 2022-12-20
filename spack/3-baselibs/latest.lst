@@ -18,5 +18,7 @@ pkgconfig
 py-numpy@1.13.3:
 py-pyyaml@3.12:~libyaml
 python@3.6:
+py-pip@9.0.1:
 swig@3.0.12:
+tar@1.29: zip=gzip
 zlib
