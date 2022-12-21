@@ -27,9 +27,7 @@ RUN set -ex \
             apt-transport-https \
             bison \
             build-essential \
-            ca-certificates \
             cmake \
-            curl \
             flex \
             freeglut3-dev \
             gfortran \
@@ -59,12 +57,13 @@ RUN set -ex \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
+ && pip3 install --no-cache-dir mpi4py \
+ && ldconfig \
+ && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /run/nologin \
  && rm -rf /root/* \
- && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true ) \
- && pip3 install --no-cache-dir mpi4py \
- && ldconfig
+ && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
 ENV PDI_SYSTEM=ubuntu-bionic
 ENV PDI_COMPILER=gcc
@@ -72,20 +71,32 @@ ENV PDI_MPI=${MPI}
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
-RUN useradd -d /home/ci -m -U ci
-ENV HOME=/home/ci
-
 USER ci:ci
-WORKDIR ${HOME}
+WORKDIR /home/ci
+ENV HOME /home/ci
 
 
 FROM main AS test
 
-#TODO: Integrate into main branch
+USER root:root
+WORKDIR /root
+ENV HOME /root
+
+RUN set -ex \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME /home/ci
+
 RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
 RUN tar -xf pdi-master.tar.bz2
-
-RUN export MAKEFLAGS="-j 1" \
+RUN export VERBOSE=1 \
+ && export MAKEFLAGS="-j1" \
  && bash pdi-master/tools/build_scripts/build_and_run.sh
 
 

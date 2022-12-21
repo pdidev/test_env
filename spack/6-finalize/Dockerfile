@@ -57,8 +57,6 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
-            ca-certificates \
-            curl \
             environment-modules \
             gfortran \
             git \
@@ -98,8 +96,9 @@ ENV HOME /home/ci
 
 RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
 RUN tar -xf pdi-master.tar.bz2
-
-RUN export MAKEFLAGS="-j 1" \
+RUN export VERBOSE=1 \
+ && export MAKEFLAGS="-j1" \
  && bash pdi-master/tools/build_scripts/build_and_run.sh
+
 
 FROM main
