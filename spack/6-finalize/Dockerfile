@@ -44,37 +44,22 @@ RUN spack clean -a
 
 FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
 
-RUN mkdir -p ${SPACK_ROOT}/var/spack/environments \
- && useradd -d /home/ci -m -U ci
-
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
 COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdienv.modules.sh
 COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
-COPY bash_run /bin/
 
-RUN set -ex \
- && apt-get update -y \
- && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends \
-            environment-modules \
-            gfortran \
-            git \
-            libstdc++-7-dev \
-            locales \
-            make \
-            tcl \
- && apt-get autoremove -y \
- && apt-get clean -y \
- && apt-get autoclean -y
+RUN useradd -d /home/ci -m -U ci
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
 
+COPY bash_run /bin/
+
 ENTRYPOINT ["/bin/bash_run"]
 SHELL ["/bin/bash_run", "bash", "-c"]
-CMD ["bash", "-i"]
+CMD ["/bin/bash_run", "bash", "-i"]
 
 
 FROM main AS test
