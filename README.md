@@ -3,10 +3,10 @@
 A set of related Docker images to build and test PDI.
 
 We provide images based on:
-* Dask recipes,
+* Spack recipes,
 * Binary packages.
 
-## Dask-based images
+## Spack-based images
 
 These images are based on a minimal Ubuntu 18.08, with spack and all dependencies installed through
 spack.
