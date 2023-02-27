@@ -31,7 +31,7 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/base
         docker push ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7}
-  step1b_dask:
+  step1b_spack:
     strategy:
       fail-fast: false
       matrix:
@@ -61,7 +61,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step1b_dask
+    needs: step1b_spack
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
