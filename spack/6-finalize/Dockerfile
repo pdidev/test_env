@@ -23,6 +23,7 @@ RUN find -L ${SPACK_INSTALL} -type f -exec file -i '{}' '+' \
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 
+RUN spack config --scope site add 'modules:default:tcl:all:autoload:direct'
 RUN spack -e pdienv module tcl refresh --delete-tree -y
 RUN spack -e pdienv env loads
 

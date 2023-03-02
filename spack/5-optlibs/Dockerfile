@@ -28,15 +28,18 @@ RUN DEFAULT_IFS="${IFS}" \
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l optlibs "${LIB}" \
   ; done
 
-# some package need to be build separately to use a more recent cmake in old env
+# some package need to use a more recent cmake than that of in old env, so remove it
 RUN spack -e pdienv remove -l baselibs cmake
-RUN spack -e pdienv concretize -fU
+
+# install the libs
+RUN spack -e pdienv concretize -f --reuse
 RUN spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated
 RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
 
+# add back the cmake version that was removed before
 RUN spack -e pdienv add -l baselibs "$(grep '^cmake' baselibs.lst)"
-RUN spack -e pdienv concretize --reuse
+RUN spack -e pdienv concretize -f --reuse
 RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
