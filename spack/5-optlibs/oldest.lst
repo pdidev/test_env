@@ -8,5 +8,5 @@ netcdf-c@4.6.2+mpi
 paraconf@0.4.16
 py-pybind11@2.3.0
 sionlib@1.7.6~fortran
-spdlog@1.5.0
+spdlog@1.5.0 ^fmt@6
 zpp@1.0.16
