@@ -43,9 +43,9 @@ jobs:
     - name: build
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/builder || true
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }} || true
         docker build \
-          --cache-from ghcr.io/pdidev/test_env/builder \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }} \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }} \
