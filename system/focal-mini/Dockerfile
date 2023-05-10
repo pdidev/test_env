@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 AS main
+FROM ubuntu:20.04 AS main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -6,7 +6,7 @@ ARG MPI
 
 ENV DOCKERFILE_BASE=ubuntu            \
     DOCKERFILE_DISTRO=ubuntu          \
-    DOCKERFILE_DISTRO_VERSION=18.04   \
+    DOCKERFILE_DISTRO_VERSION=20.04   \
     HOME=/root                        \
     container=docker
 
@@ -65,7 +65,7 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
-ENV PDI_SYSTEM=ubuntu-bionic
+ENV PDI_SYSTEM=ubuntu-focal
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 # only required for openmpi but...

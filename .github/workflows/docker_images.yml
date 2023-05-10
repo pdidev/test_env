@@ -26,7 +26,7 @@ jobs:
           ${CACHE_INFO} \
           -t ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
-          spack/1a-bionic
+          spack/1a-system
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/base
@@ -213,7 +213,7 @@ jobs:
         DOCKER_TAG="${{github.ref_name}}"
         docker tag ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }} ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${DOCKER_TAG}
         docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${DOCKER_TAG}
-  system_bionic:
+  system_focal:
     strategy:
       fail-fast: false
       matrix:
@@ -226,20 +226,20 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7} \
-          system/bionic-mini
+          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini \
+          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7} \
+          system/focal-mini
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7}
     - name: Publish tagged
       if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
       run: |
         DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${DOCKER_TAG}
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/mini:${DOCKER_TAG}
-  system_bionic_libs:
+        docker tag ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${DOCKER_TAG}
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${DOCKER_TAG}
+  system_focal_libs:
     strategy:
       fail-fast: false
       matrix:
@@ -252,20 +252,20 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7} \
-          system/bionic-all
+          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all \
+          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7} \
+          system/focal-all
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7}
     - name: Publish tagged
       if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
       run: |
         DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${DOCKER_TAG}
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/all:${DOCKER_TAG}
-  system_bionic_pdi:
+        docker tag ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${DOCKER_TAG}
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${DOCKER_TAG}
+  system_focal_pdi:
     strategy:
       fail-fast: false
       matrix:
@@ -278,16 +278,16 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi \
-          -t ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
-          system/bionic-pdi
+          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi \
+          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
+          system/focal-pdi
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7}
     - name: Publish tagged
       if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
       run: |
         DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi:${DOCKER_TAG}
-        docker push ghcr.io/pdidev/ubuntu/bionic/${{ matrix.mpi }}/pdi:${DOCKER_TAG}
+        docker tag ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${DOCKER_TAG}
+        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${DOCKER_TAG}
