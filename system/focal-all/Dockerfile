@@ -20,7 +20,7 @@ CMD ["bash", "-i"]
 
 RUN set -ex \
  && chmod +x /bin/bash_run \
- && DEBIAN_FRONTEND=noninteractive \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -31,6 +31,8 @@ RUN set -ex \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu/pdidev-archive-keyring.gpg \
  && apt-get update -y \
  && if [[ "${MPI}" = openmpi ]]; then FLOWVR=flowvr; fi\
+ && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
+ && echo tzdata tzdata/Zones/Etc string UTC | debconf-set-selections \
  && apt-get install -y --no-install-recommends \
             astyle \
             build-essential \

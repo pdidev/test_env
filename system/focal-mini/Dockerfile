@@ -20,9 +20,11 @@ CMD ["bash", "-i"]
 
 RUN set -ex \
  && chmod +x /bin/bash_run \
- && DEBIAN_FRONTEND=noninteractive \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
+ && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
+ && echo tzdata tzdata/Zones/Etc string UTC | debconf-set-selections \
  && apt-get install -y --no-install-recommends \
             apt-transport-https \
             bison \
