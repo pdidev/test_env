@@ -1,22 +1,22 @@
-bison@3.0.4:
-cmake@3.20.0:
+bison@3.5.1:
+cmake@3.16.3:
 file
 flex@2.6.4:
 freeglut
-glew@2.0.0:
-hwloc@1.11.9:
+glew
+hwloc@2.1.0:
 libiconv
-libxml2@2.9.4:
+libxml2@2.9.10:
 libxmu@1.1.2:
-libxslt@1.1.29:~crypto
+libxslt@1.1.34:
 m4
 mesa ~llvm
 mesa-glu
 pkgconf
-py-numpy@1.13.3:
-py-pyyaml@3.12:~libyaml
-python@3.6:
-py-pip@9.0.1:
-swig@3.0.12:
-tar@1.29: zip=gzip
-zlib
+py-numpy@1.17.4:
+py-pyyaml@5.3.1: ~libyaml
+python@3.8.2:
+py-pip@20.2:
+swig@4.0.1:
+tar zip=gzip
+zlib@1.2.11:
