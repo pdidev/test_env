@@ -8,7 +8,7 @@ hwloc@2.1.0:
 libiconv
 libxml2@2.9.10:
 libxmu@1.1.2:
-libxslt@1.1.34:
+libxslt@1.1.33:
 m4
 mesa ~llvm
 mesa-glu
