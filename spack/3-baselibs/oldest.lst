@@ -4,7 +4,7 @@ file
 flex@2.6.4
 freeglut
 glew
-hwloc@2.1.0
+hwloc@2.3.0
 libiconv
 libxml2@2.9.10
 libxmu@1.1.2
