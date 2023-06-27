@@ -48,7 +48,7 @@ RUN set -ex \
 
 COPY ${VERSION}.branch spack.branch
 RUN mkdir -p ${SPACK_ROOT}
-RUN git clone --depth 1 -b $(cat spack.branch) https://github.com/spack/spack.git ${SPACK_ROOT}
+RUN git clone --depth 1 -b $(cat spack.branch) ${SPACK_ROOT}
 
 SHELL ["docker-shell"]
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
