@@ -43,20 +43,20 @@ jobs:
     - name: get cache
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/builder:1b-${{ matrix.version }} || true
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1b || true
     - name: build
       run: |
         docker build \
-          --cache-from ghcr.io/pdidev/test_env/builder:1b-${{ matrix.version }} \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1b \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/builder:1b-${{ matrix.version }} \
-          -t ghcr.io/pdidev/test_env/builder:1b-${{ matrix.version }}-${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1b \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1b-${GITHUB_SHA:0:7} \
           spack/1b-spack
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/builder:1b-${{ matrix.version }}
-        docker push ghcr.io/pdidev/test_env/builder:1b-${{ matrix.version }}-${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1b
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1b-${GITHUB_SHA:0:7}
   step2a_precomp:
     strategy:
       fail-fast: false
