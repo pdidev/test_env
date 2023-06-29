@@ -94,7 +94,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step1b_spack
+    needs: step2a_precomp
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
