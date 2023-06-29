@@ -4,7 +4,7 @@ ARG MPI
 ARG LIBS
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}${LIBS}-${IMAGE_TAG} as builder
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-${LIBS}-${IMAGE_TAG} as builder
 
 ARG VERSION
 ARG COMPILER

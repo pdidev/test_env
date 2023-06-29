@@ -2,12 +2,13 @@ ARG VERSION
 ARG COMPILER
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-compiler-${IMAGE_TAG}
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-3b-${IMAGE_TAG} as builder
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ARG VERSION
 ARG COMPILER
+ARG IMAGE_TAG
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 
@@ -18,3 +19,13 @@ RUN spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated
 RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
+
+
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-1b-${IMAGE_TAG}
+
+LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
+
+COPY --from=builder ${HOME} ${HOME}
+COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
+COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
+COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}

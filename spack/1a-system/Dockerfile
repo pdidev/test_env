@@ -28,5 +28,6 @@ RUN set -ex \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
+ && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* /run/nologin \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
