@@ -2,7 +2,7 @@ ARG VERSION
 ARG COMPILER
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-compiler-${IMAGE_TAG}
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-3b-${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
