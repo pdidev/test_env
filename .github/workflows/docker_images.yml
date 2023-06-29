@@ -125,7 +125,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step2_compiler
+    needs: step2b_compiler
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
