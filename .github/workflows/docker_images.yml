@@ -40,10 +40,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: build
+    - name: get cache
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }} || true
+    - name: build
+      run: |
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }} \
           --build-arg VERSION=${{ matrix.version }} \
@@ -65,13 +67,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: build
+    - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs || true
+    - name: build
+      run: |
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs \
           --build-arg VERSION=${{ matrix.version }} \
@@ -84,7 +88,7 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-nolibs-${GITHUB_SHA:0:7}
-  step3_build_baselibs:
+  step3a_build_basecomp:
     strategy:
       fail-fast: false
       matrix:
@@ -94,13 +98,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: get cache
+      run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-compiler || true
     - name: build
+      run: |
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-compiler \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-compiler \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-compiler-${GITHUB_SHA:0:7} \
+          spack/3a-basecomp
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-compiler
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-compiler-${GITHUB_SHA:0:7}
+  step3b_build_baselibs:
+    strategy:
+      fail-fast: false
+      matrix:
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
+    needs: step3a_build_basecomp
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} || true
+    - name: build
+      run: |
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }} \
           --build-arg VERSION=${{ matrix.version }} \
@@ -120,17 +157,19 @@ jobs:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-    needs: step3_build_baselibs
+    needs: step3b_build_baselibs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: build
+    - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} || true
+    - name: build
+      run: |
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }} \
           --build-arg VERSION=${{ matrix.version }} \
@@ -155,13 +194,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: build
+    - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all || true
+    - name: build
+      run: |
         docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all \
           --build-arg VERSION=${{ matrix.version }} \
@@ -187,12 +228,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: build
+    - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: build
+      run: |
         DASH_LEVEL="-${{ matrix.level }}"
         docker build \
           --build-arg VERSION=${{ matrix.version }} \
