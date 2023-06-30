@@ -119,7 +119,7 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2b
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2b-${GITHUB_SHA:0:7}
-  step3a_build_basecomp:
+  step3a_precomp:
     strategy:
       fail-fast: false
       matrix:
@@ -145,18 +145,18 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3a \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3a-${GITHUB_SHA:0:7} \
-          spack/3a-basecomp
+          spack/3a-precomp
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3a
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3a-${GITHUB_SHA:0:7}
-  step3b_build_baselibs:
+  step3b_compiler:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step3a_build_basecomp
+    needs: step3a_precomp
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -176,19 +176,50 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3b \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3b-${GITHUB_SHA:0:7} \
-          spack/3-baselibs
+          spack/3b-compiler
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3b
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3b-${GITHUB_SHA:0:7}
-  step4_build_mpi:
+  step3c_baselibs:
+    strategy:
+      fail-fast: false
+      matrix:
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
+    needs: step3b_compiler
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: get cache
+      run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c || true
+    - name: build
+      run: |
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c-${GITHUB_SHA:0:7} \
+          spack/3c-compiler
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c-${GITHUB_SHA:0:7}
+  step4_mpi:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-    needs: step3b_build_baselibs
+    needs: step3c_baselibs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -214,14 +245,14 @@ jobs:
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini-${GITHUB_SHA:0:7}
-  step5_build_libs:
+  step5_libs:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
-    needs: step4_build_mpi
+    needs: step4_mpi
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -255,7 +286,7 @@ jobs:
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi']
         level:    ['mini', 'all']
-    needs: step5_build_libs
+    needs: step5_libs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
