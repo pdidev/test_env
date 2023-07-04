@@ -46,4 +46,3 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 COPY --from=builder ${HOME} ${HOME}
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
-COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
