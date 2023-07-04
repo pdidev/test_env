@@ -2,12 +2,13 @@ ARG VERSION
 ARG COMPILER
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-2a-${IMAGE_TAG}
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-2a-${IMAGE_TAG} as builder
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ARG VERSION
 ARG COMPILER
+ARG IMAGE_TAG
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack solve -I --reuse $(cat compiler.lst) target=x86_64 \
@@ -36,3 +37,13 @@ RUN spack compiler remove --scope user -a clang || true
 # When the selected suite does not offer a Fortran compiler (clang), use gfortran
 RUN sed -i "s#f77\s*:\s*null#f77: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/compilers.yaml
 RUN sed -i "s#fc\s*:\s*null#fc: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/compilers.yaml
+
+
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-1b-${IMAGE_TAG}
+
+LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
+
+COPY --from=builder ${HOME} ${HOME}
+COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
+COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
+COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
