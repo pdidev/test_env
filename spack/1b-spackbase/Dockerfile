@@ -4,11 +4,12 @@ FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-ENV CURRENTLY_BUILDING_DOCKER_IMAGE=1
 
+ENV CURRENTLY_BUILDING_DOCKER_IMAGE=1
 ENV LANG=en_US.UTF-8     \
     LANGUAGE=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
+
 
 RUN set -ex \
  && apt-get update -y \

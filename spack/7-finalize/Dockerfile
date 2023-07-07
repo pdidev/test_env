@@ -6,12 +6,8 @@ ARG IMAGE_TAG
 
 FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-${LIBS}-${IMAGE_TAG} as builder
 
-ARG VERSION
-ARG COMPILER
-ARG MPI
-ARG LIBS
-
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
+
 
 RUN spack mark -ia \
  && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
@@ -27,6 +23,12 @@ RUN spack config --scope site add 'modules:default:tcl:all:autoload:direct'
 RUN spack -e pdienv module tcl refresh --delete-tree -y
 RUN spack -e pdienv env loads
 
+
+ARG VERSION
+ARG COMPILER
+ARG MPI
+ARG LIBS
+
 RUN touch /etc/pdienv.env.sh
 RUN echo "export PDI_SYSTEM=spack" >> /etc/pdienv.env.sh
 RUN echo "export PDI_DEPS=${VERSION}" >> /etc/pdienv.env.sh
@@ -40,21 +42,26 @@ RUN if [[ -n "${LIBS}" ]] \
   ; fi
 RUN echo "MODULEPATH=${MODULEPATH}" >> /etc/pdienv.env.sh
 
+
 RUN spack clean -a
 
 
+
 FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
+
 
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
 COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdienv.modules.sh
 COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
 
+
 RUN useradd -d /home/ci -m -U ci
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
+
 
 COPY bash_run /bin/
 
@@ -63,11 +70,14 @@ SHELL ["/bin/bash_run", "bash", "-c"]
 CMD ["/bin/bash_run", "bash", "-i"]
 
 
+
 FROM main AS test
+
 
 USER root:root
 WORKDIR /root
 ENV HOME /root
+
 
 RUN set -ex \
  && apt-get update -y \
@@ -76,9 +86,11 @@ RUN set -ex \
             ca-certificates \
             curl
 
+
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
+
 
 RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
 RUN tar -xf pdi-master.tar.bz2

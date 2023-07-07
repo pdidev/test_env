@@ -2,6 +2,7 @@ FROM ubuntu:20.04
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
+
 ENV DOCKERFILE_BASE=ubuntu          \
     DOCKERFILE_DISTRO=ubuntu        \
     DOCKERFILE_DISTRO_VERSION=20.04 \
@@ -14,7 +15,9 @@ ENV DOCKERFILE_BASE=ubuntu          \
     SPACK_ROOT=/opt/spack           \
     container=docker
 
+
 WORKDIR ${HOME}
+
 
 RUN set -ex \
  && apt-get update -y \
