@@ -6,9 +6,7 @@ FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-3a-${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-ARG VERSION
-ARG COMPILER
-ARG IMAGE_TAG
+
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # --deprecated for some versions of our old env (python 3.6)
@@ -39,5 +37,6 @@ RUN spack compiler remove --scope user -a clang || true
 # When the selected suite does not offer a Fortran compiler (clang), use gfortran
 RUN sed -i "s#f77\s*:\s*null#f77: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/compilers.yaml
 RUN sed -i "s#fc\s*:\s*null#fc: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/compilers.yaml
+
 
 RUN spack clean -a

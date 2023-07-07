@@ -7,8 +7,6 @@ FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-mini-${IMAGE_
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-ARG VERSION
-ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti
 RUN rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git
@@ -19,7 +17,10 @@ RUN rm -rf ${SPACK_ROOT}/var/spack/repos/pdi/.git
 RUN spack repo add --scope site ${SPACK_ROOT}/var/spack/repos/pdi
 
 
+ARG VERSION
+
 COPY ${VERSION}.lst optlibs.lst
+
 
 RUN DEFAULT_IFS="${IFS}" \
   ; IFS=$'\n' \
@@ -30,6 +31,9 @@ RUN DEFAULT_IFS="${IFS}" \
 
 # some package need to use a more recent cmake than that of in old env, so remove it
 RUN spack -e pdienv remove -l baselibs cmake
+
+
+ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # install the libs
 RUN spack -e pdienv concretize --reuse
