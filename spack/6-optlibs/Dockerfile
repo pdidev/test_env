@@ -32,14 +32,20 @@ RUN DEFAULT_IFS="${IFS}" \
 RUN spack -e pdienv remove -l baselibs cmake
 
 # install the libs
-RUN spack -e pdienv concretize -f --reuse
-RUN spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
+RUN spack -e pdienv concretize --reuse
+RUN  ( spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ && spack clean -a
 
 # add back the cmake version that was removed before
 RUN spack -e pdienv add -l baselibs "$(grep '^cmake' baselibs.lst)"
-RUN spack -e pdienv concretize -f --reuse
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
+RUN spack -e pdienv concretize --reuse
+RUN  ( spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ && spack clean -a

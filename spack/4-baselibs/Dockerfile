@@ -2,7 +2,7 @@ ARG VERSION
 ARG COMPILER
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-3b-${IMAGE_TAG} as builder
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-3c-${IMAGE_TAG} as builder
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -19,9 +19,11 @@ RUN spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated \
  || spack -e pdienv fetch --deprecated
 RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
+RUN spack clean -a
 
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-1b-${IMAGE_TAG}
+
+FROM ghcr.io/pdidev/test_env/spackbase:${VERSION}-${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 

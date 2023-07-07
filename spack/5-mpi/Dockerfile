@@ -19,8 +19,9 @@ RUN DEFAULT_IFS="${IFS}" \
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l mpi "${LIB}" \
   ; done
 RUN spack -e pdienv concretize --reuse
-RUN spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}
+RUN  ( spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated \
+    || spack -e pdienv fetch --deprecated ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ && spack clean -a
