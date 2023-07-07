@@ -171,7 +171,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2c \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2c-${GITHUB_SHA:0:7} \
-          spack/2c-baselibs
+          spack/2c-squash
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2c
@@ -264,7 +264,7 @@ jobs:
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c \
           -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c-${GITHUB_SHA:0:7} \
-          spack/3c-baselibs
+          spack/3c-squash
     - name: publish
       run: |
         docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c
