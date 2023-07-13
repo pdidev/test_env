@@ -32,10 +32,6 @@ jobs:
         docker push ghcr.io/pdidev/test_env/base
         docker push ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7}
   step1b_spackbase:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
     needs: step1a_base
     runs-on: ubuntu-latest
     steps:
@@ -43,53 +39,26 @@ jobs:
     - name: get cache
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/spackbase:${{ matrix.version }} || true
+        docker pull ghcr.io/pdidev/test_env/spackbase || true
     - name: build
       run: |
         docker build \
-          --cache-from ghcr.io/pdidev/test_env/spackbase:${{ matrix.version }} \
-          --build-arg VERSION=${{ matrix.version }} \
+          --cache-from ghcr.io/pdidev/test_env/spackbase \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/spackbase:${{ matrix.version }} \
-          -t ghcr.io/pdidev/test_env/spackbase:${{ matrix.version }}-${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/spackbase \
+          -t ghcr.io/pdidev/test_env/spackbase:${GITHUB_SHA:0:7} \
           spack/1b-spackbase
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/spackbase:${{ matrix.version }}
-        docker push ghcr.io/pdidev/test_env/spackbase:${{ matrix.version }}-${GITHUB_SHA:0:7}
-  step1c_spack:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-    needs: step1b_spackbase
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: get cache
-      run: |
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1c || true
-    - name: build
-      run: |
-        docker build \
-          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1c \
-          --build-arg VERSION=${{ matrix.version }} \
-          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1c \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1c-${GITHUB_SHA:0:7} \
-          spack/1c-spack
-    - name: publish
-      run: |
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1c
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-1c-${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/spackbase
+        docker push ghcr.io/pdidev/test_env/spackbase:${GITHUB_SHA:0:7}
   step2a_precomp:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step1c_spack
+    needs: step1b_spackbase
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

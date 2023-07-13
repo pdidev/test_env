@@ -9,11 +9,11 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-RUN spack solve -I --reuse $(cat compiler.lst) target=x86_64 \
- && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compiler.lst) target=x86_64
+RUN spack solve -I --reuse $(cat compilerpkg.lst) target=x86_64 \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compilerpkg.lst) target=x86_64
 
 
-RUN spack find --no-groups  "$(cat compiler.lst)" > compilerpkg.lst \
+RUN spack find --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
  && cp compilerpkg.lst compiler.lst \
  && sed 's/llvm/clang/' -i compiler.lst
 
@@ -21,8 +21,6 @@ RUN spack find --no-groups  "$(cat compiler.lst)" > compilerpkg.lst \
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true
 RUN spack compiler remove --scope site -a clang || true
-RUN spack -e pdienv compiler remove --scope env:pdienv -a gcc || true
-RUN spack -e pdienv compiler remove --scope env:pdienv -a clang || true
 RUN spack compiler remove -a clang || true
 RUN spack compiler remove -a gcc || true
 RUN spack compiler find --scope site \

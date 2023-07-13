@@ -6,7 +6,7 @@ FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-3b-${IMAGE_TAG} as b
 
 
 
-FROM ghcr.io/pdidev/test_env/spackbase:${VERSION}-${IMAGE_TAG}
+FROM ghcr.io/pdidev/test_env/spackbase:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
