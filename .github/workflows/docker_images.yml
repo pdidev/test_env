@@ -285,21 +285,38 @@ jobs:
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4 || true
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a || true
     - name: build
       run: |
         docker build \
-          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4 \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4 \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4-${GITHUB_SHA:0:7} \
-          spack/4-baselibs
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a-${GITHUB_SHA:0:7} \
+          spack/4a-baselibs
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4-${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a-${GITHUB_SHA:0:7}
+    - name: get cache
+      run: |
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b || true
+    - name: build
+      run: |
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b-${GITHUB_SHA:0:7} \
+          spack/4b-squash
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b-${GITHUB_SHA:0:7}
   step5_mpi:
     strategy:
       fail-fast: false
@@ -317,22 +334,39 @@ jobs:
                     /usr/local/lib/android /usr/local/lib/node_modules \
                     /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini || true
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a || true
     - name: build
       run: |
         docker build \
-          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini \
-          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini-${GITHUB_SHA:0:7} \
-          spack/5-mpi
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a-${GITHUB_SHA:0:7} \
+          spack/5a-mpi
     - name: publish
       run: |
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
-        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini-${GITHUB_SHA:0:7}
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a-${GITHUB_SHA:0:7}
+    - name: get cache
+      run: |
+        docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-mini || true
+    - name: build
+      run: |
+        docker build \
+          --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-mini \
+          --build-arg VERSION=${{ matrix.version }} \
+          --build-arg COMPILER=${{ matrix.compiler }} \
+          --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-mini \
+          -t ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-mini-${GITHUB_SHA:0:7} \
+          spack/5b-squash
+    - name: publish
+      run: |
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-mini
+        docker push ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-mini-${GITHUB_SHA:0:7}
   step6_optlibs:
     strategy:
       fail-fast: false
@@ -413,11 +447,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: get cache
+      run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini || true
     - name: build
       run: |
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
+          --cache-from ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini \
           -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini \
           -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7} \
           system/focal-mini
@@ -439,11 +480,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: get cache
+      run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all || true
     - name: build
       run: |
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
+          --cache-from ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all \
           -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all \
           -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7} \
           system/focal-all
@@ -465,11 +513,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: get cache
+      run: |
+        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
+                    /usr/local/lib/android /usr/local/lib/node_modules \
+                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker pull ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi || true
     - name: build
       run: |
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker build \
           --build-arg MPI=${{ matrix.mpi }} \
+          --cache-from ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi \
           -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi \
           -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
           system/focal-pdi
