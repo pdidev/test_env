@@ -21,8 +21,6 @@ RUN spack find --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true
 RUN spack compiler remove --scope site -a clang || true
-RUN spack -e pdienv compiler remove --scope env:pdienv -a gcc || true
-RUN spack -e pdienv compiler remove --scope env:pdienv -a clang || true
 RUN spack compiler remove -a clang || true
 RUN spack compiler remove -a gcc || true
 RUN spack compiler find --scope site \

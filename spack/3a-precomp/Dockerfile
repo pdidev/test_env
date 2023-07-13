@@ -7,6 +7,8 @@ FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-2c-${IMAGE_TAG}
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
+COPY spack.yaml spack.yaml
+RUN spack env create pdienv spack.yaml
 RUN spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst)
 RUN spack -e pdienv add -l compiler $(cat compiler.lst)
 
