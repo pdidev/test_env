@@ -34,10 +34,10 @@ RUN echo "export PDI_SYSTEM=spack" >> /etc/pdienv.env.sh
 RUN echo "export PDI_DEPS=${VERSION}" >> /etc/pdienv.env.sh
 RUN echo "export PDI_COMPILER=${COMPILER}" >> /etc/pdienv.env.sh
 RUN echo "export PDI_MPI=${MPI}" >> /etc/pdienv.env.sh
-RUN if [[ openmpi = "${MPI}" ]] \
+RUN if [[ "xopenmpi" = "x${MPI}" ]] \
   ; then echo 'export OMPI_MCA_rmaps_base_oversubscribe=1' >> /etc/pdienv.env.sh \
   ; fi
-RUN if [[ -n "${LIBS}" ]] \
+RUN if [[ "xall" = "x${LIBS}" ]] \
   ; then echo 'export PDI_LIBS=provided' >> /etc/pdienv.env.sh \
   ; fi
 RUN echo "MODULEPATH=${MODULEPATH}" >> /etc/pdienv.env.sh
