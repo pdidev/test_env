@@ -56,14 +56,13 @@ COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdien
 COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
 
 
-RUN useradd -d /home/ci -m -U ci
-
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
 
 
 COPY bash_run /bin/
+
 
 ENTRYPOINT ["/bin/bash_run"]
 SHELL ["/bin/bash_run", "bash", "-c"]

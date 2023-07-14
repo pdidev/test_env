@@ -27,6 +27,8 @@ RUN  ( spack -e pdienv fetch --deprecated \
  &&  ( spack -e pdienv install ${SPACK_INSTALL_ARGS} \
     || if ( [ 'xopenmpi' = "x${MPI}" -a 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
      ; then  ( export CFLAGS=-fPIE \
-            && spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty ) \
+            && spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty openmpi ) \
+     ; else false \
      ; fi ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a
