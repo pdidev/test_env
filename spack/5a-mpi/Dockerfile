@@ -19,9 +19,14 @@ RUN DEFAULT_IFS="${IFS}" \
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l mpi "${LIB}" \
   ; done
 RUN spack -e pdienv concretize --reuse --force
+# install & workaround openmpi issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
 RUN  ( spack -e pdienv fetch --deprecated \
     || spack -e pdienv fetch --deprecated \
     || spack -e pdienv fetch --deprecated \
     || spack -e pdienv fetch --deprecated ) \
- && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ &&  ( spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+    || if ( [ 'xopenmpi' = "x${MPI}" -a 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
+     ; then  ( export CFLAGS=-fPIE \
+            && spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty ) \
+     ; fi ) \
  && spack clean -a
