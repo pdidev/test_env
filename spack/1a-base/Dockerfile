@@ -25,7 +25,7 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             environment-modules \
             gfortran \
-            libstdc++-7-dev \
+            libstdc++-9-dev \
             make \
             tcl \
  && apt-get autoremove -y \
