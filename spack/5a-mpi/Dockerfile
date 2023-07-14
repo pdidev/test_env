@@ -18,7 +18,7 @@ RUN DEFAULT_IFS="${IFS}" \
   ; for LIB in $(cat mpi.lst)\
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l mpi "${LIB}" \
   ; done
-RUN spack -e pdienv concretize --reuse
+RUN spack -e pdienv concretize --reuse --force
 RUN  ( spack -e pdienv fetch --deprecated \
     || spack -e pdienv fetch --deprecated \
     || spack -e pdienv fetch --deprecated \
