@@ -1,11 +1,11 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
 ENV DOCKERFILE_BASE=ubuntu          \
     DOCKERFILE_DISTRO=ubuntu        \
-    DOCKERFILE_DISTRO_VERSION=20.04 \
+    DOCKERFILE_DISTRO_VERSION=22.04 \
     DEBIAN_FRONTEND=noninteractive  \
     HOME=/root                      \
     LC_ALL=C                        \

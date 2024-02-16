@@ -1,14 +1,19 @@
-FROM ubuntu:20.04 AS main
+ARG DISTRO
+ARG DISTRO_VERSION
+
+FROM ${DISTRO}:${DISTRO_VERSION} AS main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
+ARG DISTRO
+ARG DISTRO_VERSION
 ARG MPI
 
-ENV DOCKERFILE_BASE=ubuntu            \
-    DOCKERFILE_DISTRO=ubuntu          \
-    DOCKERFILE_DISTRO_VERSION=20.04   \
-    HOME=/root                        \
-    container=docker
+ENV DOCKERFILE_BASE=${DISTRO}
+ENV DOCKERFILE_DISTRO=${DISTRO}
+ENV DOCKERFILE_DISTRO_VERSION=${DISTRO_VERSION}
+ENV HOME=/root
+ENV container=docker
 
 WORKDIR ${HOME}
 
@@ -19,10 +24,12 @@ ENTRYPOINT ["/bin/bash_run"]
 CMD ["bash", "-i"]
 
 RUN set -ex \
+ && if [ -f /etc/os-release ]; then . /etc/os-release; fi \
  && chmod +x /bin/bash_run \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
+ && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; fi \
  && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
  && echo tzdata tzdata/Zones/Etc string UTC | debconf-set-selections \
  && apt-get install -y --no-install-recommends \
@@ -49,6 +56,7 @@ RUN set -ex \
             pkg-config \
             python3-all \
             python3-dev \
+            ${MPI4PY} \
             python3-numpy \
             python3-pip \
             python3-setuptools \
@@ -59,7 +67,6 @@ RUN set -ex \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
- && pip3 install --no-cache-dir mpi4py \
  && ldconfig \
  && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* \
@@ -67,7 +74,7 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
-ENV PDI_SYSTEM=ubuntu-focal
+ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 # only required for openmpi but...

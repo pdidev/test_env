@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Spack images
 on:
   schedule: [ { cron: "50 23 * * 0" } ] # run every Sunday 23h50
   push: { branches: [ main, 'v*' ] }
@@ -10,7 +10,7 @@ jobs:
   step1a_base:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       if: ${{ github.event_name != 'schedule' }}
       run: |
@@ -22,8 +22,9 @@ jobs:
         CACHE_INFO="$(cat CACHE_INFO)"
         echo "Cache: ${CACHE_INFO}"
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           ${CACHE_INFO} \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           -t ghcr.io/pdidev/test_env/base \
           -t ghcr.io/pdidev/test_env/base:${GITHUB_SHA:0:7} \
           spack/1a-base
@@ -35,15 +36,16 @@ jobs:
     needs: step1a_base
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker pull ghcr.io/pdidev/test_env/spackbase || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/spackbase \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
           -t ghcr.io/pdidev/test_env/spackbase \
           -t ghcr.io/pdidev/test_env/spackbase:${GITHUB_SHA:0:7} \
@@ -61,7 +63,7 @@ jobs:
     needs: step1b_spackbase
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -71,8 +73,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2a || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2a \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -92,7 +95,7 @@ jobs:
     needs: step2a_precomp
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -102,8 +105,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2b || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2b \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -123,7 +127,7 @@ jobs:
     needs: step2b_compiler
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -133,8 +137,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2c || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-2c \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -154,7 +159,7 @@ jobs:
     needs: step2c_squash
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -164,8 +169,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3a || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3a \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -185,7 +191,7 @@ jobs:
     needs: step3a_precomp
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -195,8 +201,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3b || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3b \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -216,7 +223,7 @@ jobs:
     needs: step3b_compiler
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -226,8 +233,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-3c \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -247,7 +255,7 @@ jobs:
     needs: step3c_squash
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -257,8 +265,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4a \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -275,8 +284,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-4b \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg IMAGE_TAG=${GITHUB_SHA:0:7} \
@@ -297,7 +307,7 @@ jobs:
     needs: step4_baselibs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -307,8 +317,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
@@ -326,8 +337,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
@@ -349,7 +361,7 @@ jobs:
     needs: step5_mpi
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -359,8 +371,9 @@ jobs:
         docker pull ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all || true
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
           --cache-from ghcr.io/pdidev/test_env/builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
@@ -383,7 +396,7 @@ jobs:
     needs: step6_optlibs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: get cache
       run: |
         sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
@@ -392,7 +405,9 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
     - name: build
       run: |
-        docker build \
+        DOCKER_BUILDKIT=1 docker build \
+          --cache-from ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }} \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg VERSION=${{ matrix.version }} \
           --build-arg COMPILER=${{ matrix.compiler }} \
           --build-arg MPI=${{ matrix.mpi }} \
@@ -411,102 +426,3 @@ jobs:
         DOCKER_TAG="${{github.ref_name}}"
         docker tag ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }} ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${DOCKER_TAG}
         docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${DOCKER_TAG}
-  system_focal:
-    strategy:
-      fail-fast: false
-      matrix:
-        mpi: ['openmpi', 'mpich']
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: get cache
-      run: |
-        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
-                    /usr/local/lib/android /usr/local/lib/node_modules \
-                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini || true
-    - name: build
-      run: |
-        docker build \
-          --build-arg MPI=${{ matrix.mpi }} \
-          --cache-from ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini \
-          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini \
-          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7} \
-          system/focal-mini
-    - name: publish
-      run: |
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${GITHUB_SHA:0:7}
-    - name: Publish tagged
-      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-      run: |
-        DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${DOCKER_TAG}
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/mini:${DOCKER_TAG}
-  system_focal_libs:
-    strategy:
-      fail-fast: false
-      matrix:
-        mpi: ['openmpi', 'mpich']
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: get cache
-      run: |
-        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
-                    /usr/local/lib/android /usr/local/lib/node_modules \
-                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all || true
-    - name: build
-      run: |
-        docker build \
-          --build-arg MPI=${{ matrix.mpi }} \
-          --cache-from ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all \
-          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all \
-          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7} \
-          system/focal-all
-    - name: publish
-      run: |
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${GITHUB_SHA:0:7}
-    - name: Publish tagged
-      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-      run: |
-        DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${DOCKER_TAG}
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/all:${DOCKER_TAG}
-  system_focal_pdi:
-    strategy:
-      fail-fast: false
-      matrix:
-        mpi: ['openmpi', 'mpich']
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: get cache
-      run: |
-        sudo rm -rf /opt/az /opt/hostedtoolcache /usr/local/graalvm \
-                    /usr/local/lib/android /usr/local/lib/node_modules \
-                    /usr/local/.ghcup /usr/share/dotnet /usr/share/swift
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker pull ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi || true
-    - name: build
-      run: |
-        docker build \
-          --build-arg MPI=${{ matrix.mpi }} \
-          --cache-from ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi \
-          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi \
-          -t ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7} \
-          system/focal-pdi
-    - name: publish
-      run: |
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${GITHUB_SHA:0:7}
-    - name: Publish tagged
-      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-      run: |
-        DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${DOCKER_TAG}
-        docker push ghcr.io/pdidev/ubuntu/focal/${{ matrix.mpi }}/pdi:${DOCKER_TAG}
