@@ -30,6 +30,7 @@ RUN spack config --scope site add "modules:default:roots:tcl:${SPACK_MODULES}"
 ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-COPY ${COMPILER}-${VERSION}.lst compilerpkg.lst
+COPY ${COMPILER}.lst compilerpkg.lst
 RUN spack solve -I --reuse $(cat compilerpkg.lst) target=x86_64 \
- && spack install --deprecated ${SPACK_INSTALL_ARGS} --reuse --only dependencies $(cat compilerpkg.lst) target=x86_64
+ && spack install ${SPACK_INSTALL_ARGS} --reuse --only dependencies $(cat compilerpkg.lst) target=x86_64 \
+ && spack clean -a

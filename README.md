@@ -8,14 +8,13 @@ We provide images based on:
 
 ## Spack-based images
 
-These images are based on a minimal Ubuntu 18.08, with spack and all dependencies installed through
-spack.
+These images are based on a minimal Ubuntu with spack and all dependencies installed through spack.
 
 The images are named as: `ghcr.io/pdidev/spack/${deps_version}/${compiler}/${mpi}/${level}`
 With the following parameters:
 * `deps_version`:
-  - `oldest`: dependencies use the oldest versions supported by PDI,
-  - `latest`: dependencies use the latest versions available in spack at the time of generation,
+  - `oldest`: everything is installed with the 0.18 release of spack,
+  - `latest`: everything is installed with the latest development version of spack,
 * `compiler`:
   - `gcc`:   using GCC compiler,
   - `clang`: using clang for C/C++ and gfortran for Fortran,
@@ -28,10 +27,16 @@ With the following parameters:
 
 ## Binary package based images
 
-These images are based on Ubuntu 18.08, with all dependencies installed through packages.
+These images are based on Debian or Ubuntu, with all dependencies installed through packages.
 
-The images are named as: `ghcr.io/pdidev/ubuntu/bionic/${mpi}/${level}`
+The images are named as: `ghcr.io/pdidev/${distribution}/${version}/${mpi}/${level}`
 With the following parameters:
+* `distribution`/`version`:
+  - `debian`: the image is based on Debian GNU Linux, versions can be `oldstable`, or `unstable`,
+  - `ubuntu`: the image is based on Ubuntu, versions can be `jammy`, or `rolling`,
+* `mpi`:
+  - `mpich`: using mpich implementation of MPI,
+  - `openmpi`: using openmpi implementation of MPI,
 * `mpi`:
   - `mpich`: using mpich implementation of MPI,
   - `openmpi`: using openmpi implementation of MPI,
