@@ -13,9 +13,7 @@ RUN spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst)
 RUN spack -e pdienv add -l compiler $(cat compiler.lst)
 
 
-ARG VERSION
-
-COPY ${VERSION}.lst baselibs.lst
+COPY baselibs.lst baselibs.lst
 RUN DEFAULT_IFS="${IFS}" \
   ; IFS=$'\n' \
   ; set -f \
@@ -26,10 +24,12 @@ RUN DEFAULT_IFS="${IFS}" \
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-# --deprecated for some versions of our old env (python 3.6)
-RUN spack -e pdienv concretize -fU
-RUN spack -e pdienv fetch --deprecated $(cat compilerpkg.lst) \
- || spack -e pdienv fetch --deprecated $(cat compilerpkg.lst) \
- || spack -e pdienv fetch --deprecated $(cat compilerpkg.lst) \
- || spack -e pdienv fetch --deprecated $(cat compilerpkg.lst)
-RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst)
+RUN spack -e pdienv concretize -fU \
+ && spack clean -a
+RUN spack -e pdienv fetch $(cat compilerpkg.lst) \
+ || spack -e pdienv fetch $(cat compilerpkg.lst) \
+ || spack -e pdienv fetch $(cat compilerpkg.lst) \
+ || spack -e pdienv fetch $(cat compilerpkg.lst) \
+ && spack clean -a
+RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
+ && spack clean -a
