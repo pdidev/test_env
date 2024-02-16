@@ -9,11 +9,12 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
-# --deprecated for some versions of our old env (python 3.6)
-RUN spack -e pdienv concretize -fU
-RUN spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated \
- || spack -e pdienv fetch --deprecated
-RUN spack -e pdienv install --deprecated ${SPACK_INSTALL_ARGS}
-RUN spack clean -a
+RUN spack -e pdienv concretize -fU \
+ && spack clean -a
+RUN spack -e pdienv fetch \
+ || spack -e pdienv fetch \
+ || spack -e pdienv fetch \
+ || spack -e pdienv fetch \
+ && spack clean -a
+RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ && spack clean -a

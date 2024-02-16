@@ -1,14 +1,19 @@
-FROM ubuntu:20.04 AS main
+ARG DISTRO
+ARG DISTRO_VERSION
+
+FROM ${DISTRO}:${DISTRO_VERSION} AS main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
+ARG DISTRO
+ARG DISTRO_VERSION
 ARG MPI
 
-ENV DOCKERFILE_BASE=ubuntu            \
-    DOCKERFILE_DISTRO=ubuntu          \
-    DOCKERFILE_DISTRO_VERSION=20.04   \
-    HOME=/root                        \
-    container=docker
+ENV DOCKERFILE_BASE=${DISTRO}
+ENV DOCKERFILE_DISTRO=${DISTRO}
+ENV DOCKERFILE_DISTRO_VERSION=${DISTRO_VERSION}
+ENV HOME=/root
+ENV container=docker
 
 WORKDIR ${HOME}
 
@@ -19,6 +24,7 @@ ENTRYPOINT ["/bin/bash_run"]
 CMD ["bash", "-i"]
 
 RUN set -ex \
+ && if [ -f /etc/os-release ]; then . /etc/os-release; fi \
  && chmod +x /bin/bash_run \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
@@ -27,8 +33,8 @@ RUN set -ex \
             apt-transport-https \
             ca-certificates \
             curl \
- && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu focal main" > /etc/apt/sources.list.d/pdi.list \
- && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.ubuntu/pdidev-archive-keyring.gpg \
+ && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
+ && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
  && if [[ "${MPI}" = openmpi ]]; then PDIPLUGIN_FLOWVR=pdiplugin-flowvr; fi\
  && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
@@ -61,7 +67,7 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
-ENV PDI_SYSTEM=ubuntu-focal
+ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 ENV PDI_LIBS=provided

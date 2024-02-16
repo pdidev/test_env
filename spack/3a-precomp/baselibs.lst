@@ -1,0 +1,22 @@
+bison
+cmake
+file
+flex
+freeglut
+glew
+hwloc
+libiconv
+libxml2
+libxmu
+libxslt
+m4
+mesa ~llvm
+mesa-glu
+pkgconf
+py-numpy
+py-pyyaml ~libyaml
+python
+py-pip
+swig
+tar zip=gzip
+zlib
