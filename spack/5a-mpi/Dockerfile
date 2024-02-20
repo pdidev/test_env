@@ -27,13 +27,11 @@ RUN spack -e pdienv fetch \
  || spack -e pdienv fetch \
  || spack -e pdienv fetch \
  && spack clean -a
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ # install & workaround openmpi issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
+RUN if ( [ 'xopenmpi' = "x${MPI}" -a 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
+  ; then  ( spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} openmpi \
+         && export CFLAGS=-fPIE \
+         && spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty openmpi ) \
+  ; fi \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a
-
-# install & workaround openmpi issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
-#  &&  ( if ( [ 'xopenmpi' = "x${MPI}" -a 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
-#      ; then  ( spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} openmpi \
-#             && export CFLAGS=-fPIE \
-#             && spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty openmpi ) \
-#      ; else true \
-#      ; fi ) \
