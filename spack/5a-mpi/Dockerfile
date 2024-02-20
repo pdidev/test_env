@@ -29,9 +29,11 @@ RUN spack -e pdienv fetch \
  && spack clean -a
  # install & workaround openmpi issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
 RUN if ( [ 'xopenmpi' = "x${MPI}" -a 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
-  ; then  ( spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} openmpi \
-         && export CFLAGS=-fPIE \
-         && spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty openmpi ) \
+  ; then echo ' ==================== install openmpi dependencies ====================' \
+      && spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} openmpi \
+      && echo ' ==================== install openmpi with CFLAGS=-fPIE ====================' \
+      && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty openmpi ) \
+      && echo ' ==================== installed openmpi with CFLAGS=-fPIE ====================' \
   ; fi \
  && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a
