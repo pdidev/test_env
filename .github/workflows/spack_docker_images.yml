@@ -303,7 +303,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-        mpi:      ['openmpi']
+        mpi:      ['openmpi','mpich']
     needs: step4_baselibs
     runs-on: ubuntu-latest
     steps:
@@ -357,7 +357,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-        mpi:      ['openmpi']
+        mpi:      ['openmpi','mpich']
     needs: step5_mpi
     runs-on: ubuntu-latest
     steps:
@@ -391,7 +391,7 @@ jobs:
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-        mpi:      ['openmpi']
+        mpi:      ['openmpi','mpich']
         level:    ['mini', 'all']
     needs: step6_optlibs
     runs-on: ubuntu-latest

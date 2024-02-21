@@ -28,6 +28,7 @@ RUN spack -e pdienv fetch \
  || spack -e pdienv fetch \
  && spack clean -a
  # install & workaround openmpi issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
+ARG VERSION
 RUN if ( [ 'xopenmpi' = "x${MPI}" -a 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
   ; then echo ' ==================== install openmpi dependencies ====================' \
       && spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} openmpi \
