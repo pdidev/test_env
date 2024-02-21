@@ -13,15 +13,17 @@ RUN spack mark -ia \
  && for N in $(spack -e pdienv find --format '{name}' --no-groups -L | awk '{print $1}') \
   ; do spack mark -e "/$N" \
   ; done \
- && spack gc -y
+ && spack gc -y \
+ && spack clean -a
 
 RUN find -L ${SPACK_INSTALL} -type f -exec file -i '{}' '+' \
   | awk -F: '/(x-executable|x-sharedlib); charset=binary/ {print $1}' \
   | xargs -r strip -s
 
-RUN spack config --scope site add 'modules:default:tcl:all:autoload:direct'
-RUN spack -e pdienv module tcl refresh --delete-tree -y
-RUN spack -e pdienv env loads
+RUN spack config --scope site add 'modules:default:tcl:all:autoload:direct' \
+ && spack -e pdienv module tcl refresh --delete-tree -y \
+ && spack -e pdienv env loads \
+ && spack clean -a
 
 
 ARG VERSION
@@ -41,9 +43,6 @@ RUN if [[ "xall" = "x${LIBS}" ]] \
   ; then echo 'export PDI_LIBS=provided' >> /etc/pdienv.env.sh \
   ; fi
 RUN echo "MODULEPATH=${MODULEPATH}" >> /etc/pdienv.env.sh
-
-
-RUN spack clean -a
 
 
 
@@ -91,11 +90,12 @@ WORKDIR /home/ci
 ENV HOME /home/ci
 
 
-RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
-RUN tar -xf pdi-master.tar.bz2
+RUN curl --output pdi-deps.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/deps/pdi-deps.tar.bz2
+RUN tar -xf pdi-deps.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
- && bash pdi-master/tools/build_scripts/build_and_run.sh
+ && bash pdi-deps/tools/build_scripts/build_and_run.sh
+
 
 
 FROM main

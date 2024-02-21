@@ -36,22 +36,15 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
- && if [[ "${MPI}" = openmpi ]]; then FLOWVR=flowvr; MPI4PY=python3-mpi4py; fi\
- && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
- && echo tzdata tzdata/Zones/Etc string UTC | debconf-set-selections \
+ && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; fi\
  && apt-get install -y --no-install-recommends \
-            astyle \
             build-essential \
             cmake \
             doxygen \
-            ${FLOWVR} \
             gfortran \
-            libfti-${MPI}-dev \
             libhdf5-${MPI}-dev \
-            libnetcdf-dev \
             libnetcdf-mpi-dev \
             libparaconf-dev \
-            libsion-${MPI}-dev \
             libspdlog-dev \
             libyaml-dev \
             "${MPI/openmpi/openmpi-bin}" \
@@ -89,14 +82,15 @@ USER ci:ci
 WORKDIR ${HOME}
 
 
+
 FROM main AS test
 
-#TODO: Integrate into main branch
 RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
 RUN tar -xf pdi-master.tar.bz2
-
-RUN export MAKEFLAGS="-j 1" \
+RUN export VERBOSE=1 \
+ && export MAKEFLAGS="-j1" \
  && bash pdi-master/tools/build_scripts/build_and_run.sh
+
 
 
 FROM main

@@ -9,10 +9,8 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 COPY spack.yaml spack.yaml
 RUN spack env create pdienv spack.yaml \
- && spack clean -a
-RUN spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst) \
- && spack clean -a
-RUN spack -e pdienv add -l compiler $(cat compiler.lst) \
+ && spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst) \
+ && spack -e pdienv add -l compiler $(cat compiler.lst) \
  && spack clean -a
 
 
@@ -22,17 +20,18 @@ RUN DEFAULT_IFS="${IFS}" \
   ; set -f \
   ; for LIB in $(cat baselibs.lst)\
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l baselibs "${LIB}" \
-  ; done
+  ; done \
+ && spack clean -a
 
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN spack -e pdienv fetch $(cat compilerpkg.lst) \
- || spack -e pdienv fetch $(cat compilerpkg.lst) \
- || spack -e pdienv fetch $(cat compilerpkg.lst) \
- || spack -e pdienv fetch $(cat compilerpkg.lst) \
- && spack clean -a
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
+RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
  && spack clean -a

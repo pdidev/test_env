@@ -36,9 +36,6 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
- && if [[ "${MPI}" = openmpi ]]; then PDIPLUGIN_FLOWVR=pdiplugin-flowvr; fi\
- && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
- && echo tzdata tzdata/Zones/Etc string UTC | debconf-set-selections \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -48,9 +45,6 @@ RUN set -ex \
             pdidev-archive-keyring \
             pdiplugin-decl-hdf5-${MPI} \
             pdiplugin-decl-netcdf \
-            pdiplugin-decl-sion-${MPI} \
-            ${PDIPLUGIN_FLOWVR} \
-            pdiplugin-fti-${MPI} \
             pdiplugin-mpi-${MPI} \
             pdiplugin-pycall \
             pdiplugin-serialize \

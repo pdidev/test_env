@@ -1,0 +1,93 @@
+name: Spack step
+description: 'Builds a step of docker image'
+inputs:
+  GITHUB_TOKEN:
+    required: true
+    description: "GITHUB_TOKEN"
+  path:
+    required: true
+    description: "path to the Dockerfile"
+  image-name:
+    required: true
+    description: "Base name of the image to publish"
+  build-args:
+    default: ""
+    description: "Arguments to pass to the build"
+  cache:
+    default: true
+    description: "Whether to use cache"
+  tags:
+    default: ""
+    description: "Additional tags"
+  test:
+    default: false
+    description: "Whether to build the test target before publishing"
+runs:
+  using: "composite"
+  steps:
+  - id: setup
+    shell: bash
+    run: |
+      echo " === additional tags: ==="
+      cat<<'EOF'
+      ${{ inputs.tags }}
+      EOF
+      echo " === ==="
+      if [ -f docker_image_step_SETUP_ALREADY_DONE ]
+      then echo "done=true" >> "${GITHUB_OUTPUT}"
+      else echo "done=false" >> "${GITHUB_OUTPUT}"
+      fi
+      touch docker_image_step_SETUP_ALREADY_DONE
+  - if: "${{ steps.setup.outputs.done != 'true' }}"
+    uses: jlumbroso/free-disk-space@main
+    with: { tool-cache: true }
+  - if: "${{ steps.setup.outputs.done == 'true' }}"
+    shell: bash
+    run: "docker image prune -f"
+  - if: "${{ steps.setup.outputs.done != 'true' }}"
+    uses: docker/login-action@v3
+    with: { registry: "ghcr.io",  username: "${{ github.actor }}", password: "${{ inputs.GITHUB_TOKEN }}" }
+  - if: "${{ steps.setup.outputs.done != 'true' }}"
+    uses: docker/setup-buildx-action@v3
+  - id: info
+    shell: bash
+    run: |
+      if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
+      then echo "sep=-" >> "${GITHUB_OUTPUT}"
+      else echo "sep=:" >> "${GITHUB_OUTPUT}"
+      fi
+      echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
+  - if: "${{ inputs.test == 'true' }}"
+    uses: docker/build-push-action@v5
+    with:
+      cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
+      build-args: |
+        ${{ inputs.build-args }}
+        IMAGE_TAG=${{ steps.info.outputs.sha }}
+      context: "{{defaultContext}}:${{ inputs.path }}"
+      load: true
+      target: test
+  - if: "${{ inputs.cache == 'true' }}"
+    uses: docker/build-push-action@v5
+    with:
+      cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
+      cache-to: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
+      build-args: |
+        ${{ inputs.build-args }}
+        IMAGE_TAG=${{ steps.info.outputs.sha }}
+      tags: |
+        ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
+        ${{ inputs.tags }}
+      context: "{{defaultContext}}:${{ inputs.path }}"
+      push: true
+  - if: "${{ inputs.cache != 'true' }}"
+    uses: docker/build-push-action@v5
+    with:
+      build-args: |
+        ${{ inputs.build-args }}
+        IMAGE_TAG=${{ steps.info.outputs.sha }}
+      tags: |
+        ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
+        ${{ inputs.tags }}
+      context: "{{defaultContext}}:${{ inputs.path }}"
+      push: true

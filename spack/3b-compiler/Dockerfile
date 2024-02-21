@@ -11,7 +11,12 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
+RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
  && spack mark -ia \
  && spack mark -e "/$(spack -e pdienv find --format '{name}' --no-groups -L $(cat compilerpkg.lst) | awk '{print $1}')" \
  && spack gc -y \
@@ -20,27 +25,17 @@ RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
 
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true \
- && spack clean -a
-RUN spack compiler remove --scope site -a clang || true \
- && spack clean -a
-RUN spack compiler remove -a clang || true \
- && spack clean -a
-RUN spack compiler remove -a gcc || true \
- && spack clean -a
-RUN spack compiler find --scope site \
+ && spack compiler remove --scope site -a clang || true \
+ && spack compiler remove -a clang || true \
+ && spack compiler remove -a gcc || true \
+ && spack compiler find --scope site \
           "$(spack find --format '{name}' --paths "$(cat compilerpkg.lst)" | awk '{print $2}')" \
- && spack clean -a
-RUN spack compiler remove --scope defaults -a gcc || true \
- && spack clean -a
-RUN spack compiler remove --scope defaults -a clang || true \
- && spack clean -a
-RUN spack compiler remove --scope system -a gcc || true \
- && spack clean -a
-RUN spack compiler remove --scope system -a clang || true \
- && spack clean -a
-RUN spack compiler remove --scope user -a gcc || true \
- && spack clean -a
-RUN spack compiler remove --scope user -a clang || true \
+ && spack compiler remove --scope defaults -a gcc || true \
+ && spack compiler remove --scope defaults -a clang || true \
+ && spack compiler remove --scope system -a gcc || true \
+ && spack compiler remove --scope system -a clang || true \
+ && spack compiler remove --scope user -a gcc || true \
+ && spack compiler remove --scope user -a clang || true \
  && spack clean -a
 
 

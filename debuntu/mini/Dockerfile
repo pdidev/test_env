@@ -30,40 +30,21 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; fi \
- && echo tzdata tzdata/Areas string Etc | debconf-set-selections \
- && echo tzdata tzdata/Zones/Etc string UTC | debconf-set-selections \
  && apt-get install -y --no-install-recommends \
-            apt-transport-https \
-            bison \
             build-essential \
             cmake \
-            flex \
-            freeglut3-dev \
+            curl \
             gfortran \
-            graphviz \
-            libglew-dev \
-            libgraphviz-dev \
             lib${MPI}-dev \
-            libhwloc-dev \
-            libssl-dev \
-            libxi-dev \
-            libxml2-dev \
-            libxmu-dev \
-            libxslt1-dev \
-            m4 \
-            mesa-common-dev \
             "${MPI/openmpi/openmpi-bin}" \
             pkg-config \
-            python3-all \
             python3-dev \
             ${MPI4PY} \
             python3-numpy \
             python3-pip \
             python3-setuptools \
-            python3-venv \
             python3-yaml \
             ssh-client \
-            swig \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
@@ -83,6 +64,7 @@ ENV OMPI_MCA_rmaps_base_oversubscribe=1
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
+
 
 
 FROM main AS test
@@ -107,6 +89,7 @@ RUN tar -xf pdi-master.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
  && bash pdi-master/tools/build_scripts/build_and_run.sh
+
 
 
 FROM main
