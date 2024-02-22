@@ -22,17 +22,15 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN spack -e pdienv fetch \
- || spack -e pdienv fetch \
- || spack -e pdienv fetch \
- || spack -e pdienv fetch \
- && spack clean -a
 # workaround clang issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
 # Still present with spack 0.18
-RUN if ( [ 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
+RUN ( spack -e pdienv fetch -m \
+   || spack -e pdienv fetch -m \
+   || spack -e pdienv fetch -m \
+   || spack -e pdienv fetch -m ) \
+ && if ( [ 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
   ; then spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} $(cat mpi.lst) \
       && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty $(cat mpi.lst) ) \
   ; fi \
- && spack clean -a
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a

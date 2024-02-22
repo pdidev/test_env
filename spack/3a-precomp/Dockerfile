@@ -9,10 +9,8 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 COPY spack.yaml spack.yaml
 RUN spack env create pdienv spack.yaml \
- && spack clean -a
-RUN spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst) \
- && spack clean -a
-RUN spack -e pdienv add -l compiler $(cat compiler.lst) \
+ && spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst) \
+ && spack -e pdienv add -l compiler $(cat compiler.lst) \
  && spack clean -a
 
 
@@ -29,10 +27,9 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN spack -e pdienv fetch $(cat compilerpkg.lst) \
- || spack -e pdienv fetch $(cat compilerpkg.lst) \
- || spack -e pdienv fetch $(cat compilerpkg.lst) \
- || spack -e pdienv fetch $(cat compilerpkg.lst) \
- && spack clean -a
-RUN spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
+RUN ( spack -e pdienv fetch -m \
+   || spack -e pdienv fetch -m \
+   || spack -e pdienv fetch -m \
+   || spack -e pdienv fetch -m ) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
  && spack clean -a

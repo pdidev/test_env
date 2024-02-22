@@ -40,7 +40,6 @@ RUN set -ex \
  && apt-get autoclean -y \
  && locale-gen ${LC_ALL} \
  && rm -rf /var/lib/apt/lists/* /run/nologin \
- && pip3 --no-cache-dir install boto3 \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env
