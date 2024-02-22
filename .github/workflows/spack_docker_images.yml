@@ -13,6 +13,7 @@ jobs:
     - name: "Build and push 1a-base"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1a-base
         image-name: base
         cache: ${{ github.event_name != 'schedule' }}
@@ -20,6 +21,7 @@ jobs:
     - name: "Build and push 1b-spackbase"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1b-spackbase
         image-name: spackbase
         skip-setup: true
@@ -36,6 +38,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2a-precomp
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2a
         build-args: |
@@ -53,6 +56,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2b-compiler
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2b
         build-args: |
@@ -70,6 +74,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2c-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2c
         build-args: |
@@ -87,6 +92,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3a-precomp
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3a
         build-args: |
@@ -104,6 +110,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3b-compiler
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3b
         build-args: |
@@ -121,6 +128,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3c-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3c
         build-args: |
@@ -138,6 +146,7 @@ jobs:
     - name: "Build and push 4a-baselibs"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/4a-baselibs
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-4a
         build-args: |
@@ -146,6 +155,7 @@ jobs:
     - name: "Build and push 4b-squash"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/4b-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-4b
         build-args: |
@@ -165,6 +175,7 @@ jobs:
     - name: "Build and push 5a-mpi"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/5a-mpi
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a
         build-args: |
@@ -174,6 +185,7 @@ jobs:
     - name: "Build and push spack/5b-squash"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/spack/5b-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
         build-args: |
@@ -194,6 +206,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/6-optlibs
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
         build-args: |
@@ -214,6 +227,7 @@ jobs:
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/7-finalize
         image-name: spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         build-args: |

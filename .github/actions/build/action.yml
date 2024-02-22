@@ -1,6 +1,9 @@
 name: Spack step
 description: 'Builds a step of spack docker image'
 inputs:
+  GITHUB_TOKEN:
+    required: true
+    description: "GITHUB_TOKEN"
   path:
     required: true
     description: "path to the Dockerfile"
@@ -28,16 +31,18 @@ runs:
     with: { tool-cache: true }
   - name: Free space
     if: ${{ inputs.skip-setup }}
+    shell: bash
     run: 'docker image prune -f'
   - name: Login on GHCR
     if: ${{ ! inputs.skip-setup }}
     uses: docker/login-action@v3
-    with: { registry: "ghcr.io",  username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+    with: { registry: "ghcr.io",  username: "${{ github.actor }}", password: "${{ inputs.GITHUB_TOKEN }}" }
   - name: Setup BuildX
     if: ${{ ! inputs.skip-setup }}
     uses: docker/setup-buildx-action@v3
   - name: Compute tag
     id: info
+    shell: bash
     run: 
       if [ 'true' = '${{ inputs.column-sha }}' ]
       then echo "sep=':'" >> "${GITHUB_OUTPUT}"
