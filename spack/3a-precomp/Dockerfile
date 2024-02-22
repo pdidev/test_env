@@ -27,10 +27,10 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN ( if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
-   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
-   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
-   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
-   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi ) \
+RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
  && spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
  && spack clean -a

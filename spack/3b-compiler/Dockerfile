@@ -11,10 +11,11 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN ( spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m ) \
+RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
+   || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
  && spack -e pdienv install ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
  && spack mark -ia \
  && spack mark -e "/$(spack -e pdienv find --format '{name}' --no-groups -L $(cat compilerpkg.lst) | awk '{print $1}')" \
