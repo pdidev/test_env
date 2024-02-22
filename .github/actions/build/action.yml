@@ -30,7 +30,7 @@ runs:
     uses: jlumbroso/free-disk-space@main
     with: { tool-cache: true }
   - name: Free space
-    if: '${{ inputs.skip-setup = true }}'
+    if: '${{ inputs.skip-setup == true }}'
     shell: bash
     run: 'echo skip-setup: ${{ inputs.skip-setup }}; docker image prune -f'
   - name: Login on GHCR
@@ -50,7 +50,7 @@ runs:
       fi
       echo "sha=${SEPARATOR}${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
   - name: Build and push
-    if: '${{ inputs.cache = true }}'
+    if: '${{ inputs.cache == true }}'
     uses: docker/build-push-action@v5
     with:
       cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
