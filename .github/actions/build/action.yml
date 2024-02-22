@@ -39,7 +39,7 @@ runs:
   - id: info
     shell: bash
     run: |
-      if [ 'true' = '${{ contains(inputs.column-sha,':') }}' ]
+      if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
       then echo "sep=-" >> "${GITHUB_OUTPUT}"
       else echo "sep=:" >> "${GITHUB_OUTPUT}"
       fi
