@@ -39,9 +39,10 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 # install the libs
 RUN spack -e pdienv concretize -fU \
  && spack clean -a
-RUN ( spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m ) \
+RUN ( if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi ) \
  && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a

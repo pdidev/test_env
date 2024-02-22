@@ -10,10 +10,11 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 RUN spack solve -I --reuse $(cat compilerpkg.lst) target=x86_64 \
- && ( spack fetch -Dm $(cat compilerpkg.lst) \
-   || spack fetch -Dm $(cat compilerpkg.lst) \
-   || spack fetch -Dm $(cat compilerpkg.lst) \
-   || spack fetch -Dm $(cat compilerpkg.lst) ) \
+ && ( if ! spack fetch -m $(cat compilerpkg.lst) ; then spack clean -d; false; fi \
+   || if ! spack fetch -m $(cat compilerpkg.lst) ; then spack clean -d; false; fi \
+   || if ! spack fetch -m $(cat compilerpkg.lst) ; then spack clean -d; false; fi \
+   || if ! spack fetch -m $(cat compilerpkg.lst) ; then spack clean -d; false; fi \
+   || if ! spack fetch -m $(cat compilerpkg.lst) ; then spack clean -d; false; fi ) \
  && spack install ${SPACK_INSTALL_ARGS} --reuse $(cat compilerpkg.lst) target=x86_64 \
  && spack clean -a
 

@@ -24,10 +24,11 @@ RUN spack -e pdienv concretize -fU \
  && spack clean -a
 # workaround clang issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
 # Still present with spack 0.18
-RUN ( spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m \
-   || spack -e pdienv fetch -m ) \
+RUN ( if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi \
+   || if ! spack -e pdienv fetch ; then spack clean -d; false; fi ) \
  && if ( [ 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
   ; then spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} $(cat mpi.lst) \
       && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty $(cat mpi.lst) ) \
