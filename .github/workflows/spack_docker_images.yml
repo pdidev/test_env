@@ -18,7 +18,7 @@ jobs:
         image-name: base
         cache: ${{ github.event_name != 'schedule' }}
         column-sha: true
-        skip-setup: true
+        skip-setup: false
     - name: "Build and push 1b-spackbase"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
