@@ -1,5 +1,5 @@
 name: Spack step
-description: 'Builds a step of spack docker image'
+description: 'Builds a step of docker image'
 inputs:
   GITHUB_TOKEN:
     required: true
@@ -13,9 +13,6 @@ inputs:
   build-args:
     default: ""
     description: "Arguments to pass to the build"
-  skip-setup:
-    default: false
-    description: "Whether to skip initial setup"
   cache:
     default: true
     description: "Whether to use cache"
@@ -25,16 +22,24 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - if: "${{ inputs.skip-setup != 'true' }}"
+  - id: setup
+    shell: bash
+    run: |
+      if [ -f docker_image_step_SETUP_ALREADY_DONE ]
+      then echo "done=true" >> "${GITHUB_OUTPUT}"
+      else echo "done=false" >> "${GITHUB_OUTPUT}"
+      fi
+      touch docker_image_step_SETUP_ALREADY_DONE
+  - if: "${{ steps.setup.outputs.done != 'true' }}"
     uses: jlumbroso/free-disk-space@main
     with: { tool-cache: true }
-  - if: "${{ inputs.skip-setup == 'true' }}"
+  - if: "${{ steps.setup.outputs.done == 'true' }}"
     shell: bash
     run: "docker image prune -f"
-  - if: "${{ inputs.skip-setup != 'true' }}"
+  - if: "${{ steps.setup.outputs.done != 'true' }}"
     uses: docker/login-action@v3
     with: { registry: "ghcr.io",  username: "${{ github.actor }}", password: "${{ inputs.GITHUB_TOKEN }}" }
-  - if: "${{ inputs.skip-setup != 'true' }}"
+  - if: "${{ steps.setup.outputs.done != 'true' }}"
     uses: docker/setup-buildx-action@v3
   - id: info
     shell: bash
