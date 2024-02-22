@@ -19,6 +19,9 @@ inputs:
   cache:
     default: true
     description: "Whether to use cache"
+  tags:
+    default: ""
+    description: "Additional tags"
 runs:
   using: "composite"
   steps:
@@ -61,5 +64,6 @@ runs:
         IMAGE_TAG=${{ steps.info.outputs.sha }}
       tags: |
         ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
+        ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true

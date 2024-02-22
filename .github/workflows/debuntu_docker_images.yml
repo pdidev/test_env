@@ -16,9 +16,13 @@ jobs:
         variant: ['mini', 'all', 'pdi']
     runs-on: ubuntu-latest
     steps:
-    - name: Compute distro & version
+    - name: Compute tags, distro & version
       id: info
       run: |
+        if [ 'true' = "${{ github.event_name == 'push' || github.event_name == 'schedule' }}" ]
+        then 
+          echo "tags=ghcr.io/pdidev/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}:${{ github.ref_name }}" >> "${GITHUB_OUTPUT}"
+        fi
         BASE="${{ matrix.base }}"
         echo "distro=${BASE%/*}" >> "${GITHUB_OUTPUT}"
         echo "distro_version=${BASE##*/}" >> "${GITHUB_OUTPUT}"
@@ -32,11 +36,5 @@ jobs:
           MPI=${{ matrix.mpi }}
           DISTRO=${{ steps.info.outputs.distro }}
           DISTRO_VERSION=${{ steps.info.outputs.distro_version }}
-    - name: Publish tagged
-      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-      run: |
-        DOCKER_TAG="${{github.ref_name}}"
-        docker tag \
-          ghcr.io/pdidev/test_env/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}:${GITHUB_SHA:0:7} \
-          ghcr.io/pdidev/test_env/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}:${{github.ref_name}}
-        docker push ghcr.io/pdidev/test_env/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}:${{github.ref_name}}
+        tags: |
+          ${{ steps.info.outputs.tags }}

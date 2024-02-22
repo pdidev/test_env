@@ -222,6 +222,13 @@ jobs:
     needs: step6_optlibs
     runs-on: ubuntu-latest
     steps:
+    - name: "Compute tags"
+      id: info
+      run: |
+        if [ 'true' = "${{ github.event_name == 'push' || github.event_name == 'schedule' }}" ]
+        then 
+          echo "tags=ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+        fi
     - name: "Build and push"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
@@ -233,9 +240,3 @@ jobs:
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
           LIBS=${{ matrix.level }}
-    - name: Publish tagged
-      if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-      run: |
-        DOCKER_TAG="${{github.ref_name}}"
-        docker tag ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }} ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}
-        docker push ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}
