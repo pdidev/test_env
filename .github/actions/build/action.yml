@@ -43,7 +43,7 @@ runs:
   - name: Compute tag
     id: info
     shell: bash
-    run: 
+    run: |
       if [ 'true' = '${{ inputs.column-sha }}' ]
       then echo "sep=':'" >> "${GITHUB_OUTPUT}"
       else echo "sep='-'" >> "${GITHUB_OUTPUT}"
