@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 1a-base"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/1a-base
         image-name: base
         cache: ${{ github.event_name != 'schedule' }}
         column-sha: true
     - name: "Build and push 1b-spackbase"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/1b-spackbase
         image-name: spackbase
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/2a-precomp
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2a
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/2b-compiler
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2b
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/2c-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2c
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/3a-precomp
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3a
@@ -102,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/3b-compiler
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3b
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/3c-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3c
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 4a-baselibs"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/4a-baselibs
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-4a
@@ -144,7 +144,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 4b-squash"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/4b-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-4b
@@ -163,7 +163,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 5a-mpi"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/5a-mpi
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a
@@ -172,7 +172,7 @@ jobs:
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
     - name: "Build and push spack/5b-squash"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/spack/5b-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
@@ -192,7 +192,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/6-optlibs
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
@@ -212,7 +212,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@${{github.sha}}
+      uses: pdidev/test_env/.github/actions/build@v3
       with:
         path: spack/7-finalize
         image-name: spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
