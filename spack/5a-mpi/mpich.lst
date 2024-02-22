@@ -1,3 +1,2 @@
-openmpi
-openssh
+mpich
 py-mpi4py
