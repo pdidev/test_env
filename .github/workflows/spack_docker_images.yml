@@ -59,7 +59,7 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step3_compiler:
+  step3_compiler_4_baselibs:
     strategy:
       fail-fast: false
       matrix:
@@ -95,15 +95,6 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step4_baselibs:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-        compiler: ['gcc', 'clang']
-    needs: step3_compiler
-    runs-on: ubuntu-latest
-    steps:
     - name: "Build and push 4a-baselibs"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
@@ -129,7 +120,7 @@ jobs:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi','mpich']
-    needs: step4_baselibs
+    needs: step3_compiler_4_baselibs
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 5a-mpi"

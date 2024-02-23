@@ -1,7 +1,7 @@
 doxygen
 flowvr
 fmt
-fti
+fti ~fortran
 hdf5
 libyaml
 netcdf-c
