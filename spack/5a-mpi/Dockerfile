@@ -15,7 +15,8 @@ RUN DEFAULT_IFS="${IFS}" \
   ; set -f \
   ; for LIB in $(cat mpi.lst)\
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l mpi "${LIB}" \
-  ; done
+  ; done \
+ && spack clean -a
 
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
@@ -29,15 +30,11 @@ RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
- && echo "compiler.lst: $(cat compiler.lst)" \
- && if ( grep -qs clang compiler.lst ); then echo "compiler.lst is clang"; fi \
- && echo "spack --version: $(spack --version)" \
- && if ( spack --version | grep -qs '^0\.18' ); then echo "spack --version is 0.18"; fi \
  && if ( spack --version | grep -qs '^0\.18' && grep -qs clang compiler.lst ) \
   ; then echo ' === installing MPI deps ===' \
-      && spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} $(cat mpi.lst) \
+      && spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} $(cat mpi.lst|head -n 1) \
       && echo " === installing $(cat mpi.lst) with -fPIE ===" \
-      && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty $(cat mpi.lst) ) \
+      && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty $(cat mpi.lst|head -n 1) ) \
   ; fi \
  && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a

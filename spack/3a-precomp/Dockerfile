@@ -20,7 +20,8 @@ RUN DEFAULT_IFS="${IFS}" \
   ; set -f \
   ; for LIB in $(cat baselibs.lst)\
   ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l baselibs "${LIB}" \
-  ; done
+  ; done \
+ && spack clean -a
 
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
