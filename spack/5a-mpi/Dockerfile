@@ -30,8 +30,10 @@ RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
  && if ( [ 'xoldest' = "x${VERSION}" ] && grep -qs clang compiler.lst ) \
-  ; then spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} $(cat mpi.lst) \
-      && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty $(cat mpi.lst) ) \
+  ; then echo ' === installing MPI deps ===' \
+    && spack -e pdienv install --only dependencies ${SPACK_INSTALL_ARGS} $(cat mpi.lst) \
+    echo " === installing $(cat mpi.lst) with -fPIE ===" \
+    && && ( export CFLAGS=-fPIE; spack -e pdienv install ${SPACK_INSTALL_ARGS} --dirty $(cat mpi.lst) ) \
   ; fi \
  && spack -e pdienv install ${SPACK_INSTALL_ARGS} \
  && spack clean -a

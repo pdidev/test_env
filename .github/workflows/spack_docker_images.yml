@@ -146,7 +146,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/spack/5b-squash
+        path: spack/5b-squash
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
         build-args: |
           VERSION=${{ matrix.version }}
