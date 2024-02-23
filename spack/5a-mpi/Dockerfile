@@ -24,6 +24,7 @@ RUN spack -e pdienv concretize -fU \
  && spack clean -a
 # workaround clang issue with mixed compilers where Fortran CHARACTER detection script requires CFLAGS=-fPIE
 # Still present with spack 0.18
+ARG VERSION
 RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
