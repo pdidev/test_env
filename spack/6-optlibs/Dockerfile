@@ -8,10 +8,6 @@ FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-mini-${IMAGE_
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
-RUN git clone --depth 1 https://github.com/leobago/fti-spack ${SPACK_ROOT}/var/spack/repos/fti \
- && rm -rf ${SPACK_ROOT}/var/spack/repos/fti/.git \
- && spack repo add --scope site ${SPACK_ROOT}/var/spack/repos/fti \
- && spack clean -a
 
 RUN git clone --depth 1 https://github.com/pdidev/spack ${SPACK_ROOT}/var/spack/repos/pdi \
  && rm -rf ${SPACK_ROOT}/var/spack/repos/pdi/.git \
@@ -19,10 +15,8 @@ RUN git clone --depth 1 https://github.com/pdidev/spack ${SPACK_ROOT}/var/spack/
  && spack clean -a
 
 
-ARG VERSION
 
 COPY optlibs.lst optlibs.lst
-
 
 RUN DEFAULT_IFS="${IFS}" \
   ; IFS=$'\n' \

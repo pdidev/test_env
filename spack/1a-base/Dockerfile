@@ -3,23 +3,23 @@ FROM ubuntu:22.04
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
-ENV DOCKERFILE_BASE=ubuntu          \
-    DOCKERFILE_DISTRO=ubuntu        \
-    DOCKERFILE_DISTRO_VERSION=22.04 \
-    DEBIAN_FRONTEND=noninteractive  \
-    HOME=/root                      \
-    LC_ALL=C                        \
-    LANG=C                          \
-    SPACK_INSTALL=/opt/install      \
-    SPACK_MODULES=/opt/modules      \
-    SPACK_ROOT=/opt/spack           \
-    container=docker
+ENV DOCKERFILE_BASE=ubuntu
+ENV DOCKERFILE_DISTRO=ubuntu
+ENV DOCKERFILE_DISTRO_VERSION=22.04
+ENV HOME=/root
+ENV LC_ALL=C
+ENV LANG=C
+ENV SPACK_INSTALL=/opt/install
+ENV SPACK_MODULES=/opt/modules
+ENV SPACK_ROOT=/opt/spack
+ENV container=docker
 
 
 WORKDIR ${HOME}
 
 
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
