@@ -1,12 +1,10 @@
 doxygen
 flowvr
 fmt
-fti ~fortran
 hdf5
 libyaml
 netcdf-c
 paraconf
 py-pybind11
-sionlib
 spdlog
 zpp
