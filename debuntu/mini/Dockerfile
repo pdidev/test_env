@@ -93,3 +93,5 @@ RUN export VERBOSE=1 \
 
 
 FROM main
+
+RUN ls
