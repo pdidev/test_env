@@ -49,6 +49,16 @@ runs:
       else echo "sep=:" >> "${GITHUB_OUTPUT}"
       fi
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
+  - if: ${{ inputs.test }}
+    uses: docker/build-push-action@v5
+    with:
+      cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
+      build-args: |
+        ${{ inputs.build-args }}
+        IMAGE_TAG=${{ steps.info.outputs.sha }}
+      context: "{{defaultContext}}:${{ inputs.path }}"
+      load: true
+      target: test
   - if: "${{ inputs.cache == 'true' }}"
     uses: docker/build-push-action@v5
     with:

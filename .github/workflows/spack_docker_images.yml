@@ -177,6 +177,7 @@ jobs:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/7-finalize
         image-name: spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
+        test: true
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
