@@ -25,6 +25,11 @@ runs:
   - id: setup
     shell: bash
     run: |
+      echo " === additional tags: ==="
+      cat<<'EOF'
+      ${{ inputs.tags }}
+      EOF
+      echo " === ==="
       if [ -f docker_image_step_SETUP_ALREADY_DONE ]
       then echo "done=true" >> "${GITHUB_OUTPUT}"
       else echo "done=false" >> "${GITHUB_OUTPUT}"
