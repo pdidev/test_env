@@ -19,6 +19,9 @@ inputs:
   tags:
     default: ""
     description: "Additional tags"
+  test:
+    default: false
+    description: "Whether to build the test target before publishing"
 runs:
   using: "composite"
   steps:
@@ -54,7 +57,7 @@ runs:
       else echo "sep=:" >> "${GITHUB_OUTPUT}"
       fi
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
-  - if: ${{ inputs.test }}
+  - if: "${{ inputs.test == 'true' }}"
     uses: docker/build-push-action@v5
     with:
       cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
@@ -74,6 +77,7 @@ runs:
         IMAGE_TAG=${{ steps.info.outputs.sha }}
       tags: |
         ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
+        ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
   - if: "${{ inputs.cache != 'true' }}"
