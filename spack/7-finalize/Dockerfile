@@ -90,11 +90,11 @@ WORKDIR /home/ci
 ENV HOME /home/ci
 
 
-RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
-RUN tar -xf pdi-master.tar.bz2
+RUN curl --output pdi-deps.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/deps/pdi-deps.tar.bz2
+RUN tar -xf pdi-deps.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
- && bash pdi-master/tools/build_scripts/build_and_run.sh
+ && bash pdi-deps/tools/build_scripts/build_and_run.sh
 
 
 
