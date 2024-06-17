@@ -43,6 +43,7 @@ RUN set -ex \
             cmake \
             doxygen \
             ${FLOWVR} \
+            freeglut3-dev \
             gfortran \
             libfti-${MPI}-dev \
             libglew-dev \
@@ -97,7 +98,7 @@ WORKDIR ${HOME}
 
 FROM main AS test
 
-RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-builderv3.tar.bz2
+RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
 RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \

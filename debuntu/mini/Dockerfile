@@ -100,7 +100,7 @@ USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
 
-RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-builderv3.tar.bz2
+RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
 RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
