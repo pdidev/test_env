@@ -31,9 +31,7 @@ ARG COMPILER
 ARG MPI
 ARG LIBS
 
-RUN touch /etc/pdienv.env.sh
-RUN echo "export PDI_SYSTEM=spack" >> /etc/pdienv.env.sh
-RUN echo "export PDI_DEPS=${VERSION}" >> /etc/pdienv.env.sh
+RUN sed 's%^\([^/]*/\)\?\([^ ]*\)\s.*$%export PDI_SYSTEM=spack-\2%'> /etc/pdienv.env.sh
 RUN echo "export PDI_COMPILER=${COMPILER}" >> /etc/pdienv.env.sh
 RUN echo "export PDI_MPI=${MPI}" >> /etc/pdienv.env.sh
 RUN if [[ "xopenmpi" = "x${MPI}" ]] \
@@ -90,7 +88,7 @@ WORKDIR /home/ci
 ENV HOME /home/ci
 
 
-RUN curl --output pdi-deps.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/deps/pdi-deps.tar.bz2
+RUN curl --output pdi-deps.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/deps/pdi-builderv3.tar.bz2
 RUN tar -xf pdi-deps.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
