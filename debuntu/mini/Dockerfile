@@ -34,7 +34,19 @@ RUN set -ex \
             build-essential \
             cmake \
             curl \
+            freeglut3-dev \
             gfortran \
+            libglew-dev \
+            libgraphviz-dev \
+            libglew-dev \
+            libgraphviz-dev \
+            libhwloc-dev \
+            libopenmpi-dev \
+            libxi-dev \
+            libxml2-dev \
+            libxmu-dev \
+            libxslt1-dev \
+            mesa-common-dev \
             lib${MPI}-dev \
             "${MPI/openmpi/openmpi-bin}" \
             pkg-config \
