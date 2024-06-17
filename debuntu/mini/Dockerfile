@@ -103,11 +103,11 @@ USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
 
-RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
-RUN tar -xf pdi-master.tar.bz2
+RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-builderv3.tar.bz2
+RUN tar -xf pdi-*.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
- && bash pdi-master/tools/build_scripts/build_and_run.sh
+ && bash pdi-*/tools/build_scripts/build_and_run.sh
 
 
 
