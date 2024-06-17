@@ -45,12 +45,19 @@ RUN set -ex \
             ${FLOWVR} \
             gfortran \
             libfti-${MPI}-dev \
+            libglew-dev \
             libhdf5-${MPI}-dev \
+            lib${MPI}-dev \
             libnetcdf-mpi-dev \
             libparaconf-dev \
             libsion-${MPI}-dev \
             libspdlog-dev \
+            libxml2-dev \
+            libxmu-dev \
+            libxslt1-dev \
             libyaml-dev \
+            m4 \
+            mesa-common-dev \
             "${MPI/openmpi/openmpi-bin}" \
             pdidev-archive-keyring \
             pkg-config \
@@ -62,6 +69,7 @@ RUN set -ex \
             python3-setuptools \
             python3-yaml \
             ssh-client \
+            swig \
             zpp \
  && apt-get autoremove -y \
  && apt-get clean -y \
@@ -89,11 +97,11 @@ WORKDIR ${HOME}
 
 FROM main AS test
 
-RUN curl --output pdi-master.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-master.tar.bz2
-RUN tar -xf pdi-master.tar.bz2
+RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/master/pdi-builderv3.tar.bz2
+RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
- && bash pdi-master/tools/build_scripts/build_and_run.sh
+ && bash pdi*/tools/build_scripts/build_and_run.sh
 
 
 
