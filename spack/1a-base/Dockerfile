@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -25,7 +25,7 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             environment-modules \
             gfortran \
-            libstdc++-9-dev \
+            libstdc++-7-dev \
             make \
             tcl \
  && apt-get autoremove -y \
