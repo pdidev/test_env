@@ -31,23 +31,28 @@ RUN set -ex \
  && apt-get upgrade -y \
  && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; fi \
  && apt-get install -y --no-install-recommends \
+            bison \
             build-essential \
             cmake \
             curl \
+            flex \
             freeglut3-dev \
             gfortran \
+            graphviz \
             libglew-dev \
             libgraphviz-dev \
             libglew-dev \
             libgraphviz-dev \
             libhwloc-dev \
+            lib${MPI}-dev \
+            libssl-dev \
             libopenmpi-dev \
             libxi-dev \
             libxml2-dev \
             libxmu-dev \
             libxslt1-dev \
+            m4 \
             mesa-common-dev \
-            lib${MPI}-dev \
             "${MPI/openmpi/openmpi-bin}" \
             pkg-config \
             python3-dev \
@@ -55,8 +60,10 @@ RUN set -ex \
             python3-numpy \
             python3-pip \
             python3-setuptools \
+            python3-venv \
             python3-yaml \
             ssh-client \
+            swig \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
