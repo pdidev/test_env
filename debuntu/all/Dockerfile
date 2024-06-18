@@ -36,8 +36,7 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://raw.githubusercontent.com/pdidev/repo/pdi-master.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
- && LIBNETCDF=libnetcdf-dev \
- && if [[ "${MPI}" = openmpi ]]; then LIBNETCDF=libnetcdf-mpi-dev; MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi\
+ && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi\
  && apt-get install -y --no-install-recommends \
             astyle \
             build-essential \
@@ -51,7 +50,7 @@ RUN set -ex \
             libhdf5-${MPI}-dev \
             libhwloc-dev \
             lib${MPI}-dev \
-            ${LIBNETCDF} \
+            libnetcdf-dev \
             libparaconf-dev \
             libsion-${MPI}-dev \
             libspdlog-dev \
