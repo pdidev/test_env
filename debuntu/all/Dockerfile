@@ -124,7 +124,6 @@ RUN set -ex \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
- && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /run/nologin \
  && rm -rf /root/* \
