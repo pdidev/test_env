@@ -73,14 +73,15 @@ RUN set -ex \
             ssh-client \
             swig \
             zpp \
+ && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
+ && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /run/nologin \
  && rm -rf /root/* \
- && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true ) \
- && ldconfig
+ && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
@@ -89,9 +90,7 @@ ENV PDI_LIBS=provided
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
-RUN useradd -d /home/ci -m -U ci
 ENV HOME=/home/ci
-
 USER ci:ci
 WORKDIR ${HOME}
 
@@ -99,7 +98,42 @@ WORKDIR ${HOME}
 
 FROM main AS test
 
+USER root:root
+WORKDIR /root
+ENV HOME /root
+
+RUN set -ex \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME /home/ci
+
 RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
+
+USER root:root
+WORKDIR /root
+ENV HOME /root
+
+RUN set -ex \
+ && apt-get purge -y curl \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && useradd -d /home/ci -m -U ci \
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /run/nologin \
+ && rm -rf /root/* \
+ && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME /home/ci
+
 RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \

@@ -53,9 +53,11 @@ RUN set -ex \
             pdiplugin-user-code \
             pkg-config \
             ssh-client \
+ && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
+ && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /run/nologin \
  && rm -rf /root/* \
@@ -68,8 +70,6 @@ ENV PDI_LIBS=provided
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
-RUN useradd -d /home/ci -m -U ci
 ENV HOME=/home/ci
-
 USER ci:ci
 WORKDIR ${HOME}

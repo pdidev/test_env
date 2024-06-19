@@ -34,7 +34,6 @@ RUN set -ex \
             bison \
             build-essential \
             cmake \
-            curl \
             flex \
             freeglut3-dev \
             gfortran \
@@ -61,10 +60,10 @@ RUN set -ex \
             python3-yaml \
             ssh-client \
             swig \
+ && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
- && ldconfig \
  && useradd -d /home/ci -m -U ci \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /run/nologin \
@@ -77,9 +76,9 @@ ENV PDI_MPI=${MPI}
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 
+ENV HOME=/home/ci
 USER ci:ci
-WORKDIR /home/ci
-ENV HOME /home/ci
+WORKDIR ${HOME}
 
 
 
@@ -101,6 +100,26 @@ WORKDIR /home/ci
 ENV HOME /home/ci
 
 RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
+
+USER root:root
+WORKDIR /root
+ENV HOME /root
+
+RUN set -ex \
+ && apt-get purge -y curl \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && useradd -d /home/ci -m -U ci \
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /run/nologin \
+ && rm -rf /root/* \
+ && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME /home/ci
+
 RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \

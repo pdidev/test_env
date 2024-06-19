@@ -69,11 +69,9 @@ CMD ["/bin/bash_run", "bash", "-i"]
 
 FROM main AS test
 
-
 USER root:root
 WORKDIR /root
 ENV HOME /root
-
 
 RUN set -ex \
  && apt-get update -y \
@@ -82,17 +80,35 @@ RUN set -ex \
             ca-certificates \
             curl
 
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME /home/ci
+
+RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
+
+USER root:root
+WORKDIR /root
+ENV HOME /root
+
+RUN set -ex \
+ && apt-get purge -y curl \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && useradd -d /home/ci -m -U ci \
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /run/nologin \
+ && rm -rf /root/* \
+ && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
 
-
-RUN curl --output pdi-deps.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/deps/pdi-builderv3.tar.bz2
-RUN tar -xf pdi-deps.tar.bz2
+RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
- && bash pdi-deps/tools/build_scripts/build_and_run.sh
+ && bash pdi*/tools/build_scripts/build_and_run.sh
 
 
 
