@@ -24,7 +24,6 @@ RUN set -ex \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             environment-modules \
-            gfortran \
             libstdc++-7-dev \
             make \
             tcl \
