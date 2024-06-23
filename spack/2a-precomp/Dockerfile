@@ -38,5 +38,5 @@ RUN spack solve -I --reuse $(cat compilerpkg.lst) target=x86_64 \
    || if ! spack fetch -Dm $(cat compilerpkg.lst) ; then spack clean -a; false; fi \
    || if ! spack fetch -Dm $(cat compilerpkg.lst) ; then spack clean -a; false; fi \
    || if ! spack fetch -Dm $(cat compilerpkg.lst) ; then spack clean -a; false; fi ) \
- && spack install ${SPACK_INSTALL_ARGS} --reuse --only dependencies $(cat compilerpkg.lst) target=x86_64 \
+ && spack install -j 1 ${SPACK_INSTALL_ARGS} --reuse --only dependencies $(cat compilerpkg.lst) target=x86_64 \
  && spack clean -a
