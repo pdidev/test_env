@@ -1,6 +1,5 @@
 name: Spack images
 on:
-  schedule: [ { cron: "50 23 * * 0" } ] # run every Sunday 23h50
   push: { branches: [ main, 'v*' ] }
   pull_request:
 defaults:
@@ -43,7 +42,7 @@ jobs:
           COMPILER=${{ matrix.compiler }}
     - name: "Create swap file"
       run: |
-        sudo fallocate -l 3G /swapfile
+        sudo fallocate -l 8G /swapfile
         sudo chmod 600 /swapfile
         sudo mkswap /swapfile
         sudo swapon /swapfile
