@@ -41,6 +41,12 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
+    - name: "Create swap file"
+      run: |
+        sudo fallocate -l 3G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
     - name: "Build and push 2b-compiler"
       uses: pdidev/test_env/.github/actions/build@main
       with:
@@ -50,6 +56,10 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
+    - name: "Remove swap file"
+      run: |
+        sudo swapoff /swapfile
+        sudo rm /swapfile
     - name: "Build and push 2c-squash"
       uses: pdidev/test_env/.github/actions/build@main
       with:
