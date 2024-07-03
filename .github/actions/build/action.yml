@@ -19,6 +19,9 @@ inputs:
   tags:
     default: ""
     description: "Additional tags"
+  swap:
+    default: "0"
+    description: "Additional swap to allocate"
   test:
     default: false
     description: "Whether to build the test target before publishing"
@@ -67,6 +70,12 @@ runs:
       context: "{{defaultContext}}:${{ inputs.path }}"
       load: true
       target: test
+  - if: "${{ inputs.swap != '0' }}"
+    run: |
+      sudo fallocate -l "${{ inputs.swap }}" /swapfile
+      sudo chmod 600 /swapfile
+      sudo mkswap /swapfile
+      sudo swapon /swapfile
   - if: "${{ inputs.cache == 'true' }}"
     uses: docker/build-push-action@v5
     with:
@@ -91,3 +100,7 @@ runs:
         ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
+  - name: "Remove swap file"
+    run: |
+      sudo swapoff /swapfile || true
+      sudo rm -f /swapfile || true
