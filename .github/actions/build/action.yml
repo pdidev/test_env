@@ -71,6 +71,7 @@ runs:
       load: true
       target: test
   - if: "${{ inputs.swap != '0' }}"
+    shell: bash
     run: |
       sudo fallocate -l "${{ inputs.swap }}" /swapfile
       sudo chmod 600 /swapfile
@@ -101,6 +102,7 @@ runs:
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
   - name: "Remove swap file"
+    shell: bash
     run: |
       sudo swapoff /swapfile || true
       sudo rm -f /swapfile || true
