@@ -20,7 +20,7 @@ RUN spack solve -I --reuse $(cat compilerpkg.lst) target=x86_64 \
 
 
 # Workaround clang 14.0.2 that reports version as 14.0.1
-RUN spack find --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
+RUN spack find -v --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
  && cp compilerpkg.lst compiler.lst \
  && sed 's/llvm/clang/' -i compiler.lst \
  && sed 's/clang@14.0.2/clang@14.0.1/' -i compiler.lst \
@@ -41,8 +41,3 @@ RUN spack compiler remove --scope site -a gcc || true \
  && spack compiler remove --scope user -a gcc || true \
  && spack compiler remove --scope user -a clang || true \
  && spack clean -a
-
-
-# When the selected suite does not offer a Fortran compiler (clang), use gfortran
-# RUN sed -i "s#f77\s*:\s*null#f77: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/compilers.yaml
-# RUN sed -i "s#fc\s*:\s*null#fc: /usr/bin/gfortran#I" ${SPACK_ROOT}/etc/spack/compilers.yaml
