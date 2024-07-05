@@ -9,8 +9,8 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 COPY spack.yaml spack.yaml
 RUN spack env create pdienv spack.yaml \
- && spack -e pdienv add -l compilerpkg $(cat compilerpkg.lst) \
- && spack -e pdienv add -l compiler $(cat compiler.lst) \
+ && spack -e pdienv add -l compilerpkg ""$(cat compilerpkg.lst)"" \
+ && spack -e pdienv add -l compiler "$(cat compiler.lst)" \
  && spack clean -a
 
 
@@ -33,5 +33,5 @@ RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
- && spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies $(cat compilerpkg.lst) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} --only dependencies "$(cat compilerpkg.lst)" \
  && spack clean -a

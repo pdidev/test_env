@@ -16,9 +16,9 @@ RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
    || if ! spack -e pdienv fetch -m; then spack clean -a; false; fi ) \
- && spack -e pdienv install ${SPACK_INSTALL_ARGS} $(cat compilerpkg.lst) \
+ && spack -e pdienv install ${SPACK_INSTALL_ARGS} "$(cat compilerpkg.lst)" \
  && spack mark -ia \
- && spack mark -e "/$(spack -e pdienv find --format '{name}' --no-groups -L $(cat compilerpkg.lst) | awk '{print $1}')" \
+ && spack mark -e "/$(spack -e pdienv find --format '{name}' --no-groups -L "$(cat compilerpkg.lst)" | awk '{print $1}')" \
  && spack gc -y \
  && spack clean -a
 
