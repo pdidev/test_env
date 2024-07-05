@@ -9,7 +9,7 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 COPY spack.yaml spack.yaml
 RUN spack env create pdienv spack.yaml \
- && spack -e pdienv add -l compilerpkg ""$(cat compilerpkg.lst)"" \
+ && spack -e pdienv add -l compilerpkg "$(cat compilerpkg.lst)" \
  && spack -e pdienv add -l compiler "$(cat compiler.lst)" \
  && spack clean -a
 

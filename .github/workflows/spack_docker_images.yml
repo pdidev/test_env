@@ -54,7 +54,7 @@ jobs:
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2b-compiler
-        swap: 10G
+        swap: 15G
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2b
         build-args: |
           VERSION=${{ matrix.version }}
@@ -109,7 +109,7 @@ jobs:
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3b-compiler
-        swap: 10G
+        swap: 15G
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3b
         build-args: |
           VERSION=${{ matrix.version }}
