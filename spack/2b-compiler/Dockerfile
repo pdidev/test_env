@@ -21,7 +21,7 @@ RUN spack solve -I --reuse $(cat compilerpkg.lst) target=x86_64 \
 
 # Workaround clang 14.0.2 that reports version as 14.0.1
 RUN spack find -v --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
- && cp compilerpkg.lst compiler.lst \
+ && spack find --no-groups  "$(cat compilerpkg.lst)" > compiler.lst \
  && sed 's/llvm/clang/' -i compiler.lst \
  && sed 's/clang@14.0.2/clang@14.0.1/' -i compiler.lst \
  && spack clean -a
