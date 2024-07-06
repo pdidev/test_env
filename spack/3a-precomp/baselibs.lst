@@ -5,7 +5,6 @@ flex
 freeglut
 glew
 hwloc
-intel-mkl
 libiconv
 libxml2
 libxmu
@@ -13,6 +12,7 @@ libxslt
 m4
 mesa ~llvm
 mesa-glu
+openblas ~fortran
 pkgconf
 py-numpy
 py-pyyaml ~libyaml
