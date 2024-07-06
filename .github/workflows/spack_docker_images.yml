@@ -22,7 +22,7 @@ jobs:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1b-spackbase
         image-name: spackbase
-  step2a_precomp:
+  step2_compiler:
     strategy:
       fail-fast: false
       matrix:
@@ -40,15 +40,6 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step2b_compiler:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-        compiler: ['gcc', 'clang']
-    needs: step2a_precomp
-    runs-on: ubuntu-latest
-    steps:
     - name: "Build and push 2b-compiler"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
@@ -59,15 +50,6 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step2c_squash:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-        compiler: ['gcc', 'clang']
-    needs: step2b_compiler
-    runs-on: ubuntu-latest
-    steps:
     - name: "Build and push 2c-squash"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
@@ -77,13 +59,13 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step3a_precomp:
+  step3_compiler_4_baselibs:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step2c_squash
+    needs: step2_compiler
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 3a-precomp"
@@ -95,15 +77,6 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step3b_compiler:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-        compiler: ['gcc', 'clang']
-    needs: step3a_precomp
-    runs-on: ubuntu-latest
-    steps:
     - name: "Build and push 3b-compiler"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
@@ -114,15 +87,6 @@ jobs:
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-  step4_baselibs:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-        compiler: ['gcc', 'clang']
-    needs: step3b_compiler
-    runs-on: ubuntu-latest
-    steps:
     - name: "Build and push 3c-squash"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
@@ -157,7 +121,7 @@ jobs:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi','mpich']
-    needs: step4_baselibs
+    needs: step3_compiler_4_baselibs
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 5a-mpi"

@@ -23,6 +23,20 @@ RUN ( if ! spack -e pdienv fetch -m; then spack clean -a; false; fi \
  && spack clean -a
 
 
+# add the dependencies required for the old flang to work, TODO: move to base
+RUN if grep -q clang@14.0.1 compiler.lst \
+  ; then export DEBIAN_FRONTEND=noninteractive \
+      && apt-get update -y \
+      && apt-get upgrade -y \
+      && apt-get install -y --no-install-recommends \
+                 gfortran \
+                 uuid-runtime \
+      && apt-get autoremove -y \
+      && apt-get clean -y \
+      && apt-get autoclean -y \
+  ; fi
+
+
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true \
  && spack compiler remove --scope site -a clang || true \
@@ -37,3 +51,16 @@ RUN spack compiler remove --scope site -a gcc || true \
  && spack compiler remove --scope user -a gcc || true \
  && spack compiler remove --scope user -a clang || true \
  && spack clean -a
+
+
+# force old flang that's otherwise not detected
+RUN if grep -q clang@14.0.1 compiler.lst \
+  ; then sed "s%^\( *f\(77\|c\)\): *null%\1: $(spack find --format '{name}' --paths "$(cat compilerpkg.lst)" | awk '{print $2}')/bin/flang-new%" \
+             -i /opt/spack/etc/spack/compilers.yaml \
+  ; fi
+
+
+# flang 18.1.fails with -mtune=generic
+RUN if grep -q clang compiler.lst && ! grep -q clang@14.0.1 compiler.lst \
+  ; then sed -e "s%-mtune=generic%%" -i /opt/spack/lib/spack/external/archspec/json/cpu/microarchitectures.json \
+  ; fi

@@ -5,6 +5,7 @@ flex
 freeglut
 glew
 hwloc
+intel-mkl
 libiconv
 libxml2
 libxmu
