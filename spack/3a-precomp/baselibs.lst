@@ -12,7 +12,6 @@ libxslt
 m4
 mesa ~llvm
 mesa-glu
-openblas ~fortran
 pkgconf
 py-numpy
 py-pyyaml ~libyaml
