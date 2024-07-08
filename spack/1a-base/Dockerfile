@@ -24,7 +24,7 @@ RUN set -ex \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             environment-modules \
-            libstdc++-7-dev \
+            libstdc++-10-dev \
             make \
             tcl \
  && apt-get autoremove -y \

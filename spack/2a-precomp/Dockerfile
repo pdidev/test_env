@@ -24,8 +24,8 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
-            gcc \
-            g++ \
+            gcc-10 \
+            g++-10 \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y

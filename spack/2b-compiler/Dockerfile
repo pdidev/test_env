@@ -32,8 +32,8 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get purge -y \
-            gcc \
-            g++ \
+            gcc-10 \
+            g++-10 \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && apt-get autoclean -y \
@@ -42,15 +42,6 @@ RUN set -ex \
 
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true \
- && spack compiler remove --scope site -a clang || true \
- && spack compiler remove -a clang || true \
- && spack compiler remove -a gcc || true \
  && spack compiler find --scope site \
           "$(spack find --format '{name}' --paths "$(cat compilerpkg.lst)" | awk '{print $2}')" \
- && spack compiler remove --scope defaults -a gcc || true \
- && spack compiler remove --scope defaults -a clang || true \
- && spack compiler remove --scope system -a gcc || true \
- && spack compiler remove --scope system -a clang || true \
- && spack compiler remove --scope user -a gcc || true \
- && spack compiler remove --scope user -a clang || true \
  && spack clean -a
