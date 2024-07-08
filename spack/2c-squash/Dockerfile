@@ -2,7 +2,7 @@ ARG VERSION
 ARG COMPILER
 ARG IMAGE_TAG
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-2b-${IMAGE_TAG} as builder
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-2b-${IMAGE_TAG} AS builder
 
 
 
