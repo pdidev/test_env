@@ -31,7 +31,7 @@ RUN spack find -v --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
 RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
- && apt-get purge \
+ && apt-get purge -y \
             gcc \
             g++ \
  && apt-get autoremove -y \
