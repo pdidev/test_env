@@ -27,6 +27,19 @@ RUN spack find -v --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
  && spack clean -a
 
 
+# Remove the bootstrapping compiler
+RUN set -ex \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get purge \
+            gcc \
+            g++ \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && rm -rf /var/lib/apt/lists/*
+
+
 # switch to our new, just built, compiler
 RUN spack compiler remove --scope site -a gcc || true \
  && spack compiler remove --scope site -a clang || true \

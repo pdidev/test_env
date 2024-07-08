@@ -40,7 +40,17 @@ RUN spack compiler remove --scope site -a gcc || true \
 
 
 # use system gfortran for clang that doesn't support fortran
-RUN if grep -q clang compiler.lst \
-  ; then sed "s%^\( *f\(77\|c\)\): *null%\1: /usr/bin/gfortran%" \
+RUN set -ex \
+  ; if grep -q clang compiler.lst \
+  ; then \
+         apt-get update -y \
+      && apt-get upgrade -y \
+      && apt-get install -y --no-install-recommends \
+                 gfortran-10 \
+      && apt-get autoremove -y \
+      && apt-get clean -y \
+      && apt-get autoclean -y \
+      && rm -rf /var/lib/apt/lists/*  \
+      && sed "s%^\( *f\(77\|c\)\): *null%\1: /usr/bin/gfortran-10%" \
              -i /opt/spack/etc/spack/compilers.yaml \
   ; fi

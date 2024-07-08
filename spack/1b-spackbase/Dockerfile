@@ -19,9 +19,6 @@ RUN set -ex \
             build-essential \
             curl \
             file \
-            g++ \
-            gcc \
-            gfortran \
             git \
             gnupg2 \
             iproute2 \

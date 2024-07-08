@@ -19,6 +19,19 @@ ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
 
+# Install a bootstrapping compiler
+RUN set -ex \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+            gcc \
+            g++ \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y
+
+
+# Detect our bootstrapping compiler
 RUN spack compiler find --scope site \
  && spack config --scope site add 'packages:all:target:[x86_64]' \
  && spack config --scope site add "config:install_tree:root:${SPACK_INSTALL}" \
@@ -31,6 +44,7 @@ RUN spack compiler find --scope site \
 ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
+# Install the dependencies for our compiler
 COPY ${COMPILER}.lst compilerpkg.lst
 RUN spack solve -I --reuse "$(cat compilerpkg.lst)" target=x86_64 \
  && ( if ! spack fetch -Dm "$(cat compilerpkg.lst)" ; then spack clean -a; false; fi \
