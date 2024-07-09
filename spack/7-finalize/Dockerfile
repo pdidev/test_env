@@ -53,6 +53,21 @@ COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdien
 COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
 
 
+# use system gfortran for clang that doesn't support fortran
+RUN set -ex \
+  ; if grep -q clang compiler.lst \
+  ; then \
+         apt-get update -y \
+      && apt-get upgrade -y \
+      && apt-get install -y --no-install-recommends \
+                 gfortran-10 \
+      && apt-get autoremove -y \
+      && apt-get clean -y \
+      && apt-get autoclean -y \
+      && rm -rf /var/lib/apt/lists/*  \
+  ; fi
+
+
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME /home/ci
