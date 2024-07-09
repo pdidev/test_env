@@ -19,6 +19,7 @@ COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 
 # use system gfortran for clang that doesn't support fortran
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
   ; if grep -q clang compiler.lst \
   ; then \
          apt-get update -y \

@@ -21,6 +21,7 @@ CMD ["interactive-shell"]
 
 # Install a bootstrapping compiler
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \

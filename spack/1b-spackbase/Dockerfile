@@ -12,6 +12,7 @@ ENV LANG=en_US.UTF-8     \
 
 
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -31,7 +32,6 @@ RUN set -ex \
             python3-pip \
             python3-setuptools \
             python3-venv \
-            tcl \
             unzip \
  && apt-get autoremove -y \
  && apt-get clean -y \

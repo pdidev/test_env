@@ -57,7 +57,8 @@ ARG COMPILER
 
 # use system gfortran for clang that doesn't support fortran
 RUN set -ex \
-  ; if echo "$COMPILER" | grep -q clang \
+ && export DEBIAN_FRONTEND=noninteractive \
+ && if echo "$COMPILER" | grep -q clang \
   ; then \
          apt-get update -y \
       && apt-get upgrade -y \
@@ -66,7 +67,8 @@ RUN set -ex \
       && apt-get autoremove -y \
       && apt-get clean -y \
       && apt-get autoclean -y \
-      && rm -rf /var/lib/apt/lists/*  \
+      && rm -rf /var/lib/apt/lists/* \
+      && echo "export FC=gfortran-10" >> /etc/pdienv.env.sh \
   ; fi
 
 
@@ -91,6 +93,7 @@ WORKDIR /root
 ENV HOME /root
 
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -108,6 +111,7 @@ WORKDIR /root
 ENV HOME /root
 
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get purge -y curl \
  && apt-get autoremove -y
 

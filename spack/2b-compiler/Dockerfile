@@ -29,6 +29,7 @@ RUN spack find -v --no-groups  "$(cat compilerpkg.lst)" > compilerpkg.lst \
 
 # Remove the bootstrapping compiler
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get purge -y \

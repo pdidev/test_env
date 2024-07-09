@@ -23,6 +23,7 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
+            binutils \
             environment-modules \
             libstdc++-10-dev \
             make \
