@@ -53,9 +53,11 @@ COPY --from=builder ${SPACK_ROOT}/var/spack/environments/pdienv/loads /etc/pdien
 COPY --from=builder /etc/pdienv.env.sh /etc/pdienv.env.sh
 
 
+ARG COMPILER
+
 # use system gfortran for clang that doesn't support fortran
 RUN set -ex \
-  ; if grep -q clang compiler.lst \
+  ; if echo "$COMPILER" | grep -q clang \
   ; then \
          apt-get update -y \
       && apt-get upgrade -y \
@@ -107,13 +109,7 @@ ENV HOME /root
 
 RUN set -ex \
  && apt-get purge -y curl \
- && apt-get autoremove -y \
- && apt-get clean -y \
- && apt-get autoclean -y \
- && rm -rf /var/lib/apt/lists/* \
- && rm -rf /run/nologin \
- && rm -rf /root/* \
- && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
+ && apt-get autoremove -y
 
 USER ci:ci
 WORKDIR /home/ci
