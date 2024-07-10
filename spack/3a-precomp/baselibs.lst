@@ -1,7 +1,5 @@
-bison
 cmake
-flex
-libiconv
+doxygen
 pkgconf
 py-numpy
 py-pip
