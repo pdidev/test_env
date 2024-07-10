@@ -1,7 +1,9 @@
+bison
 cmake
+flex
 libiconv
 pkgconf
 py-numpy
+py-pip
 py-pyyaml ~libyaml
 python
-py-pip
