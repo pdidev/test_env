@@ -1,5 +1,6 @@
 name: Spack images
 on:
+  schedule: [ { cron: "50 23 * * 0" } ] # run every Sunday 23h50
   push: { branches: [ main, 'v*' ] }
   pull_request:
 defaults:
