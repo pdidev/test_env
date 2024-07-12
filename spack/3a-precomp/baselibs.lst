@@ -1,7 +1,9 @@
 cmake
 doxygen
+m4
 pkgconf
 py-numpy
 py-pip
 py-pyyaml ~libyaml
 python
+zlib

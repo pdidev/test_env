@@ -35,7 +35,9 @@ RUN set -ex \
             cmake \
             doxygen \
             gfortran \
+            libcurl-dev \
             lib${MPI}-dev \
+            libssl-dev \
             libxml2-dev \
             m4 \
             "${MPI/openmpi/openmpi-bin}" \
@@ -48,6 +50,7 @@ RUN set -ex \
             python3-venv \
             python3-yaml \
             ssh-client \
+            zlib1g-dev \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
