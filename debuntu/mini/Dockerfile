@@ -35,7 +35,7 @@ RUN set -ex \
             cmake \
             doxygen \
             gfortran \
-            libcurl-dev \
+            libcurl4-openssl-dev \
             lib${MPI}-dev \
             libssl-dev \
             libxml2-dev \
