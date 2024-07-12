@@ -37,7 +37,6 @@ RUN set -ex \
             gfortran \
             libcurl4-openssl-dev \
             lib${MPI}-dev \
-            libssl-dev \
             libxml2-dev \
             m4 \
             "${MPI/openmpi/openmpi-bin}" \
@@ -77,7 +76,7 @@ FROM main AS test
 
 USER root:root
 WORKDIR /root
-ENV HOME /root
+ENV HOME=/root
 
 RUN set -ex \
  && apt-get update -y \
@@ -88,13 +87,13 @@ RUN set -ex \
 
 USER ci:ci
 WORKDIR /home/ci
-ENV HOME /home/ci
+ENV HOME=/home/ci
 
 RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
 
 USER root:root
 WORKDIR /root
-ENV HOME /root
+ENV HOME=/root
 
 RUN set -ex \
  && apt-get purge -y curl \
@@ -108,7 +107,7 @@ RUN set -ex \
 
 USER ci:ci
 WORKDIR /home/ci
-ENV HOME /home/ci
+ENV HOME=/home/ci
 
 RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
