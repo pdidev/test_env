@@ -36,6 +36,7 @@ RUN set -ex \
             doxygen \
             gfortran \
             lib${MPI}-dev \
+            libxml2-dev \
             "${MPI/openmpi/openmpi-bin}" \
             pkg-config \
             python3-dev \
