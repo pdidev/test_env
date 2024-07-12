@@ -49,14 +49,15 @@ RUN set -ex \
             libspdlog-dev \
             libyaml-dev \
             "${MPI/openmpi/openmpi-bin}" \
+            ${MPI4PY} \
             pdidev-archive-keyring \
             pkg-config \
             pybind11-dev \
             python3-dev \
-            ${MPI4PY} \
             python3-numpy \
             python3-pip \
             python3-setuptools \
+            python3-venv \
             python3-yaml \
             ssh-client \
  && apt-get purge -y curl \
