@@ -37,10 +37,11 @@ RUN set -ex \
             gfortran \
             lib${MPI}-dev \
             libxml2-dev \
+            m4 \
             "${MPI/openmpi/openmpi-bin}" \
+            ${MPI4PY} \
             pkg-config \
             python3-dev \
-            ${MPI4PY} \
             python3-numpy \
             python3-pip \
             python3-setuptools \
