@@ -38,28 +38,16 @@ RUN set -ex \
  && apt-get update -y \
  && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi\
  && apt-get install -y --no-install-recommends \
-            astyle \
             build-essential \
             cmake \
             doxygen \
-            ${FLOWVR} \
-            freeglut3-dev \
             gfortran \
-            libfti-${MPI}-dev \
-            libglew-dev \
             libhdf5-${MPI}-dev \
-            libhwloc-dev \
             lib${MPI}-dev \
             libnetcdf-dev \
             libparaconf-dev \
-            libsion-${MPI}-dev \
             libspdlog-dev \
-            libxml2-dev \
-            libxmu-dev \
-            libxslt1-dev \
             libyaml-dev \
-            m4 \
-            mesa-common-dev \
             "${MPI/openmpi/openmpi-bin}" \
             pdidev-archive-keyring \
             pkg-config \
@@ -71,7 +59,6 @@ RUN set -ex \
             python3-setuptools \
             python3-yaml \
             ssh-client \
-            swig \
             zpp \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
