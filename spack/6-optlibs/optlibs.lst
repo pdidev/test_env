@@ -4,4 +4,3 @@ netcdf-c
 paraconf
 py-pybind11
 spdlog
-zpp

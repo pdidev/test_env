@@ -1,4 +1,5 @@
 cmake
+curl
 doxygen
 m4
 pkgconf

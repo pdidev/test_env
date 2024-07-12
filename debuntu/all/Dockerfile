@@ -59,7 +59,6 @@ RUN set -ex \
             python3-setuptools \
             python3-yaml \
             ssh-client \
-            zpp \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \

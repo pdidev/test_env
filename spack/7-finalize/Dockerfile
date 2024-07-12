@@ -36,6 +36,7 @@ RUN echo "export PDI_COMPILER=${COMPILER}" >> /etc/pdienv.env.sh
 RUN echo "export PDI_MPI=${MPI}" >> /etc/pdienv.env.sh
 RUN if [[ "xopenmpi" = "x${MPI}" ]] \
   ; then echo 'export OMPI_MCA_rmaps_base_oversubscribe=1' >> /etc/pdienv.env.sh \
+       ; echo 'export PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe' >> /etc/pdienv.env.sh \
   ; fi
 RUN if [[ "xall" = "x${LIBS}" ]] \
   ; then echo 'export PDI_LIBS=provided' >> /etc/pdienv.env.sh \
