@@ -31,7 +31,7 @@ ARG COMPILER
 ARG MPI
 ARG LIBS
 
-RUN sed 's%^\([^/]*/\)\?\([^ ]*\)\s.*$%export PDI_SYSTEM=spack-\2%'> /etc/pdienv.env.sh
+RUN echo "export PDI_SYSTEM=spack"> /etc/pdienv.env.sh
 RUN echo "export PDI_COMPILER=${COMPILER}" >> /etc/pdienv.env.sh
 RUN echo "export PDI_MPI=${MPI}" >> /etc/pdienv.env.sh
 RUN if [[ "xopenmpi" = "x${MPI}" ]] \
@@ -42,11 +42,13 @@ RUN if [[ "xall" = "x${LIBS}" ]] \
   ; then echo 'export PDI_LIBS=provided' >> /etc/pdienv.env.sh \
   ; fi
 RUN echo "MODULEPATH=${MODULEPATH}" >> /etc/pdienv.env.sh
+RUN if echo "$COMPILER" | grep -q clang \
+  ; then echo "export FC=gfortran-10" >> /etc/pdienv.env.sh \
+  ; fi
 
 
 
 FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
-
 
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
@@ -68,18 +70,15 @@ RUN set -ex \
       && apt-get autoremove -y \
       && apt-get clean -y \
       && apt-get autoclean -y \
-      && rm -rf /var/lib/apt/lists/* \
-      && echo "export FC=gfortran-10" >> /etc/pdienv.env.sh \
+      && rm -rf /var/lib/apt/lists/*  \
   ; fi
 
 
 USER ci:ci
 WORKDIR /home/ci
-ENV HOME /home/ci
-
+ENV HOME=/home/ci
 
 COPY bash_run /bin/
-
 
 ENTRYPOINT ["/bin/bash_run"]
 SHELL ["/bin/bash_run", "bash", "-c"]
@@ -89,40 +88,9 @@ CMD ["/bin/bash_run", "bash", "-i"]
 
 FROM main AS test
 
-USER root:root
-WORKDIR /root
-ENV HOME /root
-
-RUN set -ex \
- && export DEBIAN_FRONTEND=noninteractive \
- && apt-get update -y \
- && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends \
-            ca-certificates \
-            curl
-
-USER ci:ci
-WORKDIR /home/ci
-ENV HOME /home/ci
-
 RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
-
-USER root:root
-WORKDIR /root
-ENV HOME /root
-
-RUN set -ex \
- && export DEBIAN_FRONTEND=noninteractive \
- && apt-get purge -y curl \
- && apt-get autoremove -y
-
-USER ci:ci
-WORKDIR /home/ci
-ENV HOME /home/ci
-
 RUN tar -xf pdi.tar.bz2
 RUN export VERBOSE=1 \
- && export MAKEFLAGS="-j1" \
  && bash pdi*/tools/build_scripts/build_and_run.sh
 
 
