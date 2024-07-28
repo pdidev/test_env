@@ -93,7 +93,7 @@ runs:
         ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
-      target:${{ inputs.target }}
+      target: ${{ inputs.target }}
   - if: "${{ inputs.cache != 'true' }}"
     uses: docker/build-push-action@v5
     with:
@@ -105,7 +105,7 @@ runs:
         ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
-      target:${{ inputs.target }}
+      target: ${{ inputs.target }}
   - name: "Remove swap file"
     shell: bash
     run: |
