@@ -25,6 +25,9 @@ inputs:
   test:
     default: false
     description: "Whether to build the test target before publishing"
+  target:
+    default:
+    description: "Target to build"
 runs:
   using: "composite"
   steps:
@@ -90,6 +93,7 @@ runs:
         ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
+      target:${{ inputs.target }}
   - if: "${{ inputs.cache != 'true' }}"
     uses: docker/build-push-action@v5
     with:
@@ -101,8 +105,12 @@ runs:
         ${{ inputs.tags }}
       context: "{{defaultContext}}:${{ inputs.path }}"
       push: true
+      target:${{ inputs.target }}
   - name: "Remove swap file"
     shell: bash
     run: |
-      sudo swapoff /swapfile || true
-      sudo rm -f /swapfile || true
+      if [ -e /swapfile ]
+      then
+        sudo swapoff /swapfile || true
+        sudo rm -f /swapfile || true
+      fi

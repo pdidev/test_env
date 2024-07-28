@@ -86,6 +86,37 @@ CMD ["/bin/bash_run", "bash", "-i"]
 
 
 
+FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS fullspack
+
+COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
+COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
+COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
+
+
+ARG COMPILER
+
+# use system gfortran for clang that doesn't support fortran
+RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
+ && if echo "$COMPILER" | grep -q clang \
+  ; then \
+         apt-get update -y \
+      && apt-get upgrade -y \
+      && apt-get install -y --no-install-recommends \
+                 gfortran-10 \
+      && apt-get autoremove -y \
+      && apt-get clean -y \
+      && apt-get autoclean -y \
+      && rm -rf /var/lib/apt/lists/*  \
+  ; fi
+
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME=/home/ci
+
+
+
 FROM main AS test
 
 RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
