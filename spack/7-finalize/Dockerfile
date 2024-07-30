@@ -93,9 +93,9 @@ ENV LANG=en_US.UTF-8     \
     LC_ALL=en_US.UTF-8
 
 
-COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
-COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
-COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
+COPY --from=builder --chown=ci:ci ${SPACK_INSTALL} ${SPACK_INSTALL}
+COPY --from=builder --chown=ci:ci ${SPACK_MODULES} ${SPACK_MODULES}
+COPY --from=builder --chown=ci:ci ${SPACK_ROOT} ${SPACK_ROOT}
 
 
 ARG COMPILER
