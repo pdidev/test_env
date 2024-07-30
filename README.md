@@ -10,7 +10,7 @@ We provide images based on:
 
 These images are based on a minimal Ubuntu with spack and all dependencies installed through spack.
 
-The images are named as: `ghcr.io/pdidev/spack/${deps_version}/${compiler}/${mpi}/${level}`
+The images are named as: `ghcr.io/pdidev/spack/${version}/${compiler}/${mpi}/${variant}:v3`
 With the following parameters:
 * `deps_version`:
   - `oldest`: everything is installed with the 0.18 release of spack,
@@ -19,8 +19,9 @@ With the following parameters:
   - `gcc`:   using GCC compiler,
   - `clang`: using clang for C/C++ and gfortran for Fortran,
 * `mpi`:
+  - `mpich`: using mpich implementation of MPI,
   - `openmpi`: using openmpi implementation of MPI,
-* `level`:
+* `variant`:
   - `mini`: dependencies "vendored" in PDI are not included in the image,
   - `all`: dependencies "vendored" in PDI are included in the image.
 
@@ -29,18 +30,39 @@ With the following parameters:
 
 These images are based on Debian or Ubuntu, with all dependencies installed through packages.
 
-The images are named as: `ghcr.io/pdidev/${distribution}/${version}/${mpi}/${level}`
+The images are named as: `ghcr.io/pdidev/${distribution}/${version}/${mpi}/${variant}:v3`
 With the following parameters:
 * `distribution`/`version`:
-  - `debian`: the image is based on Debian GNU Linux, versions can be `oldstable`, or `unstable`,
-  - `ubuntu`: the image is based on Ubuntu, versions can be `jammy`, or `rolling`,
+  - `debian/oldstable`: the image is based on the oldest version of Debian GNU Linux supported by PDI: `oldstable`
+  - `debian/unstable`: the image is based on the Debian GNU Linux `unstable`
+  - `ubuntu/focal`: the image is based on Ubuntu `focal fossa`
+  - `ubuntu/rolling`: the image is based on Ubuntu latest release
 * `mpi`:
   - `mpich`: using mpich implementation of MPI,
   - `openmpi`: using openmpi implementation of MPI,
-* `mpi`:
-  - `mpich`: using mpich implementation of MPI,
-  - `openmpi`: using openmpi implementation of MPI,
-* `level`:
+* `variant`:
   - `mini`: dependencies "vendored" in PDI are not included in the image,
   - `all`: dependencies "vendored" in PDI are included in the image,
   - `pdi`: PDI is included in the image.
+
+## Full Spack images
+
+These images are like the spack images but contain a fully working spack in additions of the 
+dependencies installed through spack.
+
+The images are named as: `ghcr.io/pdidev/fullspack/${version}/${compiler}/${mpi}/${variant}:v3`
+With the following parameters:
+* `deps_version`:
+  - `oldest`: everything is installed with the 0.18 release of spack,
+  - `latest`: everything is installed with the latest development version of spack,
+* `compiler`:
+  - `gcc`:   using GCC compiler,
+  - `clang`: using clang for C/C++ and gfortran for Fortran,
+* `mpi`:
+  - `mpich`: using mpich implementation of MPI,
+  - `openmpi`: using openmpi implementation of MPI,
+* `variant`:
+  - `mini`: dependencies "vendored" in PDI are not included in the image,
+  - `all`: dependencies "vendored" in PDI are included in the image.
+
+

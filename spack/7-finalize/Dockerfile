@@ -88,27 +88,52 @@ CMD ["/bin/bash_run", "bash", "-i"]
 
 FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS fullspack
 
+ENV LANG=en_US.UTF-8     \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
+
+
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
 COPY --from=builder ${SPACK_ROOT} ${SPACK_ROOT}
 
 
 ARG COMPILER
-
-# use system gfortran for clang that doesn't support fortran
 RUN set -ex \
  && export DEBIAN_FRONTEND=noninteractive \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+            ca-certificates \
+            build-essential \
+            curl \
+            file \
+            git \
+            gnupg2 \
+            iproute2 \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            locales \
+            make \
+            python3 \
+            python3-dev \
+            python3-pip \
+            python3-setuptools \
+            python3-venv \
+            unzip \
  && if echo "$COMPILER" | grep -q clang \
   ; then \
-         apt-get update -y \
-      && apt-get upgrade -y \
-      && apt-get install -y --no-install-recommends \
+         apt-get install -y --no-install-recommends \
                  gfortran-10 \
-      && apt-get autoremove -y \
-      && apt-get clean -y \
-      && apt-get autoclean -y \
-      && rm -rf /var/lib/apt/lists/*  \
-  ; fi
+  ; fi \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y \
+ && locale-gen ${LC_ALL} \
+ && rm -rf /var/lib/apt/lists/* /run/nologin \
+ && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/docker-shell \
+ && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/interactive-shell \
+ && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env
 
 
 USER ci:ci
