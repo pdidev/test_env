@@ -6,6 +6,7 @@ We provide images based on:
 * Spack recipes,
 * Binary packages.
 
+
 ## Spack-based images
 
 These images are based on a minimal Ubuntu with spack and all dependencies installed through spack.
@@ -45,6 +46,7 @@ With the following parameters:
   - `all`: dependencies "vendored" in PDI are included in the image,
   - `pdi`: PDI is included in the image.
 
+
 ## Full Spack images
 
 These images are like the spack images but contain a fully working spack in additions of the 
@@ -66,3 +68,7 @@ With the following parameters:
   - `all`: dependencies "vendored" in PDI are included in the image.
 
 
+## Clang-format images
+
+The images are named as: `ghcr.io/pdidev/run_clang_format` and embed the
+`run-clang-format` tool from `https://github.com/Sarcasm/run-clang-format/`

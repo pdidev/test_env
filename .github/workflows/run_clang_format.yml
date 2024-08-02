@@ -1,0 +1,30 @@
+name: Run_clang_format images
+on:
+  schedule: [ { cron: "50 23 * * 0" } ] # run every Sunday 23h50
+  push: { branches: [ main, 'v*' ] }
+  pull_request:
+defaults:
+  run:
+    shell: bash
+jobs:
+  run_clang_format :
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout context
+      uses: actions/checkout@v4
+      with: { submodules: 'recursive' }
+    - name: Compute tags & version
+      id: info
+      run: |
+        if [ 'true' = "${{ github.event_name == 'push' || github.event_name == 'schedule' }}" ]
+        then 
+          echo "tags=ghcr.io/pdidev/run-clang-format:${{ github.ref_name }}" >> "${GITHUB_OUTPUT}"
+        fi
+    - name: "Build and push"
+      uses: pdidev/test_env/.github/actions/build@v3
+      with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: ./
+        path: run_clang_format
+        image-name: run-clang-format
+        tags: ${{ steps.info.outputs.tags }}
