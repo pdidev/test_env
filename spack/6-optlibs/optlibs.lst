@@ -1,5 +1,4 @@
 hdf5
-libyaml
 netcdf-c
 paraconf
 py-pybind11
