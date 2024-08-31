@@ -32,6 +32,12 @@ RUN set -ex \
  && apt-get autoclean -y
 
 
+# Bootstrap spack (spack bootstrap now is not available in 0.18)
+RUN spack bootstrap root "${SPACK_ROOT}/lib/spack-bootstrap" \
+ && spack solve zlib \
+ && spack clean -a
+
+
 # Detect our bootstrapping compiler
 RUN spack compiler find --scope site \
  && spack config --scope site add 'packages:all:target:[x86_64]' \
