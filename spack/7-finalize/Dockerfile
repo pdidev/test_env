@@ -144,7 +144,44 @@ ENV HOME=/home/ci
 
 FROM main AS test
 
+
+USER root:root
+WORKDIR /root
+ENV HOME=/root
+
+RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
+ && apt-get update -y \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && apt-get autoclean -y
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME=/home/ci
+
 RUN curl --output pdi.tar.gz -L https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
+
+USER root:root
+WORKDIR /root
+ENV HOME=/root
+
+RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
+ && apt-get purge -y \
+            ca-certificates \
+            curl \
+ && rm -rf /var/lib/apt/lists/*
+
+USER ci:ci
+WORKDIR /home/ci
+ENV HOME=/home/ci
+
+
 RUN tar -xf pdi.tar.gz
 RUN export VERBOSE=1 \
  && bash pdi*/bin/build_and_run_all_tests

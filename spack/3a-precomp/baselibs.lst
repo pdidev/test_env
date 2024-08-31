@@ -1,11 +1,6 @@
 cmake
-curl
 doxygen
-m4
-openssl +shared certs=mozilla
 pkgconf
 py-numpy
-py-pip
 py-pyyaml ~libyaml
 python
-zlib
