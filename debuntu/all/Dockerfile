@@ -123,7 +123,7 @@ ENV HOME=/home/ci
 RUN tar -xf pdi.tar.gz
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
- && bash pdi*/tools/build_scripts/build_and_run.sh
+ && bash pdi*/bin/build_and_run_all_tests
 
 
 

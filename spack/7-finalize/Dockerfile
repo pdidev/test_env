@@ -147,7 +147,7 @@ FROM main AS test
 RUN curl --output pdi.tar.gz -L https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
 RUN tar -xf pdi.tar.gz
 RUN export VERBOSE=1 \
- && bash pdi*/tools/build_scripts/build_and_run.sh
+ && bash pdi*/bin/build_and_run_all_tests
 
 
 
