@@ -144,8 +144,8 @@ ENV HOME=/home/ci
 
 FROM main AS test
 
-RUN curl --output pdi.tar.bz2 https://gitlab.maisondelasimulation.fr/pdidev/pdi/-/archive/builderv3/pdi.tar.bz2
-RUN tar -xf pdi.tar.bz2
+RUN curl --output pdi.tar.gz https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
+RUN tar -xf pdi.tar.gz
 RUN export VERBOSE=1 \
  && bash pdi*/tools/build_scripts/build_and_run.sh
 
