@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base: ['ubuntu/focal', 'ubuntu/rolling', 'debian/oldstable', 'debian/unstable']
-        mpi: ['openmpi', 'mpich']
+        base:    ['ubuntu/focal', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
+        mpi:     ['openmpi', 'mpich']
         variant: ['mini', 'all', 'pdi']
     runs-on: ubuntu-latest
     steps:
