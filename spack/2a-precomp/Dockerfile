@@ -33,7 +33,7 @@ RUN set -ex \
 
 
 # Bootstrap spack (spack bootstrap now is not available in 0.18)
-RUN spack bootstrap root "${SPACK_ROOT}/lib/spack-bootstrap" \
+RUN spack bootstrap root --scope site "${SPACK_ROOT}/lib/spack-bootstrap" \
  && spack solve zlib \
  && spack clean -a
 

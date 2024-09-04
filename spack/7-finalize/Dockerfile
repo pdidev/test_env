@@ -136,6 +136,11 @@ RUN set -ex \
  && ln -s ${SPACK_ROOT}/share/spack/docker/entrypoint.bash /usr/local/bin/spack-env
 
 
+SHELL ["docker-shell"]
+ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
+CMD ["interactive-shell"]
+
+
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME=/home/ci
