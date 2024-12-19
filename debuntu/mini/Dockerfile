@@ -65,6 +65,7 @@ ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
+ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 
 ENV HOME=/home/ci
 USER ci:ci
