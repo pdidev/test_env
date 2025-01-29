@@ -102,6 +102,7 @@ WORKDIR /home/ci
 ENV HOME=/home/ci
 
 RUN curl --output pdi.tar.gz -L https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
+RUN curl --output pdi-tutorial.tar.gz -L https://github.com/pdidev/tutorial/archive/refs/heads/main.tar.gz
 
 USER root:root
 WORKDIR /root
@@ -122,6 +123,9 @@ WORKDIR /home/ci
 ENV HOME=/home/ci
 
 RUN tar -xf pdi.tar.gz
+RUN rmdir pdi-*/tutorial
+RUN tar -xf pdi-tutorial.tar.gz
+RUN mv tutorial-* pdi-*/tutorial
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
  && bash pdi*/bin/build_and_run_all_tests

@@ -111,6 +111,9 @@ WORKDIR /home/ci
 ENV HOME=/home/ci
 
 RUN tar -xf pdi.tar.gz
+RUN rmdir pdi-*/tutorial
+RUN tar -xf pdi-tutorial.tar.gz
+RUN mv tutorial-* pdi-*/tutorial
 RUN export VERBOSE=1 \
  && export MAKEFLAGS="-j1" \
  && bash pdi*/bin/build_and_run_all_tests
