@@ -125,6 +125,7 @@ ENV HOME=/home/ci
 RUN tar -xf pdi.tar.gz
 RUN rmdir pdi-*/tutorial
 RUN tar -xf pdi-tutorial.tar.gz
+RUN rm *.tar.gz
 RUN cd pdi-* \
  && mv ../tutorial-* tutorial
 RUN export VERBOSE=1 \
