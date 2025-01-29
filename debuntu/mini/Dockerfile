@@ -91,6 +91,7 @@ WORKDIR /home/ci
 ENV HOME=/home/ci
 
 RUN curl --output pdi.tar.gz -L https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
+RUN curl --output pdi-tutorial.tar.gz -L https://github.com/pdidev/tutorial/archive/refs/heads/main.tar.gz
 
 USER root:root
 WORKDIR /root
