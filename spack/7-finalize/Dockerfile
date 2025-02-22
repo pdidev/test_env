@@ -160,16 +160,13 @@ RUN set -ex \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             ca-certificates \
-            curl \
- && apt-get autoremove -y \
- && apt-get clean -y \
- && apt-get autoclean -y
+            git
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME=/home/ci
 
-RUN curl --output pdi.tar.gz -L https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
+RUN git clone --recurse-submodules https://github.com/pdidev/pdi.git
 
 USER root:root
 WORKDIR /root
@@ -179,17 +176,15 @@ RUN set -ex \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get purge -y \
             ca-certificates \
-            curl \
- && rm -rf /var/lib/apt/lists/*
+            git
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME=/home/ci
 
 
-RUN tar -xf pdi.tar.gz
 RUN export VERBOSE=1 \
- && bash pdi*/bin/build_and_run_all_tests
+ && bash pdi/bin/build_and_run_all_tests
 
 
 

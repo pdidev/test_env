@@ -75,51 +75,42 @@ WORKDIR ${HOME}
 
 FROM main AS test
 
+
 USER root:root
 WORKDIR /root
 ENV HOME=/root
 
 RUN set -ex \
+ && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
             ca-certificates \
-            curl
+            git
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME=/home/ci
 
-RUN curl --output pdi.tar.gz -L https://github.com/pdidev/pdi/archive/refs/heads/main.tar.gz
-RUN curl --output pdi-tutorial.tar.gz -L https://github.com/pdidev/tutorial/archive/refs/heads/main.tar.gz
+RUN git clone --recurse-submodules https://github.com/pdidev/pdi.git
 
 USER root:root
 WORKDIR /root
 ENV HOME=/root
 
 RUN set -ex \
- && apt-get purge -y curl \
- && apt-get autoremove -y \
- && apt-get clean -y \
- && apt-get autoclean -y \
- && rm -rf /var/lib/apt/lists/* \
- && rm -rf /run/nologin \
- && rm -rf /root/* \
- && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
+ && export DEBIAN_FRONTEND=noninteractive \
+ && apt-get purge -y \
+            ca-certificates \
+            git
 
 USER ci:ci
 WORKDIR /home/ci
 ENV HOME=/home/ci
 
-RUN tar -xf pdi.tar.gz
-RUN rmdir pdi-*/tutorial
-RUN tar -xf pdi-tutorial.tar.gz
-RUN rm *.tar.gz
-RUN cd pdi-* \
- && mv ../tutorial-* tutorial
+
 RUN export VERBOSE=1 \
- && export MAKEFLAGS="-j1" \
- && bash pdi*/bin/build_and_run_all_tests
+ && bash pdi/bin/build_and_run_all_tests
 
 
 
