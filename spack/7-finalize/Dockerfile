@@ -147,41 +147,15 @@ ENV HOME=/home/ci
 
 
 
+FROM alpine/git AS pdidl
+
+RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+
+
+
 FROM main AS test
 
-
-USER root:root
-WORKDIR /root
-ENV HOME=/root
-
-RUN set -ex \
- && export DEBIAN_FRONTEND=noninteractive \
- && apt-get update -y \
- && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends \
-            ca-certificates \
-            git
-
-USER ci:ci
-WORKDIR /home/ci
-ENV HOME=/home/ci
-
-RUN git clone --recurse-submodules https://github.com/pdidev/pdi.git
-
-USER root:root
-WORKDIR /root
-ENV HOME=/root
-
-RUN set -ex \
- && export DEBIAN_FRONTEND=noninteractive \
- && apt-get purge -y \
-            ca-certificates \
-            git
-
-USER ci:ci
-WORKDIR /home/ci
-ENV HOME=/home/ci
-
+COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
