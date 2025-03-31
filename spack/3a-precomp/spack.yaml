@@ -9,7 +9,7 @@ spack:
   - mpi: []
   - optlibs: []
   concretizer:
-    unify: true
+    unify: when_possible
   specs:
   - matrix:
     - ['$%compiler']
