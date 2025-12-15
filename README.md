@@ -36,7 +36,7 @@ With the following parameters:
 * `distribution`/`version`:
   - `debian/oldstable`: the image is based on the oldest version of Debian GNU Linux supported by PDI: `oldstable`
   - `debian/unstable`: the image is based on the Debian GNU Linux `unstable`
-  - `ubuntu/focal`: the image is based on Ubuntu `focal fossa`
+  - `ubuntu/jammy`: the image is based on Ubuntu `jammy jellyfish`
   - `ubuntu/rolling`: the image is based on Ubuntu latest release
 * `mpi`:
   - `mpich`: using mpich implementation of MPI,
