@@ -11,7 +11,7 @@ We provide images based on:
 
 These images are based on a minimal Ubuntu with spack and all dependencies installed through spack.
 
-The images are named as: `ghcr.io/pdidev/spack/${version}/${compiler}/${mpi}/${variant}:v3`
+The images are named as: `ghcr.io/pdidev/spack/${version}/${compiler}/${mpi}/${variant}:v4`
 With the following parameters:
 * `deps_version`:
   - `oldest`: everything is installed with the 0.18 release of spack,
@@ -31,7 +31,7 @@ With the following parameters:
 
 These images are based on Debian or Ubuntu, with all dependencies installed through packages.
 
-The images are named as: `ghcr.io/pdidev/${distribution}/${version}/${mpi}/${variant}:v3`
+The images are named as: `ghcr.io/pdidev/${distribution}/${version}/${mpi}/${variant}:v4`
 With the following parameters:
 * `distribution`/`version`:
   - `debian/oldstable`: the image is based on the oldest version of Debian GNU Linux supported by PDI: `oldstable`
@@ -52,7 +52,7 @@ With the following parameters:
 These images are like the spack images but contain a fully working spack in additions of the 
 dependencies installed through spack.
 
-The images are named as: `ghcr.io/pdidev/fullspack/${version}/${compiler}/${mpi}/${variant}:v3`
+The images are named as: `ghcr.io/pdidev/fullspack/${version}/${compiler}/${mpi}/${variant}:v4`
 With the following parameters:
 * `deps_version`:
   - `oldest`: everything is installed with the 0.18 release of spack,
