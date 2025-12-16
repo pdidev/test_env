@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 1a-base"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1a-base
         image-name: base
         cache: ${{ github.event_name != 'schedule' }}
     - name: "Build and push 1b-spackbase"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1b-spackbase
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 2a-precomp"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2a-precomp
@@ -42,7 +42,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 2b-compiler"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2b-compiler
@@ -52,7 +52,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 2c-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2c-squash
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 3a-precomp"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3a-precomp
@@ -79,7 +79,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 3b-compiler"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3b-compiler
@@ -89,7 +89,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 3c-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3c-squash
@@ -98,7 +98,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 4a-baselibs"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/4a-baselibs
@@ -107,7 +107,7 @@ jobs:
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
     - name: "Build and push 4b-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/4b-squash
@@ -126,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 5a-mpi"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/5a-mpi
@@ -136,7 +136,7 @@ jobs:
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
     - name: "Build and push spack/5b-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/5b-squash
@@ -146,7 +146,7 @@ jobs:
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
     - name: "Build and push 6-optlibs"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/6-optlibs
@@ -175,7 +175,7 @@ jobs:
           echo "fullspack=ghcr.io/pdidev/fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
         fi
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/7-finalize
@@ -189,7 +189,7 @@ jobs:
         tags: |
           ${{ steps.info.outputs.tags }}
     - name: "Build and push fullspack"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/7-finalize
