@@ -19,6 +19,9 @@ ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["interactive-shell"]
 
 
+RUN echo 'x86_64_v2' > target
+
+
 # Install a bootstrapping compiler
 RUN set -ex \
  && export DEBIAN_FRONTEND=noninteractive \
@@ -40,7 +43,7 @@ RUN spack bootstrap root --scope site "${SPACK_ROOT}/lib/spack-bootstrap" \
 
 # Detect our bootstrapping compiler
 RUN spack compiler find --scope site \
- && spack config --scope site add 'packages:all:target:[x86_64]' \
+ && spack config --scope site add "packages:all:target:[$(cat target)]" \
  && spack config --scope site add "config:install_tree:root:${SPACK_INSTALL}" \
  && spack config --scope site add 'modules:prefix_inspections:lib64:[LD_LIBRARY_PATH]' \
  && spack config --scope site add 'modules:prefix_inspections:lib:[LD_LIBRARY_PATH]' \
@@ -53,11 +56,11 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the dependencies for our compiler
 COPY ${COMPILER}.lst compilerpkg.lst
-RUN spack solve -I --reuse "$(cat compilerpkg.lst)" target=x86_64 \
+RUN spack solve -I --reuse "$(cat compilerpkg.lst)" "target=$(cat target)" \
  && ( if ! spack fetch -Dm "$(cat compilerpkg.lst)" ; then spack clean -a; false; fi \
    || if ! spack fetch -Dm "$(cat compilerpkg.lst)" ; then spack clean -a; false; fi \
    || if ! spack fetch -Dm "$(cat compilerpkg.lst)" ; then spack clean -a; false; fi \
    || if ! spack fetch -Dm "$(cat compilerpkg.lst)" ; then spack clean -a; false; fi \
    || if ! spack fetch -Dm "$(cat compilerpkg.lst)" ; then spack clean -a; false; fi ) \
- && spack install ${SPACK_INSTALL_ARGS} --reuse --only dependencies "$(cat compilerpkg.lst)" target=x86_64 \
+ && spack install ${SPACK_INSTALL_ARGS} --reuse --only dependencies "$(cat compilerpkg.lst)" "target=$(cat target)" \
  && spack clean -a

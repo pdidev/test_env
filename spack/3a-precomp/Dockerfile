@@ -8,19 +8,10 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
 COPY spack.yaml spack.yaml
-RUN spack env create pdienv spack.yaml \
+RUN sed "s/@TARGET@/$(cat target)/g" -i spack.yaml \
+ && spack env create pdienv spack.yaml \
  && spack -e pdienv add -l compilerpkg "$(cat compilerpkg.lst)" \
  && spack -e pdienv add -l compiler "$(cat compiler.lst)" \
- && spack clean -a
-
-
-COPY baselibs.lst baselibs.lst
-RUN DEFAULT_IFS="${IFS}" \
-  ; IFS=$'\n' \
-  ; set -f \
-  ; for LIB in $(cat baselibs.lst)\
-  ; do IFS="${DEFAULT_IFS}" spack -e pdienv add -l baselibs "${LIB}" \
-  ; done \
  && spack clean -a
 
 

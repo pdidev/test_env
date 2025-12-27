@@ -1,9 +1,17 @@
 spack:
   packages:
     all:
-      target: [x86_64_v2]
+      target: [@TARGET@]
   definitions:
-  - baselibs: []
+  - baselibs:
+    - cmake
+    - doxygen
+    - pkgconf
+    - py-numpy
+    - python
+  - baselibs_nocompiler:
+    - py-pyyaml ~libyaml
+    - py-setuptools
   - compiler: []
   - compilerpkg: []
   - mpi: []
@@ -12,10 +20,12 @@ spack:
     unify: when_possible
   specs:
   - matrix:
+    - ['target=@TARGET@']
     - ['$%compiler']
-    - ['target=x86_64_v2']
-    - 
-      - '$compilerpkg'
-      - '$baselibs'
+    - - '$baselibs'
       - '$mpi'
       - '$optlibs'
+  - matrix:
+    - ['target=@TARGET@']
+    - - '$compilerpkg'
+      - '$baselibs_nocompiler'

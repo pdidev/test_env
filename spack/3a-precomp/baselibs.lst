@@ -1,7 +1,0 @@
-cmake
-doxygen
-pkgconf
-py-numpy
-py-pyyaml ~libyaml
-py-setuptools
-python
