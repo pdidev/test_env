@@ -7,155 +7,71 @@ defaults:
   run:
     shell: bash
 jobs:
-  step1_base:
+  step_1_base_2_spackbase:
     runs-on: ubuntu-latest
     steps:
-    - name: "Build and push 1a-base"
+    - name: "Build and push 1- base"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/1a-base
+        path: spack/1-base
         image-name: base
         cache: ${{ github.event_name != 'schedule' }}
-    - name: "Build and push 1b-spackbase"
+    - name: "Build and push 2- spackbase"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/1b-spackbase
+        path: spack/2-spackbase
         image-name: spackbase
-  step2_compiler:
+  step_3_baselibs:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
-    needs: step1_base
+    needs: step_1_base_2_spackbase
     runs-on: ubuntu-latest
     steps:
-    - name: "Build and push 2a-precomp"
+    - name: "Build and push 3- baselibs"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/2a-precomp
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2a
+        path: spack/3-baselibs
+        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-baselibs
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
-    - name: "Build and push 2b-compiler"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/2b-compiler
-        swap: 15G
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2b
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-    - name: "Build and push 2c-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/2c-squash
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-2c
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-  step3_compiler_4_baselibs:
-    strategy:
-      fail-fast: false
-      matrix:
-        version:  ['latest', 'oldest']
-        compiler: ['gcc', 'clang']
-    needs: step2_compiler
-    runs-on: ubuntu-latest
-    steps:
-    - name: "Build and push 3a-precomp"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/3a-precomp
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3a
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-    - name: "Build and push 3b-compiler"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/3b-compiler
-        swap: 15G
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3b
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-    - name: "Build and push 3c-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/3c-squash
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-3c
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-    - name: "Build and push 4a-baselibs"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/4a-baselibs
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-4a
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-    - name: "Build and push 4b-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/4b-squash
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-4b
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-  step5_mpi_6_optlibs:
+  step_4_mini_5_all:
     strategy:
       fail-fast: false
       matrix:
         version:  ['latest', 'oldest']
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi','mpich']
-    needs: step3_compiler_4_baselibs
+    needs: step_3_baselibs
     runs-on: ubuntu-latest
     steps:
-    - name: "Build and push 5a-mpi"
+    - name: "Build and push 4- mini"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/5a-mpi
-        image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-5a
-        build-args: |
-          VERSION=${{ matrix.version }}
-          COMPILER=${{ matrix.compiler }}
-          MPI=${{ matrix.mpi }}
-    - name: "Build and push spack/5b-squash"
-      uses: pdidev/test_env/.github/actions/build@v3
-      with:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/5b-squash
+        path: spack/4-mini
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
-    - name: "Build and push 6-optlibs"
+    - name: "Build and push 5- all"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/6-optlibs
+        path: spack/5-all
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
-  step7_finalize:
+  step6_finalize:
     strategy:
       fail-fast: false
       matrix:
@@ -163,7 +79,7 @@ jobs:
         compiler: ['gcc', 'clang']
         mpi:      ['openmpi','mpich']
         level:    ['mini', 'all']
-    needs: step5_mpi_6_optlibs
+    needs: step_4_mini_5_all
     runs-on: ubuntu-latest
     steps:
     - name: "Compute tags"
@@ -178,7 +94,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/7-finalize
+        path: spack/6-finalize
         image-name: spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         test: true
         build-args: |
@@ -192,7 +108,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v3
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        path: spack/7-finalize
+        path: spack/6-finalize
         image-name: fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         target: fullspack
         build-args: |

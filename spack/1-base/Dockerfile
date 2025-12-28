@@ -3,16 +3,11 @@ FROM ubuntu:20.04
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
-ENV DOCKERFILE_BASE=ubuntu
-ENV DOCKERFILE_DISTRO=ubuntu
-ENV DOCKERFILE_DISTRO_VERSION=22.04
-ENV HOME=/root
-ENV LC_ALL=C
 ENV LANG=C
+ENV LC_ALL=C
+ENV HOME=/root
 ENV SPACK_INSTALL=/opt/install
 ENV SPACK_MODULES=/opt/modules
-ENV SPACK_ROOT=/opt/spack
-ENV container=docker
 
 
 WORKDIR ${HOME}
