@@ -19,14 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 1- base"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1-base
         image-name: base
         cache: ${{ github.event_name != 'schedule' && ( github.event_name != 'workflow_dispatch' || inputs.cache ) }} # cache for every run but scheduled ones
     - name: "Build and push 2- spackbase"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/2-spackbase
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 3- baselibs"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/3-baselibs
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Build and push 4- mini"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/4-mini
@@ -70,7 +70,7 @@ jobs:
           COMPILER=${{ matrix.compiler }}
           MPI=${{ matrix.mpi }}
     - name: "Build and push 5- all"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/5-all
@@ -99,7 +99,7 @@ jobs:
           echo "fullspack=ghcr.io/pdidev/fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
         fi
     - name: "Build and push"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/6-finalize
@@ -113,7 +113,7 @@ jobs:
         tags: |
           ${{ steps.info.outputs.tags }}
     - name: "Build and push fullspack"
-      uses: pdidev/test_env/.github/actions/build@v3
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/6-finalize
