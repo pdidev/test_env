@@ -1,30 +1,39 @@
 name: Spack step
 description: 'Builds a step of docker image'
 inputs:
-  GITHUB_TOKEN:
-    required: true
-    description: "GITHUB_TOKEN"
-  path:
-    required: true
-    description: "path to the Dockerfile"
-  context:
-    default: '{{defaultContext}}:'
-    description: "Docker context"
   image-name:
     required: true
     description: "Base name of the image to publish"
+  path:
+    required: true
+    description: "path to the Dockerfile"
+  GITHUB_TOKEN:
+    required: true
+    description: "GITHUB_TOKEN"
+  context:
+    default: '{{defaultContext}}:'
+    description: "Docker context"
   build-args:
     default: ""
     description: "Arguments to pass to the build"
   cache:
     default: true
-    description: "Whether to use cache"
+    description: "Whether to use cached input"
+  cache-to:
+    default: "<DEFAULT>"
+    description: "Where to cache to"
+  cache-from:
+    default: "<DEFAULT>"
+    description: "Where to cache from"
   tags:
     default: ""
     description: "Additional tags"
   swap:
     default: "0"
     description: "Additional swap to allocate"
+  push:
+    default: "true"
+    description: "Whether to push the resulting image"
   test:
     default: false
     description: "Whether to build the test target before publishing"
@@ -37,12 +46,27 @@ runs:
   - id: setup
     shell: bash
     run: |
-      set -ex
-      echo " === additional tags: ==="
-      cat<<'EOF'
-      ${{ inputs.tags }}
-      EOF
-      echo " === ==="
+      set -e
+      if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
+      then CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+      else CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+      fi
+      echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
+      if [ 'x${{ inputs.cache-to }}' = 'x<DEFAULT>' ]
+      then
+        echo "cache-to=type=registry,ref=${CACHEREF},mode=max" >> "${GITHUB_OUTPUT}"
+      else
+        echo 'cache-to="${{ inputs.cache-to }}"' >> "${GITHUB_OUTPUT}"
+      fi
+      if [ 'x${{ inputs.cache-from }}' = 'x<DEFAULT>' -a 'x${{ inputs.cache }}' = 'xtrue' ]
+      then
+        echo "cache-from=type=registry,ref=${CACHEREF}" >> "${GITHUB_OUTPUT}"
+      elif [ 'x${{ inputs.cache-from }}' = 'x<DEFAULT>' ]
+      then
+        echo 'cache-from="type=local"' >> "${GITHUB_OUTPUT}"
+      else
+        echo 'cache-from="${{ inputs.cache-from }}"' >> "${GITHUB_OUTPUT}"
+      fi
       if [ -f docker_image_step_SETUP_ALREADY_DONE ]
       then echo "done=true" >> "${GITHUB_OUTPUT}"
       else
@@ -70,16 +94,6 @@ runs:
       else echo "sep=:" >> "${GITHUB_OUTPUT}"
       fi
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
-  - if: "${{ inputs.test == 'true' }}"
-    uses: docker/build-push-action@v5
-    with:
-      cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
-      build-args: |
-        ${{ inputs.build-args }}
-        IMAGE_TAG=${{ steps.info.outputs.sha }}
-      context: "${{ inputs.context }}${{ inputs.path }}"
-      load: true
-      target: test
   - if: "${{ inputs.swap != '0' }}"
     shell: bash
     run: |
@@ -87,11 +101,22 @@ runs:
       sudo chmod 600 /swapfile
       sudo mkswap /swapfile
       sudo swapon /swapfile
-  - if: "${{ inputs.cache == 'true' }}"
-    uses: docker/build-push-action@v5
+  - if: "${{ inputs.test == 'true' }}"
+    uses: docker/build-push-action@v6
     with:
-      cache-from: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
-      cache-to: "ghcr.io/pdidev/test_env/cache/${{ inputs.image-name }}"
+      cache-from: "${{ steps.setup.outputs.cache-from }}"
+      build-args: |
+        ${{ inputs.build-args }}
+        IMAGE_TAG=${{ steps.info.outputs.sha }}
+      context: "${{ inputs.context }}${{ inputs.path }}"
+      push: false
+      target: test
+    env:
+      SOURCE_DATE_EPOCH: 0
+  - uses: docker/build-push-action@v6
+    with:
+      cache-from: "${{ steps.setup.outputs.cache-from }}"
+      cache-to: "${{ steps.setup.outputs.cache-to }}"
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
@@ -99,20 +124,10 @@ runs:
         ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
         ${{ inputs.tags }}
       context: "${{ inputs.context }}${{ inputs.path }}"
-      push: true
+      push: ${{ inputs.push }}
       target: ${{ inputs.target }}
-  - if: "${{ inputs.cache != 'true' }}"
-    uses: docker/build-push-action@v5
-    with:
-      build-args: |
-        ${{ inputs.build-args }}
-        IMAGE_TAG=${{ steps.info.outputs.sha }}
-      tags: |
-        ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
-        ${{ inputs.tags }}
-      context: "${{ inputs.context }}${{ inputs.path }}"
-      push: true
-      target: ${{ inputs.target }}
+    env:
+      SOURCE_DATE_EPOCH: 0
   - name: "Remove swap file"
     shell: bash
     run: |
