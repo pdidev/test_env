@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -20,7 +20,7 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             binutils \
             environment-modules \
-            libstdc++-10-dev \
+            libstdc++-11-dev \
             make \
             tcl \
  && apt-get autoremove -y \

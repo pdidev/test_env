@@ -59,7 +59,7 @@ if [[ "xall" = "x${LIBS}" ]]
 then echo 'export PDI_LIBS=provided' >> /bin/bash_run
 fi
 if [[ "x$COMPILER" = 'xclang' ]]
-then echo "export FC=gfortran-10" >> /bin/bash_run
+then echo "export FC=gfortran" >> /bin/bash_run
 fi
 EORUN
 
@@ -111,7 +111,7 @@ if echo "$COMPILER" | grep -q clang
 then
   apt-get update -y
   apt-get upgrade -y
-  apt-get install -y --no-install-recommends gfortran-10
+  apt-get install -y --no-install-recommends gfortran
   apt-get autoremove -y --purge
   apt-get clean -y
   apt-get autoclean -y

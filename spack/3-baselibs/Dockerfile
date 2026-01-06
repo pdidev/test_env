@@ -28,14 +28,8 @@ RUN spack config --scope site add "packages:all:target:[x86_64_v2]" \
  && spack config --scope site add "modules:default:roots:tcl:${SPACK_MODULES}"
 
 
-# Detect our latest system compiler, remove all others
+# Detect our system compiler
 RUN spack compiler find --scope site /usr
-RUN <<EORUN
-set -e
-for C in $(spack compilers | tr ' ' '\n' | grep @ | sort -n | tail -n-1)
-do spack compiler rm --scope site $C
-done
-EORUN
 
 
 ARG COMPILER
@@ -44,9 +38,9 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 # Install the spack compiler with our latest system compiler
 COPY ${COMPILER}.lst compilerpkg.lst
 RUN spack solve -I -U \
-          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @ | sort -n | head -n1)" \
+          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @)" \
  && spack install ${SPACK_INSTALL_ARGS} -U \
-          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @ | sort -n | head -n1)"
+          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @)"
 
 
 # Prevent building any new compiler
@@ -86,7 +80,7 @@ else
         "$(spack find -x --format '{name}' --paths "$(cat compilerpkg.lst)" | awk '{print $2}')"
   # if using LLVM, add system gfortran as fortran compiler
   if spack find llvm &>/dev/null
-  then sed "s%^\( *f\(77\|c\)\): *null%\1: /usr/bin/gfortran-10%" \
+  then sed "s%^\( *f\(77\|c\)\): *null%\1: /usr/bin/gfortran%" \
            -i "$(spack config --scope site edit --print-file compilers)"
   fi
 fi
@@ -122,7 +116,7 @@ RUN <<EORUN
 set -e
 if ( spack --version | grep -qs '^1\.' )
 then spack -e pdienv add -l compiler pditoolchain
-else spack -e pdienv add -l compiler "$(spack compilers | tr ' ' '\n' | grep @ | sort -n | head -n1)"
+else spack -e pdienv add -l compiler "$(spack compilers | tr ' ' '\n' | grep @)"
 fi
 EORUN
 RUN spack -e pdienv concretize --reuse

@@ -20,9 +20,7 @@ RUN set -ex \
             build-essential \
             curl \
             file \
-            g++-10 \
-            gcc-10 \
-            gfortran-10 \
+            gfortran \
             git \
             gnupg2 \
             iproute2 \
