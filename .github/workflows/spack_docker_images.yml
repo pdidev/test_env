@@ -3,6 +3,14 @@ on:
   schedule: [ { cron: "50 23 * * 0" } ] # run every Sunday 23h50
   push: { branches: [ main, 'v*' ] }
   pull_request:
+  workflow_dispatch:
+    inputs:
+      cache:
+        description: 'Reuse previously cached runs if available'
+        required: false
+        default: true
+        type: boolean
+
 defaults:
   run:
     shell: bash
@@ -16,7 +24,7 @@ jobs:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         path: spack/1-base
         image-name: base
-        cache: ${{ github.event_name != 'schedule' }}
+        cache: ${{ github.event_name != 'schedule' && ( github.event_name != 'workflow_dispatch' || inputs.cache ) }} # cache for every run but scheduled ones
     - name: "Build and push 2- spackbase"
       uses: pdidev/test_env/.github/actions/build@v3
       with:
