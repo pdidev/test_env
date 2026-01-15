@@ -61,10 +61,8 @@ runs:
       if [ 'x${{ inputs.cache-from }}' = 'x<DEFAULT>' -a 'x${{ inputs.cache }}' = 'xtrue' ]
       then
         echo "cache-from=type=registry,ref=${CACHEREF}" >> "${GITHUB_OUTPUT}"
-      elif [ 'x${{ inputs.cache-from }}' = 'x<DEFAULT>' ]
+      elif [ 'x${{ inputs.cache-from }}' != 'x<DEFAULT>' ]
       then
-        echo 'cache-from="type=local"' >> "${GITHUB_OUTPUT}"
-      else
         echo 'cache-from="${{ inputs.cache-from }}"' >> "${GITHUB_OUTPUT}"
       fi
       if [ -f docker_image_step_SETUP_ALREADY_DONE ]
@@ -104,7 +102,8 @@ runs:
   - if: "${{ inputs.test == 'true' }}"
     uses: docker/build-push-action@v6
     with:
-      cache-from: "${{ steps.setup.outputs.cache-from }}"
+      cache-from: |
+        ${{ steps.setup.outputs.cache-from }}
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
@@ -115,8 +114,10 @@ runs:
       SOURCE_DATE_EPOCH: 0
   - uses: docker/build-push-action@v6
     with:
-      cache-from: "${{ steps.setup.outputs.cache-from }}"
-      cache-to: "${{ steps.setup.outputs.cache-to }}"
+      cache-from: |
+        ${{ steps.setup.outputs.cache-from }}
+      cache-to: |
+        ${{ steps.setup.outputs.cache-to }}
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
