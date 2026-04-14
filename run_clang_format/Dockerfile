@@ -12,5 +12,5 @@ COPY run-clang-format/run-clang-format.py /usr/bin/run-clang-format
 
 RUN chmod 755 /usr/bin/run-clang-format
 
-ENTRYPOINT ["/usr/bin/run-clang-format"]
+ENTRYPOINT ["/usr/bin/run-clang-format", "--clang-format-executable", "/usr/lib/llvm18/bin/clang-format"]
 WORKDIR /src
