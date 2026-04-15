@@ -18,10 +18,13 @@ jobs:
   step_1_base_2_spackbase:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v6
+      with: { submodules: 'recursive' }
     - name: "Build and push 1- base"
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/1-base
         image-name: base
         cache: ${{ github.event_name != 'schedule' && ( github.event_name != 'workflow_dispatch' || inputs.cache ) }} # cache for every run but scheduled ones
@@ -29,6 +32,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/2-spackbase
         image-name: spackbase
   step_3_baselibs:
@@ -40,10 +44,13 @@ jobs:
     needs: step_1_base_2_spackbase
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v6
+      with: { submodules: 'recursive' }
     - name: "Build and push 3- baselibs"
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/3-baselibs
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-baselibs
         build-args: |
@@ -59,10 +66,13 @@ jobs:
     needs: step_3_baselibs
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v6
+      with: { submodules: 'recursive' }
     - name: "Build and push 4- mini"
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/4-mini
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-mini
         build-args: |
@@ -73,6 +83,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/5-all
         image-name: builder:${{ matrix.version }}-${{ matrix.compiler }}-${{ matrix.mpi }}-all
         build-args: |
@@ -90,6 +101,8 @@ jobs:
     needs: step_4_mini_5_all
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v6
+      with: { submodules: 'recursive' }
     - name: "Compute tags"
       id: info
       run: |
@@ -102,6 +115,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/6-finalize
         image-name: spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         test: true
@@ -116,6 +130,7 @@ jobs:
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        context: "./"
         path: spack/6-finalize
         image-name: fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         target: fullspack
