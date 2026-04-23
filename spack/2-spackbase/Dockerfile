@@ -1,6 +1,7 @@
 ARG IMAGE_TAG
+ARG REGISTRY=ghcr.io/pdidev/test_env
 
-FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG}
+FROM ${REGISTRY}/base:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 

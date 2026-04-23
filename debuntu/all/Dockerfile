@@ -1,7 +1,7 @@
 ARG DISTRO
 ARG DISTRO_VERSION
 
-FROM ${DISTRO}:${DISTRO_VERSION} AS main
+FROM ${DISTRO}:${DISTRO_VERSION} AS no-veloc
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -70,10 +70,46 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
+
+# stage : VeloC download 
+FROM main AS velocdl
+
+# install tools needed by VeloC install script 
+RUN set -ex \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+        git \
+        python3-wget \
+        python3-bs4 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/src
+
+# Clone VeloC repository
+RUN git clone -b 'veloc-1.8' --single-branch --depth 1 \
+            https://github.com/ECP-VeloC/veloc.git veloc
+
+WORKDIR /opt/src/veloc
+
+# Run VeloC install script 
+RUN mkdir -p /opt/veloc \
+      && ./auto-install.py /opt/veloc
+
+
+# stage : complete image
+FROM no-veloc AS main
+ARG DISTRO
+ARG DISTRO_VERSION
+ARG MPI
+
+COPY --from=velocdl /opt/veloc /opt/veloc
+
+ENV CMAKE_PREFIX_PATH=/opt/veloc:${CMAKE_PREFIX_PATH}
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 ENV PDI_LIBS=provided
+ENV LD_LIBRARY_PATH="/opt/veloc/lib"
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
@@ -85,14 +121,14 @@ USER ci:ci
 WORKDIR ${HOME}
 
 
-
+# stage : PDI download for tests
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pdi.git /root/pdi
 
 
-
-FROM main AS test
+# stage : test 
+FROM complete-main AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
