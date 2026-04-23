@@ -101,15 +101,15 @@ jobs:
     needs: step_4_mini_5_all
     runs-on: ubuntu-latest
     steps:
-    - uses: ./.github/actions/build 
+    - uses: actions/checkout@v6
       with: { submodules: 'recursive' }
     - name: "Compute tags"
       id: info
       run: |
         if [ 'true' = "${{ github.event_name == 'push' || github.event_name == 'schedule' }}" ]
         then 
-          echo "tags=ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
-          echo "fullspack=ghcr.io/pdidev/fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+          echo "tags=ghcr.io/${{ github.repository_owner }}/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+          echo "fullspack=ghcr.io/${{ github.repository_owner }}/fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
         fi
     - name: "Build and push"
       uses: ./.github/actions/build 
