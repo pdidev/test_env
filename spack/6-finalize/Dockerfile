@@ -3,8 +3,9 @@ ARG COMPILER
 ARG MPI
 ARG LIBS
 ARG IMAGE_TAG
+ARG REGISTRY=ghcr.io/pdidev/test_env
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-${LIBS}-${IMAGE_TAG} AS builder
+FROM ${REGISTRY}/builder:${VERSION}-${COMPILER}-${MPI}-${LIBS}-${IMAGE_TAG} AS builder
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
