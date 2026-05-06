@@ -136,7 +136,7 @@ RUN set -ex \
 
 
 RUN set -ex \
- && git clone --depth 1 -b main https://github.com/ECP-VeloC/veloc.git /tmp/veloc \
+ && git clone --depth 1 -b 'veloc-1.8' https://github.com/ECP-VeloC/veloc.git /tmp/veloc \
  && cmake -S /tmp/veloc -B /tmp/veloc/build \
           -DCMAKE_INSTALL_PREFIX=/usr/local \
           -DCOMM_QUEUE=socket_queue \
@@ -173,7 +173,7 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules --branch cp-plugin https://github.com/iole-bolognesi/pdi.git /root/pdi
 
 
 # stage : test 

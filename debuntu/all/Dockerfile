@@ -30,11 +30,10 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
+            git \
             apt-transport-https \
             ca-certificates \
             curl \
-            libboost-dev \
-            libssl-dev \
  && echo "deb [ arch=amd64 ] https://repo.pdi.dev/pdi-main.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://repo.pdi.dev/pdi-main.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
@@ -42,6 +41,8 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
+            libboost-dev \
+            libssl-dev \
             doxygen \
             gfortran \
             libhdf5-${MPI}-dev \
@@ -73,19 +74,9 @@ RUN set -ex \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
 
-
 # stage : veloc download 
 
 FROM main AS velocdl
-
-RUN set -ex \
- && apt-get update -y \
- && apt-get install -y --no-install-recommends \
-            git \
- && apt-get clean -y \
- && apt-get autoclean -y \
- && rm -rf /var/lib/apt/lists/*
-
 
 RUN set -ex \
  && git clone --depth 1 -b v1.4.0 https://github.com/ECP-VeloC/KVTree.git /tmp/kvtree \
@@ -148,10 +139,10 @@ RUN set -ex \
 
 
 RUN set -ex \
- && git clone --depth 1 -b main https://github.com/ECP-VeloC/veloc.git /tmp/veloc \
+ && git clone --depth 1 -b 'veloc-1.8' https://github.com/ECP-VeloC/veloc.git /tmp/veloc \
  && cmake -S /tmp/veloc -B /tmp/veloc/build \
           -DCMAKE_INSTALL_PREFIX=/usr/local \
-          -DCOMM_QUEUE=socket_queue \
+          -DCOMM_QUEUE=ipc_queue \
           -DENABLE_TESTS=OFF \
           -DCMAKE_CXX_FLAGS="-DOMPI_SKIP_MPICXX=1" \
  && cmake --build /tmp/veloc/build --parallel \
@@ -187,7 +178,7 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules --branch cp-plugin https://github.com/iole-bolognesi/pdi.git /root/pdi
 
 
 # stage : test 
