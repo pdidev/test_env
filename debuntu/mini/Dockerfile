@@ -33,8 +33,6 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
-            doxygen \
-            libspdlog-dev \
             libboost-dev \
             libssl-dev \
             gfortran \
@@ -63,6 +61,13 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
+RUN set -ex \
+ && wget -qO /tmp/doxygen.tar.gz \
+      https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz \
+ && tar -xzf /tmp/doxygen.tar.gz -C /usr/local --strip-components=1 \
+ && rm /tmp/doxygen.tar.gz
+
+ 
 # stage : veloc download 
 
 FROM main AS velocdl
