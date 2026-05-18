@@ -72,17 +72,52 @@ ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
-
+## chmod -R o+rX .
+FROM main AS builder-catalyst
+USER root
+RUN set -ex \
+&& export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update -y \
+&& apt-get upgrade -y \
+&& apt-get install -y --no-install-recommends \
+            apt-transport-https \
+            ca-certificates \
+            git \
+            ninja-build \
+&& rm -rf /var/lib/apt/lists/*
+USER ci
+RUN git clone --branch v2.0.0 \
+            --single-branch \
+            https://gitlab.kitware.com/paraview/catalyst.git \
+            ${HOME}/catalyst_clone/
+WORKDIR ${HOME}/catalyst_clone/
+RUN mkdir build
+RUN git submodule update --depth=1 --init --recursive
+RUN cmake -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
+    -DCATALYST_USE_MPI:BOOL=ON \
+    -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
+    -DCATALYST_WRAP_PYTHON:BOOL=ON \
+    -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
+    -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
+RUN cmake --build ${HOME}/catalyst_clone/build
+USER root
+RUN cmake --install ${HOME}/catalyst_clone/build
+USER ci
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
-
+#RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.com/francois-kitware/pdi /root/pdi
 
 
 FROM main AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
+COPY --from=builder-catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
+
+## adding expott for execution of catalayst test
+RUN export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/catalyst/lib \
+ && export catalyst_dir=/opt/catalyst/lib/cmake/catalyst-2.0
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
