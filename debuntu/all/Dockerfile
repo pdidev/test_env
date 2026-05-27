@@ -160,7 +160,7 @@ RUN set -ex \
       apt-get update -y \
       && apt-get install -y --no-install-recommends dpkg-dev \
       && echo "Types: deb-src\nURIs: http://deb.debian.org/debian\nSuites: ${DISTRO_VERSION}\nComponents: main" \
-         > /etc/apt/sources.list.d/debian-src.sources
+         > /etc/apt/sources.list.d/debian-src.sources \
       && apt-get update -y \
       && apt-get source mpich \
       && cd mpich-* \
