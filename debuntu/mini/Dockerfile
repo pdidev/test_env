@@ -1,6 +1,5 @@
 ARG DISTRO
 ARG DISTRO_VERSION
-ARG MPI
 
 FROM ${DISTRO}:${DISTRO_VERSION} AS main
 
@@ -156,7 +155,6 @@ RUN set -ex \
 
 # stage : mpich download (with options for shared memory support)
 FROM main AS mpichdl
-ARG MPI
 
 RUN set -ex \
  && apt-get update -y \
@@ -177,11 +175,6 @@ RUN set -ex \
  && make install \
  && ldconfig
 
-
-FROM scratch AS mpi_is_openmpi
-FROM mpichdl AS mpi_is_mpich
-FROM mpi_is_${MPI} AS conditional_mpich
-
 # stage : complete image
 
 FROM main AS complete-main
@@ -189,7 +182,13 @@ ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
 COPY --from=velocdl /usr/local /usr/local
-COPY --from=conditional_mpich /usr/local /usr/local
+COPY --from=mpichdl /usr/local /usr/local_mpich
+RUN if [ "${MPI}" = "mpich" ]; then \
+      cp -a /usr/local_mpich/. /usr/local/ \
+      && rm -rf /usr/local_mpich; \
+    else \
+      rm -rf /usr/local_mpich; \
+    fi
 RUN echo "/usr/local/lib" > /etc/ld.so.conf.d/veloc.conf && ldconfig
 
 ENV PDI_SYSTEM=${DISTRO}
