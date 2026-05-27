@@ -1,5 +1,6 @@
 ARG DISTRO
 ARG DISTRO_VERSION
+ARG MPI
 
 FROM ${DISTRO}:${DISTRO_VERSION} AS main
 
@@ -153,6 +154,34 @@ RUN set -ex \
 
 
 
+# stage : mpich download (with options for shared memory support)
+FROM main AS mpichdl
+ARG MPI
+
+RUN set -ex \
+ && apt-get update -y \
+ && apt-get install -y --no-install-recommends \
+            dpkg-dev \
+ && echo "deb-src http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list \
+ && apt-get update -y \
+ && apt-get source mpich \
+ && cd mpich-* \
+ && ./configure \
+      --prefix=/usr/local \
+      --with-ch4-shmmods=posix \
+      --with-device=ch4:ucx \
+      --enable-shared \
+      --disable-static \
+      FC=gfortran \
+ && make -j$(nproc) \
+ && make install \
+ && ldconfig
+
+
+FROM scratch AS mpi_is_openmpi
+FROM mpichdl AS mpi_is_mpich
+FROM mpi_is_${MPI} AS conditional_mpich
+
 # stage : complete image
 
 FROM main AS complete-main
@@ -160,6 +189,7 @@ ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
 COPY --from=velocdl /usr/local /usr/local
+COPY --from=conditional_mpich /usr/local /usr/local
 RUN echo "/usr/local/lib" > /etc/ld.so.conf.d/veloc.conf && ldconfig
 
 ENV PDI_SYSTEM=${DISTRO}

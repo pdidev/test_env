@@ -14,10 +14,6 @@ jobs:
         base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
         mpi:     ['openmpi', 'mpich']
         variant: ['mini', 'all', 'pdi']
-        # exclude debian/unstable + mpich due to mpich issue #7814 
-        exclude:
-          - { base: 'debian/unstable', mpi: mpich, variant : all}
-          - { base: 'debian/unstable', mpi: mpich, variant : mini}
     runs-on: ubuntu-latest
     steps:
     - name: Compute tags, distro & version
