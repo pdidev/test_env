@@ -163,7 +163,7 @@ RUN set -ex \
  && if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSION}" = "unstable" ]; then \
       apt-get update -y \
       && apt-get install -y --no-install-recommends dpkg-dev \
-      && echo "Types: deb-src\nURIs: http://deb.debian.org/debian\nSuites: ${DISTRO_VERSION}\nComponents: main" \
+      && printf "Types: deb-src\nURIs: http://deb.debian.org/debian\nSuites: ${DISTRO_VERSION}\nComponents: main\n" \
          > /etc/apt/sources.list.d/debian-src.sources \
       && apt-get update -y \
       && apt-get source mpich \
