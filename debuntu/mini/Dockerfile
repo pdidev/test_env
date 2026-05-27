@@ -155,25 +155,30 @@ RUN set -ex \
 
 # stage : mpich download (with options for shared memory support)
 FROM main AS mpichdl
+ARG MPI
+ARG DISTRO
+ARG DISTRO_VERSION
 
 RUN set -ex \
- && apt-get update -y \
- && apt-get install -y --no-install-recommends \
-            dpkg-dev \
- && echo "deb-src http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list \
- && apt-get update -y \
- && apt-get source mpich \
- && cd mpich-* \
- && ./configure \
-      --prefix=/usr/local \
-      --with-ch4-shmmods=posix \
-      --with-device=ch4:ucx \
-      --enable-shared \
-      --disable-static \
-      FC=gfortran \
- && make -j$(nproc) \
- && make install \
- && ldconfig
+ && if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSION}" = "unstable" ]; then \
+      apt-get update -y \
+      && apt-get install -y --no-install-recommends dpkg-dev \
+      && echo "Types: deb-src\nURIs: http://deb.debian.org/debian\nSuites: ${DISTRO_VERSION}\nComponents: main" \
+         > /etc/apt/sources.list.d/debian-src.sources
+      && apt-get update -y \
+      && apt-get source mpich \
+      && cd mpich-* \
+      && ./configure \
+           --prefix=/usr/local \
+           --with-ch4-shmmods=posix \
+           --with-device=ch4:ucx \
+           --enable-shared \
+           --disable-static \
+           FC=gfortran \
+      && make -j$(nproc) \
+      && make install \
+      && ldconfig; \
+    fi
 
 # stage : complete image
 
@@ -183,7 +188,7 @@ ARG DISTRO_VERSION
 ARG MPI
 COPY --from=velocdl /usr/local /usr/local
 COPY --from=mpichdl /usr/local /usr/local_mpich
-RUN if [ "${MPI}" = "mpich" ]; then \
+RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSION}" = "unstable" ]; then \
       cp -a /usr/local_mpich/. /usr/local/ \
       && rm -rf /usr/local_mpich; \
     else \
