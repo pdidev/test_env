@@ -9,8 +9,7 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
 ARG VERSION
-
-# Download spack
+ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 COPY ${VERSION}.branch spack.branch
 RUN mkdir -p ${SPACK_ROOT} \
  && git clone --depth 1 -b $(cat spack.branch) ${SPACK_ROOT} \
@@ -38,11 +37,8 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the spack compiler with our latest system compiler
 COPY ${COMPILER}.lst compilerpkg.lst
-RUN spack solve -I -U \
-          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @)" \
- && spack install ${SPACK_INSTALL_ARGS} -U \
-          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @)"
-
+RUN spack install ${SPACK_INSTALL_ARGS} -U \
+      "$(cat compilerpkg.lst)~bootstrap%$(spack compilers | tr ' ' '\n' | grep @)"
 
 # Prevent building any new compiler
 RUN spack config --scope site add 'packages:llvm:buildable: false'
@@ -88,38 +84,33 @@ fi
 EORUN
 
 
-# Install an environment with our base libraries using the compiler ref we just generated
+# Create an environment with our base libraries using the compiler ref we just generated
 COPY <<'EOCOPY' spack.yaml
 spack:
   view: false
+  concretizer:
+    unify: when_possible
   definitions:
   - buildeps: []
-  - compiler: []
   - libs: []
-  - mpi: []
-  - mpilibs: []
   specs:
-  - '$buildeps'
-  - matrix:
-    - ['$%compiler']
-    - - '$libs'
-      - '$mpi'
-  - matrix:
-    - ['$%compiler']
-    - ['$^mpi']
-    - ['$mpilibs']
+  - $buildeps
+  - $libs
 EOCOPY
 RUN spack env create pdienv spack.yaml
 COPY deps.sh deps.sh
-RUN . deps.sh && spack -e pdienv add -l buildeps ${BASE_BUILDDEPS}
-RUN . deps.sh && spack -e pdienv add -l libs     ${BASE_LIBS}
-RUN <<EORUN
+# The toolchain is attached directly to each lib spec (string-parsed), which
+# avoids the matrix `$%compiler` path that crashes expand_toolchains on latest spack
+RUN <<'EORUN'
 set -e
-if ( spack --version | grep -qs '^1\.' )
-then spack -e pdienv add -l compiler pditoolchain
-else spack -e pdienv add -l compiler "$(spack compilers | tr ' ' '\n' | grep @)"
-fi
+. deps.sh
+spack -e pdienv add -l buildeps ${BASE_BUILDDEPS}
+for p in ${BASE_LIBS}; do
+  spack -e pdienv add -l libs "$p %pditoolchain"
+done
 EORUN
+
+# Concretize, fetch, install 
 RUN spack -e pdienv concretize --reuse
 RUN spack -e pdienv fetch \
  || spack -e pdienv fetch \
