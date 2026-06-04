@@ -36,10 +36,19 @@ ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the spack compiler with our latest system compiler
-COPY ${COMPILER}.lst compilerpkg.lst
-RUN spack install ${SPACK_INSTALL_ARGS} -U \
-      "$(cat compilerpkg.lst)~bootstrap%$(spack compilers | tr ' ' '\n' | grep @)"
-
+COPY ${COMPILER}.lst compilerpkg.lst 
+RUN <<EORUN
+set -e
+PKG="$(cat compilerpkg.lst)"
+SYS="$(spack compilers | tr ' ' '\n' | grep @)"
+if [[ "$PKG" == gcc* ]]
+then
+  BOOT="~bootstrap"
+else
+  BOOT=""
+fi
+spack install ${SPACK_INSTALL_ARGS} -U "${PKG}${BOOT}%${SYS}"
+EORUN
 # Prevent building any new compiler
 RUN spack config --scope site add 'packages:llvm:buildable: false'
 RUN spack config --scope site add 'packages:gcc:buildable: false'
