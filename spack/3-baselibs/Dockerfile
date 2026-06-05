@@ -115,11 +115,16 @@ set -e
 . deps.sh
 spack -e pdienv add -l buildeps ${BASE_BUILDDEPS}
 if spack --version | grep -qs '^1\.'
-then CREF="%pditoolchain"                              # 1.x: the toolchain
-else CREF="%$(spack compilers | tr ' ' '\n' | grep @)" # pre-1.0: the built compiler, e.g. %gcc@16.1.0
+then CREF="%pditoolchain"                              
+else CREF="%$(spack compilers | tr ' ' '\n' | grep @)"
+fi
+if spack find llvm &>/dev/null; then
+  LTOFLAGS='ldflags==-fuse-ld=lld'
+else
+  LTOFLAGS=''
 fi
 for p in ${BASE_LIBS}; do
-  spack -e pdienv add -l libs "$p ${CREF}"
+  spack -e pdienv add -l libs "$p ${CREF} ${LTOFLAGS}"
 done
 EORUN
 
