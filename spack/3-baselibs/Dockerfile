@@ -118,8 +118,9 @@ set -e
 . deps.sh
 spack -e pdienv add -l buildeps ${BASE_BUILDDEPS}
 if spack --version | grep -qs '^1\.'
-then CREF="%pditoolchain"                              
+then CREF="%pditoolchain"
 else CREF="%$(spack compilers | tr ' ' '\n' | grep @)"
+fi
 for p in ${BASE_LIBS}; do
   spack -e pdienv add -l libs "$p ${CREF}"
 done
