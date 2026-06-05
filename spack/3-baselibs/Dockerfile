@@ -99,9 +99,6 @@ spack:
   view: false
   concretizer:
     unify: when_possible
-  packages:
-    doxygen:
-      require: "cxxflags=-fno-lto ldflags=-fno-lto"
   definitions:
   - buildeps: []
   - libs: []
@@ -121,6 +118,7 @@ if spack --version | grep -qs '^1\.'
 then CREF="%pditoolchain"
 else CREF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
+spack -e pdienv add doxygen cxxflags=-fno-lto ldflags=-fno-lto ${CREF}
 for p in ${BASE_LIBS}; do
   spack -e pdienv add -l libs "$p ${CREF}"
 done
