@@ -113,12 +113,17 @@ COPY deps.sh deps.sh
 RUN <<'EORUN'
 set -e
 . deps.sh
-spack -e pdienv add -l buildeps ${BASE_BUILDDEPS}
 if spack --version | grep -qs '^1\.'
 then CREF="%pditoolchain"
 else CREF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
-spack -e pdienv add doxygen cxxflags=-fno-lto ldflags=-fno-lto ${CREF}
+for p in ${BASE_BUILDDEPS}; do
+  if [ "$p" = doxygen ]; then
+    spack -e pdienv add -l buildeps "doxygen ${CREF} cxxflags=-fno-lto ldflags=-fno-lto"
+  else
+    spack -e pdienv add -l buildeps "$p ${CREF}"
+  fi
+done
 for p in ${BASE_LIBS}; do
   spack -e pdienv add -l libs "$p ${CREF}"
 done
