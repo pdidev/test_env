@@ -118,7 +118,7 @@ if spack --version | grep -qs '^1\.'
 then CREF="%pditoolchain"                              
 else CREF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
-if spack find llvm &>/dev/null; then
+if spack --version | grep -qs '^1\.' && spack find llvm &>/dev/null; then
   LTOFLAGS='ldflags==-fuse-ld=lld'
 else
   LTOFLAGS=''
