@@ -101,8 +101,7 @@ spack:
     unify: when_possible
   packages:
     doxygen:
-      require:
-      - "cxxflags=-fno-lto ldflags=-fno-lto"
+      require: "cxxflags=-fno-lto ldflags=-fno-lto"
   definitions:
   - buildeps: []
   - libs: []
