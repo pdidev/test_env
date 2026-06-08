@@ -102,9 +102,13 @@ spack:
   definitions:
   - buildeps: []
   - libs: []
+  - mpi: []
+  - mpilibs: []
   specs:
   - $buildeps
   - $libs
+  - $mpi
+  - $mpilibs
 EOCOPY
 RUN spack env create pdienv spack.yaml
 COPY deps.sh deps.sh
