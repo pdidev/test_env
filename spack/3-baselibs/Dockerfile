@@ -36,6 +36,7 @@ ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the spack compiler with our latest system compiler
+# Select the ~bootstrap gcc variant as the 3-stage bootstrap fails on latest spack
 COPY ${COMPILER}.lst compilerpkg.lst 
 RUN <<EORUN
 set -e
