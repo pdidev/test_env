@@ -10,6 +10,7 @@ LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
 
 ARG MPI
+ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Add our MPI of choice and base MPI-dependant libs to the environment and install it
