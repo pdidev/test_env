@@ -73,7 +73,6 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
-
 # stage : veloc download 
 
 FROM main AS velocdl
@@ -87,7 +86,6 @@ RUN set -ex \
  && cmake --install /tmp/kvtree/build \
  && rm -rf /tmp/kvtree
 
-
 RUN set -ex \
  && git clone --depth 1 -b v0.8.0 https://github.com/ECP-VeloC/AXL.git /tmp/axl \
  && cmake -S /tmp/axl -B /tmp/axl/build \
@@ -96,7 +94,6 @@ RUN set -ex \
  && cmake --build /tmp/axl/build --parallel \
  && cmake --install /tmp/axl/build \
  && rm -rf /tmp/axl
-
 
 RUN set -ex \
  && git clone --depth 1 -b v0.3.0 https://github.com/ECP-VeloC/rankstr.git /tmp/rankstr \
@@ -107,7 +104,6 @@ RUN set -ex \
  && cmake --install /tmp/rankstr/build \
  && rm -rf /tmp/rankstr
 
-
 RUN set -ex \
  && git clone --depth 1 -b v0.3.0 https://github.com/ECP-VeloC/redset.git /tmp/redset \
  && cmake -S /tmp/redset -B /tmp/redset/build \
@@ -116,7 +112,6 @@ RUN set -ex \
  && cmake --build /tmp/redset/build --parallel \
  && cmake --install /tmp/redset/build \
  && rm -rf /tmp/redset
-
 
 RUN set -ex \
  && git clone --depth 1 -b v0.3.0 https://github.com/ECP-VeloC/shuffile.git /tmp/shuffile \
@@ -127,7 +122,6 @@ RUN set -ex \
  && cmake --install /tmp/shuffile/build \
  && rm -rf /tmp/shuffile
 
-
 RUN set -ex \
  && git clone --depth 1 -b v0.4.0 https://github.com/ECP-VeloC/er.git /tmp/er \
  && cmake -S /tmp/er -B /tmp/er/build \
@@ -136,7 +130,6 @@ RUN set -ex \
  && cmake --build /tmp/er/build --parallel \
  && cmake --install /tmp/er/build \
  && rm -rf /tmp/er
-
 
 RUN set -ex \
  && git clone --depth 1 -b 'veloc-1.8' https://github.com/ECP-VeloC/veloc.git /tmp/veloc \
@@ -192,7 +185,6 @@ RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSI
     fi
 RUN echo "/usr/local/lib" > /etc/ld.so.conf.d/veloc.conf && ldconfig
 
-
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
@@ -205,13 +197,11 @@ ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
-
 # stage : pdi download 
 
 FROM alpine/git AS pdidl
 
 RUN git -C /root clone --recurse-submodules --branch cp-plugin https://github.com/iole-bolognesi/pdi.git /root/pdi
-
 
 # stage : test 
 
@@ -221,7 +211,5 @@ COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
-
-
 
 FROM complete-main

@@ -95,7 +95,7 @@ RUN spack clean -a
 
 
 
-FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
+FROM ${REGISTRY}/base:${IMAGE_TAG} AS main
 
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
@@ -134,7 +134,7 @@ CMD ["bash", "-i"]
 
 
 
-FROM ghcr.io/pdidev/test_env/spackbase:${IMAGE_TAG} AS fullspack
+FROM ${REGISTRY}/spackbase:${IMAGE_TAG} AS fullspack
 
 
 COPY --from=builder --chown=ci:ci ${SPACK_INSTALL} ${SPACK_INSTALL}

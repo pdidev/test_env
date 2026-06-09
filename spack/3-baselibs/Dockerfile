@@ -36,12 +36,12 @@ ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the spack compiler with our latest system compiler
-# Select the ~bootstrap gcc variant as the 3-stage bootstrap fails on latest spack
 COPY ${COMPILER}.lst compilerpkg.lst 
 RUN <<EORUN
 set -e
 PKG="$(cat compilerpkg.lst)"
 SYS="$(spack compilers | tr ' ' '\n' | grep @)"
+# Select the ~bootstrap gcc variant as the 3-stage bootstrap fails on latest spack
 if [[ "$PKG" == gcc* ]]
 then
   BOOT="~bootstrap"
@@ -53,7 +53,6 @@ EORUN
 # Prevent building any new compiler
 RUN spack config --scope site add 'packages:llvm:buildable: false'
 RUN spack config --scope site add 'packages:gcc:buildable: false'
-
 
 # Generate a compiler ref
 # * before 1.0, rely on the compilers section and generate a mixed compiler for llvm
@@ -114,7 +113,7 @@ EOCOPY
 RUN spack env create pdienv spack.yaml
 COPY deps.sh deps.sh
 # The toolchain is attached directly to each lib spec (string-parsed), which
-# avoids the matrix `$%compiler` path that crashes expand_toolchains on latest spack
+# avoids the matrix that crashes in expand_toolchains on latest spack
 RUN <<'EORUN'
 set -e
 . deps.sh
