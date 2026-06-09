@@ -11,13 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
-        # mpi:     ['openmpi', 'mpich']
-        # variant: ['mini', 'all', 'pdi']
-        ###  remove some variant until is work on local
-        base:    ['ubuntu/rolling', 'debian/unstable']
+        base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
         mpi:     ['openmpi', 'mpich']
-        variant: ['mini', 'all']
+        variant: ['mini', 'all', 'pdi']
     runs-on: ubuntu-latest
     steps:
     - name: Compute tags, distro & version
