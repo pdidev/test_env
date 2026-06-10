@@ -71,7 +71,11 @@ RUN set -ex \
 
 FROM main AS velocdl
 
-RUN pip3 install --break-system-packages beautifulsoup4 wget
+RUN if pip3 install --help | grep -q -- --break-system-packages; then \
+      pip3 install --break-system-packages beautifulsoup4 wget; \
+    else \
+      pip3 install beautifulsoup4 wget; \
+    fi
 
 WORKDIR /usr/veloc-src
 RUN git clone https://github.com/ECP-VeloC/VELOC.git . \
@@ -122,6 +126,9 @@ RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSI
     fi
 RUN printf "/usr/local_veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
     && ldconfig
+
+ENV CMAKE_PREFIX_PATH=/usr/local_veloc:${CMAKE_PREFIX_PATH}
+ENV PATH=/usr/local_veloc/bin:${PATH}
 
 ENV PDI_SYSTEM=${DISTRO}
 ENV PDI_COMPILER=gcc
