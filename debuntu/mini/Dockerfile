@@ -73,7 +73,7 @@ USER ci:ci
 WORKDIR ${HOME}
 
 ## chmod -R o+rX .
-FROM main AS builder-catalyst
+FROM main AS builder_catalyst
 USER root
 RUN set -ex \
 && export DEBIAN_FRONTEND=noninteractive \
@@ -98,13 +98,13 @@ RUN chmod +x /home/ci/install_catalyst.sh
 RUN chown ci /home/ci/cmake_catalyst.sh
 RUN chown ci /home/ci/build_catalyst.sh
 
-RUN set -x && bash /home/ci/cmake_catalyst.sh
+RUN set -ex && bash /home/ci/cmake_catalyst.sh
 
 USER ci
-RUN set -x && bash /home/ci/build_catalyst.sh
+RUN set -ex && bash /home/ci/build_catalyst.sh
 
 USER root
-RUN set -x && bash /home/ci/install_catalyst.sh
+RUN set -ex && bash /home/ci/install_catalyst.sh
 
 USER ci
 
@@ -116,7 +116,7 @@ RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.co
 FROM main AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
-COPY --from=builder-catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
+COPY --from=builder_catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
 
 WORKDIR ${HOME}
 ## Add env varible for catalyst lib
