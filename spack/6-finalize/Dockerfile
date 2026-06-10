@@ -172,7 +172,7 @@ RUN <<'EORUN'
 set -e
 export VERBOSE=1
 if [ "${VERSION}" = oldest ]; then
-  export CTEST_EXCLUDE='^(veloc_test_|PDI_example_veloc)'
+  export CMAKE_FLAGS="-DBUILD_VELOC_PLUGIN=OFF"
 fi
 bash pdi/bin/build_and_run_all_tests
 EORUN
