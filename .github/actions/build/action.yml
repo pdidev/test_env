@@ -48,8 +48,8 @@ runs:
     run: |
       set -e
       if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
-      then CACHEREF="ghcr.io/${{ github.repository_owner }}/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
-      else CACHEREF="ghcr.io/${{ github.repository_owner }}/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+      then CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+      else CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
       fi
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
       if [ 'x${{ inputs.cache-to }}' = 'x<DEFAULT>' ]
@@ -107,7 +107,7 @@ runs:
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
-        REGISTRY=ghcr.io/${{ github.repository_owner }}/test_env
+        REGISTRY=ghcr.io/pdidev/test_env
       context: "${{ inputs.context }}${{ inputs.path }}"
       push: false
       target: test
@@ -122,9 +122,9 @@ runs:
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
-        REGISTRY=ghcr.io/${{ github.repository_owner }}/test_env
+        REGISTRY=ghcr.io/pdidev/test_env
       tags: |
-        ghcr.io/${{ github.repository_owner }}/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
+        ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
         ${{ inputs.tags }}
       context: "${{ inputs.context }}${{ inputs.path }}"
       push: ${{ inputs.push }}
