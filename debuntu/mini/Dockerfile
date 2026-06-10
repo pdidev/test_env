@@ -71,78 +71,12 @@ RUN set -ex \
 
 FROM main AS velocdl
 
-RUN set -ex \
- && apt-get update -y \
- && apt-get install -y --no-install-recommends \
-            git \
- && apt-get clean -y \
- && apt-get autoclean -y \
- && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --break-system-packages beautifulsoup4 wget
 
-RUN set -ex \
- && git clone --depth 1 -b v1.4.0 https://github.com/ECP-VeloC/KVTree.git /tmp/kvtree \
- && cmake -S /tmp/kvtree -B /tmp/kvtree/build \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
- && cmake --build /tmp/kvtree/build --parallel \
- && cmake --install /tmp/kvtree/build \
- && rm -rf /tmp/kvtree
-
-RUN set -ex \
- && git clone --depth 1 -b v0.8.0 https://github.com/ECP-VeloC/AXL.git /tmp/axl \
- && cmake -S /tmp/axl -B /tmp/axl/build \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
- && cmake --build /tmp/axl/build --parallel \
- && cmake --install /tmp/axl/build \
- && rm -rf /tmp/axl
-
-RUN set -ex \
- && git clone --depth 1 -b v0.3.0 https://github.com/ECP-VeloC/rankstr.git /tmp/rankstr \
- && cmake -S /tmp/rankstr -B /tmp/rankstr/build \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
- && cmake --build /tmp/rankstr/build --parallel \
- && cmake --install /tmp/rankstr/build \
- && rm -rf /tmp/rankstr
-
-RUN set -ex \
- && git clone --depth 1 -b v0.3.0 https://github.com/ECP-VeloC/redset.git /tmp/redset \
- && cmake -S /tmp/redset -B /tmp/redset/build \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
- && cmake --build /tmp/redset/build --parallel \
- && cmake --install /tmp/redset/build \
- && rm -rf /tmp/redset
-
-RUN set -ex \
- && git clone --depth 1 -b v0.3.0 https://github.com/ECP-VeloC/shuffile.git /tmp/shuffile \
- && cmake -S /tmp/shuffile -B /tmp/shuffile/build \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
- && cmake --build /tmp/shuffile/build --parallel \
- && cmake --install /tmp/shuffile/build \
- && rm -rf /tmp/shuffile
-
-RUN set -ex \
- && git clone --depth 1 -b v0.4.0 https://github.com/ECP-VeloC/er.git /tmp/er \
- && cmake -S /tmp/er -B /tmp/er/build \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
- && cmake --build /tmp/er/build --parallel \
- && cmake --install /tmp/er/build \
- && rm -rf /tmp/er
-
-RUN set -ex \
- && git clone --depth 1 -b 'veloc-1.8' https://github.com/ECP-VeloC/veloc.git /tmp/veloc \
- && cmake -S /tmp/veloc -B /tmp/veloc/build \
-          -DCMAKE_INSTALL_PREFIX=/usr/local \
-          -DCOMM_QUEUE=socket_queue \
-          -DENABLE_TESTS=OFF \
-          -DCMAKE_CXX_FLAGS="-DOMPI_SKIP_MPICXX=1" \
- && cmake --build /tmp/veloc/build --parallel \
- && cmake --install /tmp/veloc/build \
- && rm -rf /tmp/veloc
+WORKDIR /usr/veloc-src
+RUN git clone https://github.com/ECP-VeloC/VELOC.git . \
+    && mkdir -p /usr/local \
+    && python3 auto-install.py /usr/local
 
 # stage : mpich download (with options for shared memory support)
 
@@ -178,7 +112,7 @@ FROM main AS complete-main
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
-COPY --from=velocdl /usr/local /usr/local
+COPY --from=velocdl /usr/local /usr/local_veloc
 COPY --from=mpichdl /usr/local /usr/local_mpich
 RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSION}" = "unstable" ]; then \
       cp -a /usr/local_mpich/. /usr/local/ \
@@ -186,7 +120,8 @@ RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSI
     else \
       rm -rf /usr/local_mpich; \
     fi
-RUN echo "/usr/local/lib" > /etc/ld.so.conf.d/veloc.conf && ldconfig
+RUN printf "/usr/local_veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
+    && ldconfig
 
 ENV PDI_SYSTEM=${DISTRO}
 ENV PDI_COMPILER=gcc
