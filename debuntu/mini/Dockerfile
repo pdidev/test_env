@@ -34,6 +34,7 @@ RUN set -ex \
             build-essential \
             cmake \
             curl \
+            git \
             libspdlog-dev \
             libboost-dev \
             libssl-dev \
