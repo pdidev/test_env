@@ -159,16 +159,23 @@ FROM alpine/git AS pdidl
 
 RUN git -C /root clone --recurse-submodules --branch cp-plugin https://github.com/iole-bolognesi/pdi.git /root/pdi
 
-
-
-
-
 FROM main AS test
+
+ARG VERSION
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
-RUN export VERBOSE=1 \
- && bash pdi/bin/build_and_run_all_tests
+# The oldest release of spack only provides veloc package until version 1.5 
+# The VeloC plugin requires at least veloc 1.7, therefore, skips these steps 
+# in the image built with spack 0.19 s
+RUN <<'EORUN'
+set -e
+export VERBOSE=1
+if [ "${VERSION}" = oldest ]; then
+  export CTEST_EXCLUDE='^(veloc_test_|PDI_example_veloc)'
+fi
+bash pdi/bin/build_and_run_all_tests
+EORUN
 
 
 
