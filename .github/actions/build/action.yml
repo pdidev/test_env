@@ -107,7 +107,6 @@ runs:
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
-        REGISTRY=ghcr.io/pdidev/test_env
       context: "${{ inputs.context }}${{ inputs.path }}"
       push: false
       target: test
@@ -122,7 +121,6 @@ runs:
       build-args: |
         ${{ inputs.build-args }}
         IMAGE_TAG=${{ steps.info.outputs.sha }}
-        REGISTRY=ghcr.io/pdidev/test_env
       tags: |
         ghcr.io/pdidev/test_env/${{ inputs.image-name }}${{ steps.info.outputs.sep }}${{ steps.info.outputs.sha }}
         ${{ inputs.tags }}
