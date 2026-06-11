@@ -167,7 +167,7 @@ COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
 # The oldest release of spack only provides veloc package until version 1.5 
 # The VeloC plugin requires at least veloc 1.7, therefore, skips these steps 
-# in the image built with spack 0.19 s
+# in the image built with spack v 0.19
 RUN <<'EORUN'
 set -e
 export VERBOSE=1

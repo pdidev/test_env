@@ -132,7 +132,7 @@ RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSI
     fi
 RUN printf "/usr/local_veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
     && ldconfig
-    
+
 ENV CMAKE_PREFIX_PATH=/usr/local_veloc:${CMAKE_PREFIX_PATH}
 
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
@@ -151,7 +151,7 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules --branch cp-plugin https://github.com/iole-bolognesi/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
 
 # stage : test 
 

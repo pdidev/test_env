@@ -7,9 +7,9 @@ FROM ${REGISTRY}/spackbase:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
-
 ARG VERSION
-ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
+
+# Download spack
 COPY ${VERSION}.branch spack.branch
 RUN mkdir -p ${SPACK_ROOT} \
  && git clone --depth 1 -b $(cat spack.branch) ${SPACK_ROOT} \
