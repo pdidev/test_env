@@ -129,7 +129,6 @@ RUN printf "/usr/local_veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
     && ldconfig
 
 ENV CMAKE_PREFIX_PATH=/usr/local_veloc:${CMAKE_PREFIX_PATH}
-ENV PATH=/usr/local_veloc/bin:${PATH}
 
 ENV PDI_SYSTEM=${DISTRO}
 ENV PDI_COMPILER=gcc
