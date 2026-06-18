@@ -49,8 +49,9 @@ runs:
       set -e
       if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
       then CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
-      elif [ 'true' = "${{ github.event_name == 'pull_request' }} && 'true' = '${{ contains('${{ contains(github.ref_name,'/merge') }}' ]
+      elif [ 'true' = "${{ github.event_name == 'pull_request' }}" && 'true' = '${{ contains('${{ contains(github.ref_name,'/merge') }}' ]
       then
+        echo "case pull request not merged"
         TAG_NOT_CORRECT="${{ github.ref_name }}"
         SAFE_TAG="${TAG_NOT_CORRECT//\//-}"
         CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${SAFE_TAG}" >> "${GITHUB_OUTPUT}"
