@@ -58,7 +58,6 @@ runs:
       else
         CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
       fi
-      fi
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
       if [ 'x${{ inputs.cache-to }}' = 'x<DEFAULT>' ]
       then
