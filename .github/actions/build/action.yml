@@ -47,10 +47,7 @@ runs:
     shell: bash
     run: |
       set -e
-      if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
-      then CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
-      else CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
-      fi
+      CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}${{case(contains(inputs.image-name,':'),'-',':')}}${GITHUB_REF_NAME//\//-}" >> "${GITHUB_OUTPUT}"
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
       if [ 'x${{ inputs.cache-to }}' = 'x<DEFAULT>' ]
       then

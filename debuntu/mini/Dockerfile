@@ -50,6 +50,7 @@ RUN set -ex \
             python3-yaml \
             ssh-client \
             zlib1g-dev \
+ && if dpkg-query -W 'libspdlog1*' > /dev/null; then apt-get install -y --no-install-recommends libspdlog-dev; fi \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
@@ -60,7 +61,7 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
-ENV PDI_SYSTEM=${DISTRO}
+ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 # only required for openmpi but...
