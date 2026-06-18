@@ -30,6 +30,7 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; fi \
+ && if [[ "${DISTRO}" = ubuntu ]] && [[ "${VERSION}" = rolling ]]; then SPDLOGDEV=libspdlog-dev; fi \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -41,6 +42,7 @@ RUN set -ex \
             m4 \
             "${MPI/openmpi/openmpi-bin}" \
             ${MPI4PY} \
+            ${SPDLOGDEV} \
             pkg-config \
             python3-dev \
             python3-numpy \
@@ -60,7 +62,7 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
-ENV PDI_SYSTEM=${DISTRO}
+ENV PDI_SYSTEM=${DISTRO}-${VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 # only required for openmpi but...
@@ -75,8 +77,8 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
-
+#RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone -b mismatch_spdlog_version_for_doxygen --recurse-submodules https://github.com/jmoric91/pdi /root/pdi
 
 
 FROM main AS test
