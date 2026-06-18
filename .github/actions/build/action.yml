@@ -49,7 +49,14 @@ runs:
       set -e
       if [ 'true' = '${{ contains(inputs.image-name,':') }}' ]
       then CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
-      else CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+      elif [ 'true' = "${{ github.event_name == 'pull_request' }} && 'true' = '${{ contains('${{ contains(github.ref_name,'/merge') }}' ]
+      then
+        TAG_NOT_CORRECT="${{ github.ref_name }}"
+        SAFE_TAG="${TAG_NOT_CORRECT//\//-}"
+        CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${SAFE_TAG}" >> "${GITHUB_OUTPUT}"
+      else
+        CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
+      fi
       fi
       echo "sha=${GITHUB_SHA:0:7}" >> "${GITHUB_OUTPUT}"
       if [ 'x${{ inputs.cache-to }}' = 'x<DEFAULT>' ]
