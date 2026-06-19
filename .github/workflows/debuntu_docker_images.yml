@@ -36,6 +36,7 @@ jobs:
     - name: "Build and push"
 #      uses: pdidev/test_env/.github/actions/build@v4
       uses: pdidev/test_env/.github/actions/build@adding_spdlog_dev_ubuntu_rolling
+#      uses: .github/actions/build
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         context: "./"
