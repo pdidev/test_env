@@ -54,7 +54,7 @@ runs:
       else 
       if [ 'true' = '${{ github.event_name == 'pull_request' }}' ]
       then
-        if ['true' = '${{ contains(github.ref_name,'/merge') }}' ]
+        if [ 'true' = '${{ contains(github.ref_name,'/merge') }}' ]
         then
           echo "$$ case pull request not merged"
           TAG_NOT_CORRECT="${{ github.ref_name }}"
