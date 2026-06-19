@@ -52,7 +52,7 @@ runs:
         echo "$$ image name contains :"
         CACHEREF="ghcr.io/pdidev/test_env/cache/${{inputs.image-name}}-${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
       else 
-      if[ 'true' = '${{ github.event_name == 'pull_request' }}' ]
+      if [ 'true' = '${{ github.event_name == 'pull_request' }}' ]
       then
         if ['true' = '${{ contains(github.ref_name,'/merge') }}' ]
         then
