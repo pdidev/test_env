@@ -76,8 +76,7 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-#RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
-RUN git -C /root clone -b mismatch_spdlog_version_for_doxygen --recurse-submodules https://github.com/jmorice91/pdi /root/pdi
+RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
 
 
 FROM main AS test
