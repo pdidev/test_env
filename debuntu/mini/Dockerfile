@@ -30,7 +30,6 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; fi \
- && if [[ "${DISTRO}" = ubuntu ]] && [[ "${DISTRO_VERSION}" = rolling ]]; then SPDLOGDEV=libspdlog-dev; fi \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -42,7 +41,6 @@ RUN set -ex \
             m4 \
             "${MPI/openmpi/openmpi-bin}" \
             ${MPI4PY} \
-            ${SPDLOGDEV} \
             pkg-config \
             python3-dev \
             python3-numpy \
@@ -52,6 +50,7 @@ RUN set -ex \
             python3-yaml \
             ssh-client \
             zlib1g-dev \
+ && if dpkg-query -W 'libspdlog1*' > /dev/null; then apt-get install libspdlog-dev; fi \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
