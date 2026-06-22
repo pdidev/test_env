@@ -6,19 +6,14 @@ on:
 defaults:
   run:
     shell: bash
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 jobs:
   debuntu:
     strategy:
       fail-fast: false
       matrix:
-        # base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
-        # mpi:     ['openmpi', 'mpich']
-        # variant: ['mini', 'all', 'pdi']
-        base:    ['ubuntu/rolling']
-        mpi:     ['openmpi']
-        variant: ['mini']
+        base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
+        mpi:     ['openmpi', 'mpich']
+        variant: ['mini', 'all', 'pdi']
     runs-on: ubuntu-latest
     steps:
     - name: Compute tags, distro & version

@@ -21,8 +21,7 @@ jobs:
           echo "tags=ghcr.io/pdidev/run-clang-format:${{ github.ref_name }}" >> "${GITHUB_OUTPUT}"
         fi
     - name: "Build and push"
-#      uses: pdidev/test_env/.github/actions/build@v4
-      uses: pdidev/test_env/.github/actions/build@adding_spdlog_dev_ubuntu_rolling
+      uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         context: ./
