@@ -37,6 +37,7 @@ jobs:
         image-name: ${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}
         test: "${{ matrix.variant != 'pdi' }}" # should be true, except for "pdi" variant
         push : "false"
+        cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
         build-args: |
           MPI=${{ matrix.mpi }}
           DISTRO=${{ steps.info.outputs.distro }}

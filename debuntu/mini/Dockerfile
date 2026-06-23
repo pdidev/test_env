@@ -33,6 +33,7 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
+            doxygen \
             curl \
             git \
             libspdlog-dev \
