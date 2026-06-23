@@ -28,7 +28,7 @@ jobs:
         echo "distro_version=${BASE##*/}" >> "${GITHUB_OUTPUT}"
     - uses: actions/checkout@v6
       with: { submodules: 'recursive' }
-    - name: "Build and push"
+    - name: "Build and no push"
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -36,6 +36,7 @@ jobs:
         path: debuntu/${{ matrix.variant }}
         image-name: ${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}
         test: "${{ matrix.variant != 'pdi' }}" # should be true, except for "pdi" variant
+        push : "false"
         build-args: |
           MPI=${{ matrix.mpi }}
           DISTRO=${{ steps.info.outputs.distro }}
