@@ -34,9 +34,7 @@ RUN set -ex \
             build-essential \
             cmake \
             doxygen \
-            curl \
             git \
-            libspdlog-dev \
             libboost-dev \
             libssl-dev \
             gfortran \
