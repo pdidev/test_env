@@ -1,7 +1,7 @@
 name: Spack images
 on:
   schedule: [ { cron: "50 23 * * 0" } ] # run every Sunday 23h50
-  push: { branches: [ main, 'v*' ] }
+  push: { branches: [ main, 'v*', fix-spack-images ] }
   pull_request:
   workflow_dispatch:
     inputs:
