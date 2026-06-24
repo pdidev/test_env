@@ -18,7 +18,7 @@ RUN <<'EORUN'
 set -e
 if [ "${COMPILER}" = gcc ] && [ "${MPI}" = openmpi ] && spack --version | grep -qs '^1\.'; then
 # Use main branch of openmpi because it contains fix to issue #13756 that is still unreleased. 
-  spack -e pdienv add -l mpi "openmpi@main"
+  spack -e pdienv add -l mpi "openmpi"
 else
   spack -e pdienv add -l mpi "${MPI}"
 fi
