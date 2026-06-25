@@ -36,7 +36,7 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://repo.pdi.dev/pdi-main.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://repo.pdi.dev/pdi-main.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
- && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi\
+ && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -82,17 +82,56 @@ ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
+FROM main AS builder_catalyst
+USER root
+RUN set -ex \
+&& export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update -y \
+&& apt-get upgrade -y \
+&& apt-get install -y --no-install-recommends \
+            apt-transport-https \
+            ca-certificates \
+            git \
+            ninja-build \
+&& rm -rf /var/lib/apt/lists/*
 
+# copy file for building and installing catalyst
+COPY cmake_catalyst.sh ${HOME}
+COPY build_catalyst.sh ${HOME}
+COPY install_catalyst.sh ${HOME}
+
+RUN chmod +x /home/ci/cmake_catalyst.sh
+RUN chmod +x /home/ci/build_catalyst.sh
+RUN chmod +x /home/ci/install_catalyst.sh
+
+RUN chown ci /home/ci/cmake_catalyst.sh
+RUN chown ci /home/ci/build_catalyst.sh
+
+RUN set -ex && bash /home/ci/cmake_catalyst.sh
+
+USER ci
+RUN set -ex && bash /home/ci/build_catalyst.sh
+
+USER root
+RUN set -ex && bash /home/ci/install_catalyst.sh
+
+USER ci
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
-
-
+#RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.com/francois-kitware/pdi /root/pdi
 
 FROM main AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
+COPY --from=builder_catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
+
+WORKDIR ${HOME}
+## Add env varible for catalyst lib
+ENV LD_LIBRARY_PATH="/opt/catalyst/lib"
+ENV catalyst_dir="/opt/catalyst/lib/cmake/catalyst-2.0"
+## add to check if catalyst_dir is needed
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
