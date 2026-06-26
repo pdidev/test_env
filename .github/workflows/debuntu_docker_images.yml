@@ -11,8 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
-        base:    ['ubuntu/rolling', 'debian/unstable']
+        base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
         mpi:     ['openmpi', 'mpich']
         variant: ['mini', 'all', 'pdi']
     runs-on: ubuntu-latest
@@ -41,7 +40,7 @@ jobs:
           MPI=${{ matrix.mpi }}
           DISTRO=${{ steps.info.outputs.distro }}
           DISTRO_VERSION=${{ steps.info.outputs.distro_version }}
-          CMAKE_VERSION_FOR_CATALYST="3.26.0"
+          CMAKE_MINIMAL_VERSION_FOR_CATALYST="3.26.0"
           CATALYST_VERSION="2.0.0"
         tags: |
           ${{ steps.info.outputs.tags }}

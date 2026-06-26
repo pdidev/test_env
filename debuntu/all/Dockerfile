@@ -86,11 +86,11 @@ FROM main AS builder_catalyst
 USER root
 
 ARG CATALYST_VERSION
-ARG CMAKE_VERSION_FOR_CATALYST
+ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
 
 RUN <<EORUN
 set -ex
-cmake_catalyst_required=${CMAKE_VERSION_FOR_CATALYST}
+cmake_catalyst_required=${CMAKE_MINIMAL_VERSION_FOR_CATALYST}
 cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
