@@ -75,36 +75,45 @@ WORKDIR ${HOME}
 ## chmod -R o+rX .
 FROM main AS builder_catalyst
 USER root
-RUN set -ex \
-&& export DEBIAN_FRONTEND=noninteractive \
-&& apt-get update -y \
-&& apt-get upgrade -y \
-&& apt-get install -y --no-install-recommends \
+
+RUN <<EORUN
+set -x
+cmake_catalyst_required=3.26.0
+cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
+
+mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
+
+if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
+    set -ex \
+    export DEBIAN_FRONTEND=noninteractive \
+    apt-get update -y \
+    apt-get upgrade -y \
+    apt-get install -y --no-install-recommends \
             apt-transport-https \
             ca-certificates \
             git \
             ninja-build \
-&& rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
-# copy file for building and installing catalyst
-COPY cmake_catalyst.sh ${HOME}
-COPY build_catalyst.sh ${HOME}
-COPY install_catalyst.sh ${HOME}
-
-RUN chmod +x /home/ci/cmake_catalyst.sh
-RUN chmod +x /home/ci/build_catalyst.sh
-RUN chmod +x /home/ci/install_catalyst.sh
-
-RUN chown ci /home/ci/cmake_catalyst.sh
-RUN chown ci /home/ci/build_catalyst.sh
-
-RUN set -ex && bash /home/ci/cmake_catalyst.sh
-
-USER ci
-RUN set -ex && bash /home/ci/build_catalyst.sh
-
-USER root
-RUN set -ex && bash /home/ci/install_catalyst.sh
+    git clone --branch v2.0.0 \
+            --single-branch \
+            https://gitlab.kitware.com/paraview/catalyst.git \
+            ${HOME}/catalyst_clone/
+    mkdir ${HOME}/catalyst_clone/
+    mkdir build
+    git submodule update --depth=1 --init --recursive
+    cmake -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
+        -DCATALYST_USE_MPI:BOOL=ON \
+        -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
+        -DCATALYST_WRAP_PYTHON:BOOL=ON \
+        -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
+        -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
+    cmake --build ${HOME}/catalyst_clone/build  
+    cmake --install ${HOME}/catalyst_clone/build
+else
+    mkdir -p /opt/catalyst
+fi
+EORUN
 
 USER ci
 
