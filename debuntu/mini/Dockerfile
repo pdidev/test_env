@@ -76,9 +76,12 @@ WORKDIR ${HOME}
 FROM main AS builder_catalyst
 USER root
 
+ARG CATALYST_VERSION
+ARG CMAKE_VERSION_FOR_CATALYST
+
 RUN <<EORUN
 set -ex
-cmake_catalyst_required=3.26.0
+cmake_catalyst_required=${CMAKE_VERSION_FOR_CATALYST}
 cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
@@ -94,7 +97,7 @@ if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
             ninja-build
     rm -rf /var/lib/apt/lists/*
 
-    git clone --branch v2.0.0 \
+    git clone --branch v${CATALYST_VERSION} \
             --single-branch \
             https://gitlab.kitware.com/paraview/catalyst.git \
             ${HOME}/catalyst_clone/
