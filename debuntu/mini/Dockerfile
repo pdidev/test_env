@@ -91,7 +91,7 @@ if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
             apt-transport-https \
             ca-certificates \
             git \
-            ninja-build \
+            ninja-build
     rm -rf /var/lib/apt/lists/*
 
     git clone --branch v2.0.0 \
