@@ -107,7 +107,7 @@ if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
             --single-branch \
             https://gitlab.kitware.com/paraview/catalyst.git \
             ${HOME}/catalyst_clone/
-    mkdir ${HOME}/catalyst_clone/
+    cd ${HOME}/catalyst_clone/
     mkdir build
     git submodule update --depth=1 --init --recursive
     cmake -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
