@@ -77,14 +77,13 @@ FROM main AS builder_catalyst
 USER root
 
 RUN <<EORUN
-set -x
+set -ex
 cmake_catalyst_required=3.26.0
 cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
 
 if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
-    set -ex \
     export DEBIAN_FRONTEND=noninteractive \
     apt-get update -y \
     apt-get upgrade -y \
