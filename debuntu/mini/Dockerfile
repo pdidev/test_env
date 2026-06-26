@@ -84,9 +84,9 @@ cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
 
 if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
-    export DEBIAN_FRONTEND=noninteractive \
-    apt-get update -y \
-    apt-get upgrade -y \
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -y
+    apt-get upgrade -y
     apt-get install -y --no-install-recommends \
             apt-transport-https \
             ca-certificates \
