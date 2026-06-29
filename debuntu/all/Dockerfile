@@ -144,6 +144,4 @@ ENV catalyst_dir="/opt/catalyst/lib/cmake/catalyst-2.0"
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
 
-
-
 FROM main
