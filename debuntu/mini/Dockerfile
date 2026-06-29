@@ -72,7 +72,6 @@ ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
-## chmod -R o+rX .
 FROM main AS builder_catalyst
 USER root
 
@@ -117,15 +116,13 @@ else
 fi
 EORUN
 
-USER ci
-
 FROM alpine/git AS pdidl
 
 #RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
 RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.com/francois-kitware/pdi /root/pdi
 
 FROM main AS test
-
+USER ci
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 COPY --from=builder_catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
 
@@ -133,7 +130,6 @@ WORKDIR ${HOME}
 ## Add env varible for catalyst lib
 ENV LD_LIBRARY_PATH="/opt/catalyst/lib"
 ENV catalyst_dir="/opt/catalyst/lib/cmake/catalyst-2.0"
-## add to check if catalyst_dir is needed
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
