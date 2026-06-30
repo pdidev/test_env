@@ -33,7 +33,7 @@ jobs:
     - name: "Build and push 2- spackbase"
       uses: pdidev/test_env/.github/actions/build@v4
       push : "false"
-        cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
+      cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         context: "./"
