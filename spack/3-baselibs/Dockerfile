@@ -120,7 +120,7 @@ then COMPILER_REF="%pditoolchain"
 else COMPILER_REF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
 for p in ${BASE_BUILDDEPS}; do
-    spack -e pdienv add -l buildeps "$p"
+  spack -e pdienv add -l buildeps "$p"
 done
 for p in ${BASE_LIBS}; do
   spack -e pdienv add -l libs "$p ${COMPILER_REF}"
