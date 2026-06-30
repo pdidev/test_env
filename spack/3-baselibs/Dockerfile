@@ -44,11 +44,11 @@ SPACK_VERSION="$(spack compilers | tr ' ' '\n' | grep @)"
 # Select the ~bootstrap gcc variant as the 3-stage bootstrap fails on latest spack
 if [[ "$COMPILER_PKG" == gcc* ]]
 then
-  BOOT="~bootstrap"
+  COMPILER_SPECIFIC_VARIANTS="~bootstrap"
 else
-  BOOT=""
+  COMPILER_SPECIFIC_VARIANTS=""
 fi
-spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${BOOT}%${SPACK_VERSION}"
+spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION}"
 EORUN
 # Prevent building any new compiler
 RUN spack config --scope site add 'packages:llvm:buildable: false'
@@ -120,7 +120,7 @@ then COMPILER_REF="%pditoolchain"
 else COMPILER_REF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
 for p in ${BASE_BUILDDEPS}; do
-    spack -e pdienv add -l buildeps "$p ${COMPILER_REF}"
+    spack -e pdienv add -l buildeps "$p"
 done
 for p in ${BASE_LIBS}; do
   spack -e pdienv add -l libs "$p ${COMPILER_REF}"
