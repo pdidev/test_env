@@ -32,13 +32,13 @@ jobs:
         cache: ${{ github.event_name != 'schedule' && ( github.event_name != 'workflow_dispatch' || inputs.cache ) }} # cache for every run but scheduled ones
     - name: "Build and push 2- spackbase"
       uses: pdidev/test_env/.github/actions/build@v4
-      push : "false"
-      cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         context: "./"
         path: spack/2-spackbase
         image-name: spackbase
+        push : "false"
+        cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
   step_3_baselibs:
     strategy:
       fail-fast: false
