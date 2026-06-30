@@ -111,7 +111,7 @@ jobs:
           echo "tags=ghcr.io/pdidev/spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
           echo "fullspack=ghcr.io/pdidev/fullspack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}:${{github.ref_name}}" >> "${GITHUB_OUTPUT}"
         fi
-    - name: "Build and push"
+    - name: "Build and no push"
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -119,6 +119,8 @@ jobs:
         path: spack/6-finalize
         image-name: spack/${{ matrix.version }}/${{ matrix.compiler }}/${{ matrix.mpi }}/${{ matrix.level }}
         test: true
+        push : "false"
+        cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
         build-args: |
           VERSION=${{ matrix.version }}
           COMPILER=${{ matrix.compiler }}

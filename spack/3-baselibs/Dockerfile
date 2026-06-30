@@ -39,16 +39,16 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 COPY ${COMPILER}.lst compilerpkg.lst 
 RUN <<EORUN
 set -e
-PKG="$(cat compilerpkg.lst)"
-SYS="$(spack compilers | tr ' ' '\n' | grep @)"
+COMPILER_PKG="$(cat compilerpkg.lst)"
+SPACK_VERSION="$(spack compilers | tr ' ' '\n' | grep @)"
 # Select the ~bootstrap gcc variant as the 3-stage bootstrap fails on latest spack
-if [[ "$PKG" == gcc* ]]
+if [[ "$COMPILER_PKG" == gcc* ]]
 then
   BOOT="~bootstrap"
 else
   BOOT=""
 fi
-spack install ${SPACK_INSTALL_ARGS} -U "${PKG}${BOOT}%${SYS}"
+spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${BOOT}%${SPACK_VERSION}"
 EORUN
 # Prevent building any new compiler
 RUN spack config --scope site add 'packages:llvm:buildable: false'
@@ -92,13 +92,10 @@ else
 fi
 EORUN
 
-
 # Create an environment with our base libraries using the compiler ref we just generated
 COPY <<'EOCOPY' spack.yaml
 spack:
   view: false
-  concretizer:
-    unify: when_possible
   definitions:
   - buildeps: []
   - libs: []
@@ -112,20 +109,21 @@ spack:
 EOCOPY
 RUN spack env create pdienv spack.yaml
 COPY deps.sh deps.sh
+
 # The toolchain is attached directly to each lib spec (string-parsed), which
 # avoids the matrix that crashes in expand_toolchains on latest spack
 RUN <<'EORUN'
 set -e
 . deps.sh
 if spack --version | grep -qs '^1\.'
-then CREF="%pditoolchain"
-else CREF="%$(spack compilers | tr ' ' '\n' | grep @)"
+then COMPILER_REF="%pditoolchain"
+else COMPILER_REF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
 for p in ${BASE_BUILDDEPS}; do
-    spack -e pdienv add -l buildeps "$p ${CREF}"
+    spack -e pdienv add -l buildeps "$p ${COMPILER_REF}"
 done
 for p in ${BASE_LIBS}; do
-  spack -e pdienv add -l libs "$p ${CREF}"
+  spack -e pdienv add -l libs "$p ${COMPILER_REF}"
 done
 EORUN
 
