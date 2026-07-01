@@ -63,18 +63,20 @@ if ( spack --version | grep -qs '^1\.' )
 then
   # get the name of the just built spack compiler
   COMPILER="$(spack find -x --format '{name}@{version}' "$(cat compilerpkg.lst)")"
-  # if using LLVM, add the system compiler as fortran compiler
+  # if using LLVM, add the system compiler as fortran compiler and use LLD linker 
   if spack find llvm &>/dev/null
   then FCMP="$(spack find -e --format '{name}@{version}' gcc)"
+       LTOSPEC=" ldflags=-fuse-ld=lld"
   else FCMP="${COMPILER}"
+       LTOSPEC=""
   fi
   # generate a toolchain with those
   cat<<-EOF > "$(spack config --scope site edit --print-file toolchains)"
     toolchains:
       pditoolchain:
-      - spec: "%c=${COMPILER}"
+      - spec: "%c=${COMPILER}${LTOSPEC}"
         when: "%c"
-      - spec: "%cxx=${COMPILER}"
+      - spec: "%cxx=${COMPILER}${LTOSPEC}"
         when: "%cxx"
       - spec: "%fortran=${FCMP}"
         when: "%fortran"
