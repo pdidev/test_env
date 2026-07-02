@@ -98,6 +98,8 @@ EORUN
 COPY <<'EOCOPY' spack.yaml
 spack:
   view: false
+  concretizer:
+    unify: when_possible
   definitions:
   - buildeps: []
   - libs: []
