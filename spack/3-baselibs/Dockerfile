@@ -50,9 +50,25 @@ else
 fi
 spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION}"
 EORUN
-# Prevent building any new compiler
-RUN spack config --scope site add 'packages:llvm:buildable: false'
-RUN spack config --scope site add 'packages:gcc:buildable: false'
+
+# Prevent building any new compiler and set compiler flags for doxygen to support LTO 
+RUN <<EORUN
+set -e
+COMPILER="$(spack find -x --format '{name}@{version}' "$(cat compilerpkg.lst)")"
+cat<<-EOF > "$(spack config --scope site edit --print-file packages)"
+  packages:
+    llvm:
+      buildable: false
+    gcc:
+      buildable: false
+    all:
+      require:
+      - spec: "ldflags=-fuse-ld=lld"
+        when: "%c=${COMPILER}"
+      - spec: "ldflags=-fuse-ld=lld"
+        when: "%cxx=${COMPILER}"
+EOF
+EORUN
 
 # Generate a compiler ref
 # * before 1.0, rely on the compilers section and generate a mixed compiler for llvm
@@ -66,17 +82,15 @@ then
   # if using LLVM, add the system compiler as fortran compiler and use LLD linker 
   if spack find llvm &>/dev/null
   then FCMP="$(spack find -e --format '{name}@{version}' gcc)"
-       LTOSPEC=" ldflags=-fuse-ld=lld"
   else FCMP="${COMPILER}"
-       LTOSPEC=""
   fi
   # generate a toolchain with those
   cat<<-EOF > "$(spack config --scope site edit --print-file toolchains)"
     toolchains:
       pditoolchain:
-      - spec: "%c=${COMPILER}${LTOSPEC}"
+      - spec: "%c=${COMPILER}"
         when: "%c"
-      - spec: "%cxx=${COMPILER}${LTOSPEC}"
+      - spec: "%cxx=${COMPILER}$"
         when: "%cxx"
       - spec: "%fortran=${FCMP}"
         when: "%fortran"
