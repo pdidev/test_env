@@ -90,7 +90,7 @@ then
       pditoolchain:
       - spec: "%c=${COMPILER}"
         when: "%c"
-      - spec: "%cxx=${COMPILER}$"
+      - spec: "%cxx=${COMPILER}"
         when: "%cxx"
       - spec: "%fortran=${FCMP}"
         when: "%fortran"
