@@ -48,8 +48,8 @@ then
 else
   COMPILER_SPECIFIC_VARIANTS=""
 fi
-spack solve -I -U ${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION}
-&& spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION}"
+spack solve -I -U ${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION} \
+  && spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION}"
 EORUN
 
 # Prevent building any new compiler and set compiler flags for doxygen to support LTO 
