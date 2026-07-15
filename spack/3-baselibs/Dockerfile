@@ -55,20 +55,17 @@ EORUN
 # Prevent building any new compiler and set compiler flags for doxygen to support LTO 
 RUN <<EORUN
 set -e
-COMPILER="$(spack find -x --format '{name}@{version}' "$(cat compilerpkg.lst)")"
+spack config --scope site add "packages:llvm:buildable:false"
+spack config --scope site add "packages:gcc:buildable:false"
+if spack find llvm &>/dev/null
+then
 cat<<-EOF | spack config --scope site add -f -
   packages:
-    llvm:
-      buildable: false
-    gcc:
-      buildable: false
-    all:
+    doxygen:
       require:
       - spec: "ldflags=-fuse-ld=lld"
-        when: "%c=${COMPILER}"
-      - spec: "ldflags=-fuse-ld=lld"
-        when: "%cxx=${COMPILER}"
 EOF
+fi
 EORUN
 
 # Generate a compiler ref
@@ -80,7 +77,7 @@ if ( spack --version | grep -qs '^1\.' )
 then
   # get the name of the just built spack compiler
   COMPILER="$(spack find -x --format '{name}@{version}' "$(cat compilerpkg.lst)")"
-  # if using LLVM, add the system compiler as fortran compiler and use LLD linker 
+  # if using LLVM, add the system compiler as fortran compiler 
   if spack find llvm &>/dev/null
   then FCMP="$(spack find -e --format '{name}@{version}' gcc)"
   else FCMP="${COMPILER}"
