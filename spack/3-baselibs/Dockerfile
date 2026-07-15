@@ -37,7 +37,7 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the spack compiler with our latest system compiler
 COPY ${COMPILER}.lst compilerpkg.lst 
-RUN <<EORUN
+RUN <<'EORUN'
 set -e
 COMPILER_PKG="$(cat compilerpkg.lst)"
 SPACK_VERSION="$(spack compilers | tr ' ' '\n' | grep @)"
@@ -53,11 +53,11 @@ spack solve -I -U ${COMPILER_PKG}${COMPILER_SPECIFIC_VARIANTS}%${SPACK_VERSION} 
 EORUN
 
 # Prevent building any new compiler and set compiler flags for doxygen to support LTO 
-RUN <<EORUN
+RUN <<'EORUN'
 set -e
 spack config --scope site add "packages:llvm:buildable:false"
 spack config --scope site add "packages:gcc:buildable:false"
-if spack find llvm &>/dev/null
+if spack --version | grep -qs '^1\.' && spack find llvm &>/dev/null
 then
   spack config --scope site add "packages:doxygen:require:ldflags=-fuse-ld=lld"
 fi
@@ -66,7 +66,7 @@ EORUN
 # Generate a compiler ref
 # * before 1.0, rely on the compilers section and generate a mixed compiler for llvm
 # * from spack 1.0 on, define a toolchain
-RUN <<EORUN
+RUN <<'EORUN'
 set -e
 if ( spack --version | grep -qs '^1\.' )
 then
