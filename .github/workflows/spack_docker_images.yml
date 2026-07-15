@@ -39,8 +39,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version:  ['latest']
-        compiler: ['clang']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
     needs: step_1_base_2_spackbase
     runs-on: ubuntu-latest
     steps:
@@ -60,8 +60,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version:  ['latest']
-        compiler: ['clang']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
         mpi:      ['openmpi','mpich']
     needs: step_3_baselibs
     runs-on: ubuntu-latest
@@ -94,8 +94,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version:  ['latest']
-        compiler: ['clang']
+        version:  ['latest', 'oldest']
+        compiler: ['gcc', 'clang']
         mpi:      ['openmpi','mpich']
         level:    ['mini', 'all']
     needs: step_4_mini_5_all

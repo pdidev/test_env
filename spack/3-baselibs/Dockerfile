@@ -59,12 +59,7 @@ spack config --scope site add "packages:llvm:buildable:false"
 spack config --scope site add "packages:gcc:buildable:false"
 if spack find llvm &>/dev/null
 then
-cat<<-EOF | spack config --scope site add -f -
-  packages:
-    doxygen:
-      require:
-      - spec: "ldflags=-fuse-ld=lld"
-EOF
+  spack config --scope site add "packages:doxygen:require:ldflags=-fuse-ld=lld"
 fi
 EORUN
 
