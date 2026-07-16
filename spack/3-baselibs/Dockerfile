@@ -3,7 +3,7 @@ ARG COMPILER
 ARG IMAGE_TAG
 ARG REGISTRY=ghcr.io/pdidev/test_env
 
-FROM ${REGISTRY}/spackbase:${IMAGE_TAG}
+FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -72,7 +72,7 @@ if ( spack --version | grep -qs '^1\.' )
 then
   # get the name of the just built spack compiler
   COMPILER="$(spack find -x --format '{name}@{version}' "$(cat compilerpkg.lst)")"
-  # if using LLVM, add the system compiler as fortran compiler 
+  # if using LLVM, add the system compiler as fortran compiler
   if spack find llvm &>/dev/null
   then FCMP="$(spack find -e --format '{name}@{version}' gcc)"
   else FCMP="${COMPILER}"
@@ -105,8 +105,6 @@ EORUN
 COPY <<'EOCOPY' spack.yaml
 spack:
   view: false
-  concretizer:
-    unify: when_possible
   definitions:
   - buildeps: []
   - libs: []
