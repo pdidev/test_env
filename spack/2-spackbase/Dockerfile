@@ -1,5 +1,4 @@
 ARG IMAGE_TAG
-ARG REGISTRY=ghcr.io/pdidev/test_env
 
 FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG}
 
