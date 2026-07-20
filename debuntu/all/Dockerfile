@@ -77,44 +77,27 @@ RUN set -ex \
 
 FROM main AS velocdl
 
-RUN if pip3 install --help | grep -q -- --break-system-packages; then \
-      pip3 install --break-system-packages beautifulsoup4 wget; \
-    else \
-      pip3 install beautifulsoup4 wget; \
-    fi
-
-WORKDIR /usr/veloc-src
-RUN git clone https://github.com/ECP-VeloC/VELOC.git . \
-    && mkdir -p /usr/local \
-    && python3 auto-install.py /usr/local
-
-# stage : mpich download enabling options for shared memory support 
-# shared mem support is needed for VeloC  
-FROM main AS mpichdl
-ARG MPI
-ARG DISTRO
-ARG DISTRO_VERSION
-
+# install tools needed by VeloC install script 
 RUN set -ex \
- && if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSION}" = "unstable" ]; then \
-      apt-get update -y \
-      && apt-get install -y --no-install-recommends dpkg-dev \
-      && printf "Types: deb-src\nURIs: http://deb.debian.org/debian\nSuites: ${DISTRO_VERSION}\nComponents: main\n" \
-         > /etc/apt/sources.list.d/debian-src.sources \
-      && apt-get update -y \
-      && apt-get source mpich \
-      && cd mpich-* \
-      && ./configure \
-           --prefix=/usr/local \
-           --with-ch4-shmmods=posix \
-           --with-device=ch4:ucx \
-           --enable-shared \
-           --disable-static \
-           FC=gfortran \
-      && make -j$(nproc) \
-      && make install \
-      && ldconfig; \
-    fi
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+        git \
+        python3-wget \
+        python3-bs4 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/src
+
+# Clone VeloC repository
+RUN git clone -b 'veloc-1.8' --single-branch --depth 1 \
+            https://github.com/ECP-VeloC/veloc.git veloc
+
+WORKDIR /opt/src/veloc
+
+# Run VeloC install script 
+RUN mkdir -p /opt/veloc \
+      && ./auto-install.py /opt/veloc
+
 
 # stage : complete image
 
@@ -122,23 +105,15 @@ FROM main AS complete-main
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
-COPY --from=velocdl /usr/local /usr/local_veloc
-COPY --from=mpichdl /usr/local /usr/local_mpich
-RUN if [ "${MPI}" = "mpich" ] && [ "${DISTRO}" = "debian" ] && [ "${DISTRO_VERSION}" = "unstable" ]; then \
-      cp -a /usr/local_mpich/. /usr/local/ \
-      && rm -rf /usr/local_mpich; \
-    else \
-      rm -rf /usr/local_mpich; \
-    fi
-RUN printf "/usr/local_veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
-    && ldconfig
 
-ENV CMAKE_PREFIX_PATH=/usr/local_veloc:${CMAKE_PREFIX_PATH}
+COPY --from=velocdl /opt/veloc /opt/veloc
 
+ENV CMAKE_PREFIX_PATH=/opt/veloc:${CMAKE_PREFIX_PATH}
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 ENV PDI_LIBS=provided
+ENV LD_LIBRARY_PATH="/opt/veloc/lib"
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
