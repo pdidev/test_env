@@ -30,7 +30,6 @@ RUN set -ex \
  && apt-get update -y \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
-            git \
             apt-transport-https \
             ca-certificates \
             curl \
@@ -41,8 +40,6 @@ RUN set -ex \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
-            libboost-dev \
-            libssl-dev \
             doxygen \
             gfortran \
             libhdf5-${MPI}-dev \

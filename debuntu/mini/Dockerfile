@@ -34,9 +34,6 @@ RUN set -ex \
             build-essential \
             cmake \
             doxygen \
-            git \
-            libboost-dev \
-            libssl-dev \
             gfortran \
             libcurl4-openssl-dev \
             lib${MPI}-dev \
