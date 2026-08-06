@@ -36,7 +36,7 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://repo.pdi.dev/pdi-main.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://repo.pdi.dev/pdi-main.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
- && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi\
+ && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi \
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -82,21 +82,66 @@ ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
+FROM main AS builder_catalyst
+USER root
 
+ARG CATALYST_VERSION
+ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
+
+RUN <<EORUN
+set -ex
+cmake_catalyst_required=${CMAKE_MINIMAL_VERSION_FOR_CATALYST}
+cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
+
+mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
+
+if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -y
+    apt-get upgrade -y
+    apt-get install -y --no-install-recommends \
+            apt-transport-https \
+            ca-certificates \
+            git \
+            ninja-build
+    rm -rf /var/lib/apt/lists/*
+
+    git clone --branch v${CATALYST_VERSION} \
+            --single-branch \
+            https://gitlab.kitware.com/paraview/catalyst.git \
+            ${HOME}/catalyst_clone/
+    cd ${HOME}/catalyst_clone/
+    mkdir build
+    git submodule update --depth=1 --init --recursive
+    cmake -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
+        -DCATALYST_USE_MPI:BOOL=ON \
+        -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
+        -DCATALYST_WRAP_PYTHON:BOOL=ON \
+        -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
+        -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
+    cmake --build ${HOME}/catalyst_clone/build  
+    cmake --install ${HOME}/catalyst_clone/build
+else
+    mkdir -p /opt/catalyst
+fi
+EORUN
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
-
-
+#RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.com/francois-kitware/pdi /root/pdi
 
 FROM main AS test
-
+USER ci
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
+COPY --from=builder_catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
+
+WORKDIR ${HOME}
+## Add env varible for catalyst lib
+ENV LD_LIBRARY_PATH="/opt/catalyst/lib"
+ENV catalyst_dir="/opt/catalyst/lib/cmake/catalyst-2.0"
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
-
-
 
 FROM main

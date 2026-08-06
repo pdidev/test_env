@@ -40,5 +40,7 @@ jobs:
           MPI=${{ matrix.mpi }}
           DISTRO=${{ steps.info.outputs.distro }}
           DISTRO_VERSION=${{ steps.info.outputs.distro_version }}
+          CMAKE_MINIMAL_VERSION_FOR_CATALYST="3.26.0"
+          CATALYST_VERSION="2.0.0"
         tags: |
           ${{ steps.info.outputs.tags }}
