@@ -1,11 +1,11 @@
 ARG VERSION
 ARG COMPILER
 ARG IMAGE_TAG
+ARG REGISTRY=ghcr.io/pdidev/test_env
 
-FROM ghcr.io/pdidev/test_env/spackbase:${IMAGE_TAG}
+FROM ${REGISTRY}/spackbase:${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
-
 
 ARG VERSION
 
@@ -36,17 +36,23 @@ ARG COMPILER
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Install the spack compiler with our latest system compiler
-COPY ${COMPILER}.lst compilerpkg.lst
-RUN spack solve -I -U \
-          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @)" \
- && spack install ${SPACK_INSTALL_ARGS} -U \
-          "$(cat compilerpkg.lst)%$(spack compilers | tr ' ' '\n' | grep @)"
-
-
+COPY ${COMPILER}.lst compilerpkg.lst 
+RUN <<EORUN
+set -e
+COMPILER_PKG="$(cat compilerpkg.lst)"
+SPACK_VERSION="$(spack compilers | tr ' ' '\n' | grep @)"
+# Select the ~bootstrap gcc variant as the 3-stage bootstrap fails on latest spack
+if [[ "$COMPILER_PKG" == gcc* ]]
+then
+  BOOT="~bootstrap"
+else
+  BOOT=""
+fi
+spack install ${SPACK_INSTALL_ARGS} -U "${COMPILER_PKG}${BOOT}%${SPACK_VERSION}"
+EORUN
 # Prevent building any new compiler
 RUN spack config --scope site add 'packages:llvm:buildable: false'
 RUN spack config --scope site add 'packages:gcc:buildable: false'
-
 
 # Generate a compiler ref
 # * before 1.0, rely on the compilers section and generate a mixed compiler for llvm
@@ -86,39 +92,42 @@ else
 fi
 EORUN
 
-
-# Install an environment with our base libraries using the compiler ref we just generated
+# Create an environment with our base libraries using the compiler ref we just generated
 COPY <<'EOCOPY' spack.yaml
 spack:
   view: false
   definitions:
   - buildeps: []
-  - compiler: []
   - libs: []
   - mpi: []
   - mpilibs: []
   specs:
-  - '$buildeps'
-  - matrix:
-    - ['$%compiler']
-    - - '$libs'
-      - '$mpi'
-  - matrix:
-    - ['$%compiler']
-    - ['$^mpi']
-    - ['$mpilibs']
+  - $buildeps
+  - $libs
+  - $mpi
+  - $mpilibs
 EOCOPY
 RUN spack env create pdienv spack.yaml
 COPY deps.sh deps.sh
-RUN . deps.sh && spack -e pdienv add -l buildeps ${BASE_BUILDDEPS}
-RUN . deps.sh && spack -e pdienv add -l libs     ${BASE_LIBS}
-RUN <<EORUN
+
+# The toolchain is attached directly to each lib spec (string-parsed), which
+# avoids the matrix that crashes in expand_toolchains on latest spack
+RUN <<'EORUN'
 set -e
-if ( spack --version | grep -qs '^1\.' )
-then spack -e pdienv add -l compiler pditoolchain
-else spack -e pdienv add -l compiler "$(spack compilers | tr ' ' '\n' | grep @)"
+. deps.sh
+if spack --version | grep -qs '^1\.'
+then COMPILER_REF="%pditoolchain"
+else COMPILER_REF="%$(spack compilers | tr ' ' '\n' | grep @)"
 fi
+for p in ${BASE_BUILDDEPS}; do
+    spack -e pdienv add -l buildeps "$p ${COMPILER_REF}"
+done
+for p in ${BASE_LIBS}; do
+  spack -e pdienv add -l libs "$p ${COMPILER_REF}"
+done
 EORUN
+
+# Concretize, fetch, install 
 RUN spack -e pdienv concretize --reuse
 RUN spack -e pdienv fetch \
  || spack -e pdienv fetch \

@@ -2,11 +2,11 @@ ARG VERSION
 ARG COMPILER
 ARG MPI
 ARG IMAGE_TAG
+ARG REGISTRY=ghcr.io/pdidev/test_env
 
-FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-mini-${IMAGE_TAG}
+FROM ${REGISTRY}/builder:${VERSION}-${COMPILER}-${MPI}-mini-${IMAGE_TAG}
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
-
 
 # before 1.0, add the external repo for paraconf
 RUN <<EORUN
@@ -18,7 +18,6 @@ then
   spack repo add --scope site ${SPACK_ROOT}/var/spack/repos/pdi
 fi
 EORUN
-
 
 ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 

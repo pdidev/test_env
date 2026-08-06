@@ -14,6 +14,11 @@ jobs:
         base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/trixie', 'debian/unstable']
         mpi:     ['openmpi', 'mpich']
         variant: ['mini', 'all', 'pdi']
+        # exclude debian/unstable + mpich as debian/unstable mpich package 
+        # does not allow building with shared mem support needed by VeloC 
+        exclude: 
+          - { base: 'debian/unstable', mpi: mpich, variant : all}
+          - { base: 'debian/unstable', mpi: mpich, variant : mini}
     runs-on: ubuntu-latest
     steps:
     - name: Compute tags, distro & version
@@ -28,7 +33,7 @@ jobs:
         echo "distro_version=${BASE##*/}" >> "${GITHUB_OUTPUT}"
     - uses: actions/checkout@v6
       with: { submodules: 'recursive' }
-    - name: "Build and push"
+    - name: "Build and no push"
       uses: pdidev/test_env/.github/actions/build@v4
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -36,6 +41,8 @@ jobs:
         path: debuntu/${{ matrix.variant }}
         image-name: ${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }}
         test: "${{ matrix.variant != 'pdi' }}" # should be true, except for "pdi" variant
+        push : "false"
+        cache-to: "type=registry,ref=ghcr.io/iole-bolognesi/test_env/cache/${{ matrix.base }}/${{ matrix.mpi }}/${{ matrix.variant }},mode=max"
         build-args: |
           MPI=${{ matrix.mpi }}
           DISTRO=${{ steps.info.outputs.distro }}
