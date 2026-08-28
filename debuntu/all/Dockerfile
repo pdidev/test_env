@@ -44,7 +44,7 @@ RUN set -ex \
             gfortran \
             libhdf5-${MPI}-dev \
             lib${MPI}-dev \
-            libnetcdf-dev \
+            libnetcdf-mpi-dev \
             libparaconf-dev \
             libspdlog-dev \
             libyaml-dev \
@@ -59,7 +59,7 @@ RUN set -ex \
             python3-setuptools \
             python3-venv \
             python3-yaml \
-            ssh-client \
+            openssh-client \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
