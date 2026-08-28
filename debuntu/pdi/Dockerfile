@@ -52,7 +52,7 @@ RUN set -ex \
             pdiplugin-trace \
             pdiplugin-user-code \
             pkg-config \
-            ssh-client \
+            openssh-client \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \

@@ -48,7 +48,7 @@ RUN set -ex \
             python3-setuptools \
             python3-venv \
             python3-yaml \
-            ssh-client \
+            openssh-client \
             zlib1g-dev \
  && if dpkg-query -W 'libspdlog1*' > /dev/null; then apt-get install -y --no-install-recommends libspdlog-dev; fi \
  && apt-get purge -y curl \
