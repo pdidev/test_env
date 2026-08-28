@@ -44,7 +44,7 @@ RUN set -ex \
             gfortran \
             libhdf5-${MPI}-dev \
             lib${MPI}-dev \
-            libnetcdf-dev \
+            libnetcdf-mpi-dev \
             libparaconf-dev \
             libspdlog-dev \
             libyaml-dev \
