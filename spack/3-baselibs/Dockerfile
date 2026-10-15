@@ -107,14 +107,20 @@ spack:
   view: false
   definitions:
   - buildeps: []
+  - compiler: []
   - libs: []
   - mpi: []
   - mpilibs: []
   specs:
-  - $buildeps
-  - $libs
-  - $mpi
-  - $mpilibs
+  - '$buildeps'
+  - matrix:
+    - ['$%compiler']
+    - - '$libs'
+      - '$mpi'
+  - matrix:
+    - ['$%compiler']
+    - ['$^mpi']
+    - ['$mpilibs']
 EOCOPY
 RUN spack env create pdienv spack.yaml
 COPY deps.sh deps.sh
