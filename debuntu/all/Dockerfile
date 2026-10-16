@@ -59,7 +59,7 @@ RUN set -ex \
             python3-setuptools \
             python3-venv \
             python3-yaml \
-            ssh-client \
+            openssh-client \
  && apt-get purge -y curl \
  && apt-get autoremove -y \
  && apt-get clean -y \
@@ -86,7 +86,8 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+# RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules -b fixHasHDF5 https://github.com/JAuriac/pdi.git /root/pdi
 
 
 
