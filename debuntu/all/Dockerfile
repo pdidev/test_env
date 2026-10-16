@@ -86,7 +86,8 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+# RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules -b fixHasHDF5 https://github.com/JAuriac/pdi.git /root/pdi
 
 
 
