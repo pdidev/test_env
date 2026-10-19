@@ -48,6 +48,18 @@ RUN spack config --scope site add 'packages:llvm:buildable: false'
 RUN spack config --scope site add 'packages:gcc:buildable: false'
 
 
+# Doxygen (1.15 on) forces which fails with spack (Cf. https://github.com/doxygen/doxygen/issues/12392 )
+# Remove once the doxygen version spack builds has the fix.
+COPY <<'EOCOPY' doxygen.yaml
+packages:
+  doxygen:
+    require:
+    - spec: "ldflags=-fuse-ld=lld"
+      when: "%cxx=llvm"
+EOCOPY
+RUN if ( spack --version | grep -qs '^1\.' ); then spack config --scope site add -f doxygen.yaml; fi
+
+
 # Generate a compiler ref
 # * before 1.0, rely on the compilers section and generate a mixed compiler for llvm
 # * from spack 1.0 on, define a toolchain
