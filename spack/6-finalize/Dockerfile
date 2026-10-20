@@ -3,9 +3,8 @@ ARG COMPILER
 ARG MPI
 ARG LIBS
 ARG IMAGE_TAG
-ARG REGISTRY=ghcr.io/pdidev/test_env
 
-FROM ${REGISTRY}/builder:${VERSION}-${COMPILER}-${MPI}-${LIBS}-${IMAGE_TAG} AS builder
+FROM ghcr.io/pdidev/test_env/builder:${VERSION}-${COMPILER}-${MPI}-${LIBS}-${IMAGE_TAG} AS builder
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -95,7 +94,7 @@ RUN spack clean -a
 
 
 
-FROM ${REGISTRY}/base:${IMAGE_TAG} AS main
+FROM ghcr.io/pdidev/test_env/base:${IMAGE_TAG} AS main
 
 COPY --from=builder ${SPACK_INSTALL} ${SPACK_INSTALL}
 COPY --from=builder ${SPACK_MODULES} ${SPACK_MODULES}
@@ -134,7 +133,7 @@ CMD ["bash", "-i"]
 
 
 
-FROM ${REGISTRY}/spackbase:${IMAGE_TAG} AS fullspack
+FROM ghcr.io/pdidev/test_env/spackbase:${IMAGE_TAG} AS fullspack
 
 
 COPY --from=builder --chown=ci:ci ${SPACK_INSTALL} ${SPACK_INSTALL}
@@ -165,21 +164,10 @@ RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /r
 
 FROM main AS test
 
-ARG VERSION
-
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
-# The oldest release of spack only provides veloc package until version 1.5 
-# The VeloC plugin requires at least veloc 1.7, therefore, skips these steps 
-# in the image built with spack v 0.19
-RUN <<'EORUN'
-set -e
-export VERBOSE=1
-if [ "${VERSION}" = oldest ]; then
-  export CMAKE_FLAGS="-DBUILD_VELOC_PLUGIN=OFF"
-fi
-bash pdi/bin/build_and_run_all_tests
-EORUN
+RUN export VERBOSE=1 \
+ && bash pdi/bin/build_and_run_all_tests
 
 
 

@@ -87,20 +87,21 @@ WORKDIR /opt/src/veloc
 RUN mkdir -p /opt/veloc \
       && ./auto-install.py /opt/veloc
 
-# stage : complete image
+# stage : image with VeloC
 
-FROM main AS complete-main
+FROM main AS main2
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
-ENV CMAKE_PREFIX_PATH=/opt/veloc:${CMAKE_PREFIX_PATH}
+ENV veloc_DIR=/opt/veloc
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
-ENV LD_LIBRARY_PATH="/opt/veloc/lib"
+RUN echo "/opt/veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
+&& ldconfig
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
@@ -117,11 +118,11 @@ RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pd
 
 # stage : test 
 
-FROM complete-main AS test
+FROM main2 AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
 
-FROM complete-main
+FROM main2

@@ -1,7 +1,7 @@
 ARG DISTRO
 ARG DISTRO_VERSION
 
-FROM ${DISTRO}:${DISTRO_VERSION} AS no-veloc
+FROM ${DISTRO}:${DISTRO_VERSION} AS main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -97,21 +97,21 @@ RUN mkdir -p /opt/veloc \
       && ./auto-install.py /opt/veloc
 
 
-
-# stage : complete image
-FROM no-veloc AS main
+# stage : main image with VeloC 
+FROM main AS main2
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
-ENV CMAKE_PREFIX_PATH=/opt/veloc:${CMAKE_PREFIX_PATH}
+ENV veloc_DIR=/opt/veloc
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 ENV PDI_LIBS=provided
-ENV LD_LIBRARY_PATH="/opt/veloc/lib"
+RUN echo "/opt/veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
+&& ldconfig
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
@@ -132,7 +132,7 @@ RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pd
 
 
 # stage : test 
-FROM main AS test
+FROM main2 AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
@@ -141,4 +141,4 @@ RUN export VERBOSE=1 \
 
 
 
-FROM main
+FROM main2
