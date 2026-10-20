@@ -125,4 +125,6 @@ COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
 
+
+ 
 FROM main2
