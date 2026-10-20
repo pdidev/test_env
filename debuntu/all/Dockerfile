@@ -73,7 +73,7 @@ RUN set -ex \
 
 
 # stage : VeloC download 
-FROM no-veloc AS velocdl
+FROM main AS velocdl
 
 # install tools needed by VeloC install script 
 RUN set -ex \
