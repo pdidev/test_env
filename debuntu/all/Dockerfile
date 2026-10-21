@@ -105,13 +105,13 @@ ARG MPI
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
-ENV veloc_DIR=/opt/veloc \
-    er_DIR=/opt/veloc/ \
-    axl_DIR=/opt/veloc/ \
-    kvtree_DIR=/opt/veloc/ \
-    rankstr_DIR=/opt/veloc/ \
-    shuffile_DIR=/opt/veloc/ \
-    redset_ROOT=/opt/veloc/
+ENV veloc_ROOT=/opt/veloc 
+    # er_DIR=/opt/veloc/ \
+    # axl_DIR=/opt/veloc/ \
+    # kvtree_DIR=/opt/veloc/ \
+    # rankstr_DIR=/opt/veloc/ \
+    # shuffile_DIR=/opt/veloc/ \
+    # redset_ROOT=/opt/veloc/
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
