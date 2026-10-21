@@ -105,7 +105,13 @@ ARG MPI
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
-ENV veloc_DIR=/opt/veloc
+ENV veloc_ROOT=/opt/veloc
+#     er_ROOT=/opt/veloc/ \
+#     axl_ROOT=/opt/veloc/ \
+#     kvtree_ROOT=/opt/veloc/ \
+#     rankstr_ROOT=/opt/veloc/ \
+#     shuffile_ROOT=/opt/veloc/ \
+#     redset_ROOT=/opt/veloc/
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
@@ -127,7 +133,7 @@ WORKDIR ${HOME}
 # stage : PDI download for tests
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pdi.git  --depth 1 --single-branch -b cp-plugin /root/pdi
 
 
 
