@@ -64,7 +64,8 @@ RUN set -ex \
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
-ENV PDI_VARIANT=mini
+# required for build_and_run_all_tests to not build the VeloC plugin in the "mini" variant 
+ENV PDI_VARIANT=mini 
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
