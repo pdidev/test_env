@@ -105,7 +105,7 @@ ARG MPI
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
-ENV veloc_DIR=/opt/veloc
+ENV veloc_DIR=/opt/veloc \
     er_DIR=/opt/veloc/ \
     axl_DIR=/opt/veloc/ \
     kvtree_DIR=/opt/veloc/ \
