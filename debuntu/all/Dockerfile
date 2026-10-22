@@ -93,6 +93,17 @@ cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
 
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get upgrade -y
+apt-get install -y --no-install-recommends \
+        apt-transport-https \
+        ca-certificates \
+        git \
+        ninja-build \
+        curl
+rm -rf /var/lib/apt/lists/*
+
 cmake_exec=cmake
 if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
     cmake_exec=cmake
@@ -101,16 +112,6 @@ else
     tar -xf cmake-bin.tar.gz
     cmake_exec=${HOME}/cmake-3.26.4-linux-x86_64/bin/cmake
 fi
-
-export DEBIAN_FRONTEND=noninteractive
-apt-get update -y
-apt-get upgrade -y
-apt-get install -y --no-install-recommends \
-        apt-transport-https \
-        ca-certificates \
-        git \
-        ninja-build
-rm -rf /var/lib/apt/lists/*
 
 git clone --branch v${CATALYST_VERSION} \
         --single-branch \
