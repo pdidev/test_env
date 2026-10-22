@@ -130,7 +130,6 @@ FROM alpine/git AS pdidl
 RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pdi.git  --depth 1 --single-branch -b cp-plugin /root/pdi
 
 
-
 # stage : test 
 FROM main2 AS test
 

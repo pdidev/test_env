@@ -78,7 +78,7 @@ WORKDIR ${HOME}
 
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pdi.git  --depth 1 --single-branch -b cp-plugin /root/pdi
+RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
 
 
 FROM main AS test
