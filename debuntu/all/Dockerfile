@@ -36,7 +36,7 @@ RUN set -ex \
  && echo "deb [ arch=amd64 ] https://repo.pdi.dev/pdi-main.${DISTRO} ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/pdi.list \
  && curl --output /etc/apt/trusted.gpg.d/pdidev-archive-keyring.gpg https://repo.pdi.dev/pdi-main.${DISTRO}/pdidev-archive-keyring.gpg \
  && apt-get update -y \
- && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi \
+ && if [[ "${MPI}" = openmpi ]]; then MPI4PY=python3-mpi4py; FLOWVR=flowvr; fi\
  && apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
@@ -97,11 +97,74 @@ RUN mkdir -p /opt/veloc \
       && ./auto-install.py /opt/veloc
 
 
-# stage : pre_main image with VeloC 
+# stage : catalyst builder
+FROM pre_main AS builder_catalyst
+
+ARG CATALYST_VERSION
+ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
+
+RUN mkdir -p /opt
+ENV HOME=/opt
+WORKDIR ${HOME}
+
+RUN set -ex \
+&& export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update -y \
+&& apt-get upgrade -y \
+&& apt-get install -y --no-install-recommends \
+        apt-transport-https \
+        ca-certificates \
+        git \
+        ninja-build \
+        curl \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN <<EORUN
+set -ex
+cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
+
+mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V)
+
+cmake_exec=cmake
+if [[ ${sorted[0]} == ${CMAKE_MINIMAL_VERSION_FOR_CATALYST} ]]; then
+    cmake_exec=cmake
+else
+    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/cmake-"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"-linux-x86_64.tar.gz"
+    tar -xf cmake-bin.tar.gz
+    cmake_exec=${HOME}/cmake-${CMAKE_MINIMAL_VERSION_FOR_CATALYST}-linux-x86_64/bin/cmake
+fi
+
+git clone --branch v${CATALYST_VERSION}.0 \
+        --single-branch \
+        https://gitlab.kitware.com/paraview/catalyst.git \
+        ${HOME}/catalyst_clone/
+cd ${HOME}/catalyst_clone/
+mkdir build
+git submodule update --depth=1 --init --recursive
+
+${cmake_exec} -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
+    -DCATALYST_USE_MPI:BOOL=ON \
+    -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
+    -DCATALYST_WRAP_PYTHON:BOOL=ON \
+    -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
+    -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
+${cmake_exec} --build ${HOME}/catalyst_clone/build  
+${cmake_exec} --install ${HOME}/catalyst_clone/build
+EORUN
+
+
+# stage : pre_main image with VeloC and Catalyst
 FROM pre_main AS main
+
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
+
+# add Catalyst
+COPY --from=builder_catalyst /opt/catalyst /opt/catalyst
+ENV catalyst_DIR=/opt/catalyst/lib/cmake/catalyst-${CATALYST_VERSION}
+RUN echo "/opt/catalyst/lib" > /etc/ld.so.conf.d/image_catalyst.conf \
+&& ldconfig
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
@@ -118,53 +181,12 @@ ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 # force parallel HDF5 as first try (see #43)
 ENV HDF5_DIR=/usr/lib/x86_64-linux-gnu/cmake/hdf5_${MPI}
 
+# create user ci
 ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
 
-FROM main AS builder_catalyst
-USER root
 
-ARG CATALYST_VERSION
-ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
-
-RUN <<EORUN
-set -ex
-cmake_catalyst_required=${CMAKE_MINIMAL_VERSION_FOR_CATALYST}
-cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
-
-mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
-
-if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -y
-    apt-get upgrade -y
-    apt-get install -y --no-install-recommends \
-            apt-transport-https \
-            ca-certificates \
-            git \
-            ninja-build
-    rm -rf /var/lib/apt/lists/*
-
-    git clone --branch v${CATALYST_VERSION} \
-            --single-branch \
-            https://gitlab.kitware.com/paraview/catalyst.git \
-            ${HOME}/catalyst_clone/
-    cd ${HOME}/catalyst_clone/
-    mkdir build
-    git submodule update --depth=1 --init --recursive
-    cmake -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
-        -DCATALYST_USE_MPI:BOOL=ON \
-        -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
-        -DCATALYST_WRAP_PYTHON:BOOL=ON \
-        -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
-        -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
-    cmake --build ${HOME}/catalyst_clone/build  
-    cmake --install ${HOME}/catalyst_clone/build
-else
-    mkdir -p /opt/catalyst
-fi
-EORUN
 
 # stage : PDI download for tests
 FROM alpine/git AS pdidl
@@ -172,17 +194,15 @@ FROM alpine/git AS pdidl
 #RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
 RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.com/francois-kitware/pdi /root/pdi
 
-FROM main AS test
-USER ci
-COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
-COPY --from=builder_catalyst --chown=ci:ci /opt/catalyst /opt/catalyst
 
-WORKDIR ${HOME}
-## Add env varible for catalyst lib
-ENV LD_LIBRARY_PATH="/opt/catalyst/lib"
-ENV catalyst_dir="/opt/catalyst/lib/cmake/catalyst-2.0"
+# stage : test 
+FROM main AS test
+
+COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
 RUN export VERBOSE=1 \
  && bash pdi/bin/build_and_run_all_tests
+
+
 
 FROM main
