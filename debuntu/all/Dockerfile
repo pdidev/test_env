@@ -109,12 +109,12 @@ cmake_exec=cmake
 if [[ ${sorted[0]} == ${cmake_catalyst_required} ]]; then
     cmake_exec=cmake
 else
-    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v3.26.4/cmake-3.26.4-linux-x86_64.tar.gz"
+    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${cmake_catalyst_required}"/cmake-"${cmake_catalyst_required}"-linux-x86_64.tar.gz"
     tar -xf cmake-bin.tar.gz
-    cmake_exec=${HOME}/cmake-3.26.4-linux-x86_64/bin/cmake
+    cmake_exec=${HOME}/cmake-${cmake_catalyst_required}-linux-x86_64/bin/cmake
 fi
 
-git clone --branch v${CATALYST_VERSION} \
+git clone --branch v${CATALYST_VERSION}.0 \
         --single-branch \
         https://gitlab.kitware.com/paraview/catalyst.git \
         ${HOME}/catalyst_clone/
@@ -148,7 +148,7 @@ ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 
 ## add catalyst
 COPY --from=builder_catalyst /opt/catalyst /opt/catalyst
-ENV catalyst_DIR="/opt/catalyst/lib/cmake/catalyst-2.0"
+ENV catalyst_DIR=/opt/catalyst/lib/cmake/catalyst-${CATALYST_VERSION}
 RUN echo "/opt/catalyst/lib" > /etc/ld.so.conf.d/image_catalyst.conf \
 && ldconfig
 
