@@ -86,23 +86,24 @@ RUN mkdir -p /opt
 ENV HOME=/opt
 WORKDIR ${HOME}
 
+RUN set -ex \
+&& export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update -y \
+&& apt-get upgrade -y \
+&& apt-get install -y --no-install-recommends \
+        apt-transport-https \
+        ca-certificates \
+        git \
+        ninja-build \
+        curl
+&& rm -rf /var/lib/apt/lists/*
+
 RUN <<EORUN
 set -ex
 cmake_catalyst_required=${CMAKE_MINIMAL_VERSION_FOR_CATALYST}
 cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
-
-export DEBIAN_FRONTEND=noninteractive
-apt-get update -y
-apt-get upgrade -y
-apt-get install -y --no-install-recommends \
-        apt-transport-https \
-        ca-certificates \
-        git \
-        ninja-build \
-        curl
-rm -rf /var/lib/apt/lists/*
 
 cmake_exec=cmake
 if [[ ${sorted[0]} == "$cmake_catalyst_required" ]]; then
