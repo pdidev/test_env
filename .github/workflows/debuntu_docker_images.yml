@@ -14,7 +14,7 @@ jobs:
         # base:    ['ubuntu/jammy', 'ubuntu/rolling', 'debian/bookworm', 'debian/unstable']
         # mpi:     ['openmpi', 'mpich']
         # variant: ['mini', 'all', 'pdi']
-        base:    ['ubuntu/jammy', 'ubuntu/rolling'] #, 'debian/bookworm', 'debian/unstable']
+        base:    ['ubuntu/jammy'] #, 'ubuntu/rolling'] #, 'debian/bookworm', 'debian/unstable']
         mpi:     ['openmpi']
         variant: ['all']
     runs-on: ubuntu-latest

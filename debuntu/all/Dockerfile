@@ -95,7 +95,7 @@ RUN set -ex \
         ca-certificates \
         git \
         ninja-build \
-        curl
+        curl \
 && rm -rf /var/lib/apt/lists/*
 
 RUN <<EORUN
