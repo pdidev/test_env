@@ -122,14 +122,14 @@ cd ${HOME}/catalyst_clone/
 mkdir build
 git submodule update --depth=1 --init --recursive
 
-cmake_exec -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
+${cmake_exec} -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
     -DCATALYST_USE_MPI:BOOL=ON \
     -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
     -DCATALYST_WRAP_PYTHON:BOOL=ON \
     -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
     -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
-cmake_exec --build ${HOME}/catalyst_clone/build  
-cmake_exec --install ${HOME}/catalyst_clone/build
+${cmake_exec} --build ${HOME}/catalyst_clone/build  
+${cmake_exec} --install ${HOME}/catalyst_clone/build
 EORUN
 
 FROM base_main as main
