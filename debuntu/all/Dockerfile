@@ -106,7 +106,7 @@ cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
 
 cmake_exec=cmake
-if [[ ${sorted[0]} == "${cmake_catalyst_required}" ]]; then
+if [[ ${sorted[0]} == ${cmake_catalyst_required} ]]; then
     cmake_exec=cmake
 else
     curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v3.26.4/cmake-3.26.4-linux-x86_64.tar.gz"
