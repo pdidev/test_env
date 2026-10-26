@@ -100,18 +100,17 @@ RUN set -ex \
 
 RUN <<EORUN
 set -ex
-cmake_catalyst_required=${CMAKE_MINIMAL_VERSION_FOR_CATALYST}
 cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
 
-mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$cmake_catalyst_required" | sort -V)
+mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V)
 
 cmake_exec=cmake
-if [[ ${sorted[0]} == ${cmake_catalyst_required} ]]; then
+if [[ ${sorted[0]} == ${CMAKE_MINIMAL_VERSION_FOR_CATALYST} ]]; then
     cmake_exec=cmake
 else
-    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${cmake_catalyst_required}"/cmake-"${cmake_catalyst_required}"-linux-x86_64.tar.gz"
+    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/cmake-"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"-linux-x86_64.tar.gz"
     tar -xf cmake-bin.tar.gz
-    cmake_exec=${HOME}/cmake-${cmake_catalyst_required}-linux-x86_64/bin/cmake
+    cmake_exec=${HOME}/cmake-${CMAKE_MINIMAL_VERSION_FOR_CATALYST}-linux-x86_64/bin/cmake
 fi
 
 git clone --branch v${CATALYST_VERSION}.0 \
