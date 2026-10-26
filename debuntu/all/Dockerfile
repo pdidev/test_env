@@ -1,7 +1,7 @@
 ARG DISTRO
 ARG DISTRO_VERSION
 
-FROM ${DISTRO}:${DISTRO_VERSION} AS main
+FROM ${DISTRO}:${DISTRO_VERSION} AS pre_main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -73,7 +73,7 @@ RUN set -ex \
 
 
 # stage : VeloC download 
-FROM main AS velocdl
+FROM pre_main AS velocdl
 
 # install tools needed by VeloC install script 
 RUN set -ex \
@@ -97,8 +97,8 @@ RUN mkdir -p /opt/veloc \
       && ./auto-install.py /opt/veloc
 
 
-# stage : main image with VeloC 
-FROM main AS main2
+# stage : pre_main image with VeloC 
+FROM pre_main AS main
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
@@ -127,11 +127,11 @@ WORKDIR ${HOME}
 # stage : PDI download for tests
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone --recurse-submodules https://github.com/iole-bolognesi/pdi.git -b cp-plugin /root/pdi
 
 
 # stage : test 
-FROM main2 AS test
+FROM main AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
 
@@ -140,4 +140,4 @@ RUN export VERBOSE=1 \
 
 
 
-FROM main2
+FROM main
