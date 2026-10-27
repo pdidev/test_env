@@ -13,6 +13,16 @@ ARG SPACK_INSTALL_ARGS="--show-log-on-error --fail-fast"
 
 # Add our MPI of choice and base MPI-dependant libs to the environment and install it
 RUN              spack -e pdienv add -l mpi    "${MPI}"
-RUN . deps.sh && spack -e pdienv add -l mpilibs ${BASE_MPILIBS}
+RUN <<EORUN
+set -e
+if ( spack --version | grep -qs '^1\.' )
+then
+  . deps.sh
+  spack -e pdienv add -l mpilibs ${BASE_MPILIBS}
+else
+  . deps.sh
+  spack -e pdienv add -l mpilibs ${BASE_MPILIBS_OLDSPACK}
+fi
+EORUN
 RUN spack -e pdienv concretize -f --reuse
 RUN spack -e pdienv install ${SPACK_INSTALL_ARGS}

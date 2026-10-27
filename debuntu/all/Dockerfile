@@ -1,7 +1,7 @@
 ARG DISTRO
 ARG DISTRO_VERSION
 
-FROM ${DISTRO}:${DISTRO_VERSION} AS base_main
+FROM ${DISTRO}:${DISTRO_VERSION} AS pre_main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -76,7 +76,7 @@ ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 # force parallel HDF5 as first try (see #43)
 ENV HDF5_DIR=/usr/lib/x86_64-linux-gnu/cmake/hdf5_${MPI}
 
-FROM base_main AS builder_catalyst
+FROM pre_main AS builder_catalyst
 
 ARG CATALYST_VERSION
 ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
@@ -131,7 +131,7 @@ ${cmake_exec} --build ${HOME}/catalyst_clone/build
 ${cmake_exec} --install ${HOME}/catalyst_clone/build
 EORUN
 
-FROM base_main as main
+FROM pre_main as main
 
 ARG DISTRO
 ARG DISTRO_VERSION
