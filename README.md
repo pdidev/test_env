@@ -44,7 +44,7 @@ With the following parameters:
 * `variant`:
   - `mini`: dependencies "vendored" in PDI are not included in the image,
   - `all`: dependencies "vendored" in PDI are included in the image,
-  - `pdi`: PDI is included in the image.
+  - `pdi`: PDI is included in the image. The VeloC plugin is not present in this image for the time being. 
 
 
 ## Full Spack images

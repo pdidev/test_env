@@ -1,7 +1,7 @@
 ARG DISTRO
 ARG DISTRO_VERSION
 
-FROM ${DISTRO}:${DISTRO_VERSION} AS main
+FROM ${DISTRO}:${DISTRO_VERSION} AS pre_main
 
 LABEL "org.opencontainers.image.source"="https://github.com/pdidev/test_env"
 
@@ -70,10 +70,48 @@ RUN set -ex \
  && rm -rf /root/* \
  && [ -f ~/.profile ] && ( sed -i 's/mesg n/( tty -s \&\& mesg n || true )/g' ~/.profile || true )
 
+
+
+# stage : VeloC download 
+FROM pre_main AS velocdl
+
+# install tools needed by VeloC install script 
+RUN set -ex \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+        git \
+        python3-wget \
+        python3-bs4 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/src
+
+# Clone VeloC repository
+RUN git clone -b 'veloc-1.8' --single-branch --depth 1 \
+            https://github.com/ECP-VeloC/veloc.git veloc
+
+WORKDIR /opt/src/veloc
+
+# Run VeloC install script 
+RUN mkdir -p /opt/veloc \
+      && ./auto-install.py /opt/veloc
+
+
+# stage : pre_main image with VeloC 
+FROM pre_main AS main
+ARG DISTRO
+ARG DISTRO_VERSION
+ARG MPI
+
+COPY --from=velocdl /opt/veloc /opt/veloc
+
+ENV veloc_ROOT=/opt/veloc 
 ENV PDI_SYSTEM=${DISTRO}-${DISTRO_VERSION}
 ENV PDI_COMPILER=gcc
 ENV PDI_MPI=${MPI}
 ENV PDI_LIBS=provided
+RUN echo "/opt/veloc/lib" > /etc/ld.so.conf.d/veloc.conf \
+&& ldconfig
 # only required for openmpi but...
 ENV OMPI_MCA_rmaps_base_oversubscribe=1
 ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
@@ -86,12 +124,13 @@ WORKDIR ${HOME}
 
 
 
+# stage : PDI download for tests
 FROM alpine/git AS pdidl
 
 RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
 
 
-
+# stage : test 
 FROM main AS test
 
 COPY --from=pdidl --chown=ci:ci /root/pdi /home/ci/pdi
