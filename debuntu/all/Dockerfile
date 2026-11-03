@@ -121,12 +121,16 @@ RUN set -ex \
 
 RUN <<EORUN
 set -ex
-cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
+#cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
+#
+#mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V)
+#
+#cmake_exec=cmake
+#if [[ ${sorted[0]} == ${CMAKE_MINIMAL_VERSION_FOR_CATALYST} ]]; then
 
-mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V)
+rejected_cmake_version="$(printf "%s\n" "$(cmake --version | head -1 | cut -f3 -d" ")" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V | head -1)"
 
-cmake_exec=cmake
-if [[ ${sorted[0]} == ${CMAKE_MINIMAL_VERSION_FOR_CATALYST} ]]; then
+if [ "${rejected_cmake_version}" = "${CMAKE_MINIMAL_VERSION_FOR_CATALYST}" ]; then
     cmake_exec=cmake
 else
     curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/cmake-"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"-linux-x86_64.tar.gz"
@@ -136,11 +140,13 @@ fi
 
 git clone --branch v${CATALYST_VERSION}.0 \
         --single-branch \
+        --depth 1 \
+        --recurse-submodules \
+        --shallow-submodules \
         https://gitlab.kitware.com/paraview/catalyst.git \
         ${HOME}/catalyst_clone/
 cd ${HOME}/catalyst_clone/
 mkdir build
-git submodule update --depth=1 --init --recursive
 
 ${cmake_exec} -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
     -DCATALYST_USE_MPI:BOOL=ON \
@@ -162,7 +168,8 @@ ARG MPI
 
 # add Catalyst
 COPY --from=builder_catalyst /opt/catalyst /opt/catalyst
-ENV catalyst_DIR=/opt/catalyst/lib/cmake/catalyst-${CATALYST_VERSION}
+#ENV catalyst_DIR=/opt/catalyst/lib/cmake/catalyst-${CATALYST_VERSION}
+ENV catalyst_ROOT=/opt/catalyst/
 RUN echo "/opt/catalyst/lib" > /etc/ld.so.conf.d/image_catalyst.conf \
 && ldconfig
 
@@ -181,7 +188,6 @@ ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 # force parallel HDF5 as first try (see #43)
 ENV HDF5_DIR=/usr/lib/x86_64-linux-gnu/cmake/hdf5_${MPI}
 
-# create user ci
 ENV HOME=/home/ci
 USER ci:ci
 WORKDIR ${HOME}
