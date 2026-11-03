@@ -97,11 +97,81 @@ RUN mkdir -p /opt/veloc \
       && ./auto-install.py /opt/veloc
 
 
-# stage : pre_main image with VeloC 
+# stage : catalyst builder
+FROM pre_main AS builder_catalyst
+
+ARG CATALYST_VERSION
+ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
+
+RUN mkdir -p /opt
+ENV HOME=/opt
+WORKDIR ${HOME}
+
+RUN set -ex \
+&& export DEBIAN_FRONTEND=noninteractive \
+&& apt-get update -y \
+&& apt-get upgrade -y \
+&& apt-get install -y --no-install-recommends \
+        apt-transport-https \
+        ca-certificates \
+        git \
+        ninja-build \
+        curl \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN <<EORUN
+set -ex
+#cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
+#
+#mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V)
+#
+#cmake_exec=cmake
+#if [[ ${sorted[0]} == ${CMAKE_MINIMAL_VERSION_FOR_CATALYST} ]]; then
+
+rejected_cmake_version="$(printf "%s\n" "$(cmake --version | head -1 | cut -f3 -d" ")" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V | head -1)"
+
+if [ "${rejected_cmake_version}" = "${CMAKE_MINIMAL_VERSION_FOR_CATALYST}" ]; then
+    cmake_exec=cmake
+else
+    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/cmake-"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"-linux-x86_64.tar.gz"
+    tar -xf cmake-bin.tar.gz
+    cmake_exec=${HOME}/cmake-${CMAKE_MINIMAL_VERSION_FOR_CATALYST}-linux-x86_64/bin/cmake
+fi
+
+git clone --branch v${CATALYST_VERSION}.0 \
+        --single-branch \
+        --depth 1 \
+        --recurse-submodules \
+        --shallow-submodules \
+        https://gitlab.kitware.com/paraview/catalyst.git \
+        ${HOME}/catalyst_clone/
+cd ${HOME}/catalyst_clone/
+mkdir build
+
+${cmake_exec} -GNinja -DCATALYST_BUILD_TESTING:BOOL=OFF \
+    -DCATALYST_USE_MPI:BOOL=ON \
+    -DCATALYST_WRAP_FORTRAN:BOOL=OFF \
+    -DCATALYST_WRAP_PYTHON:BOOL=ON \
+    -DCMAKE_INSTALL_PREFIX:PATH=/opt/catalyst/ \
+    -S ${HOME}/catalyst_clone/ -B ${HOME}/catalyst_clone/build
+${cmake_exec} --build ${HOME}/catalyst_clone/build  
+${cmake_exec} --install ${HOME}/catalyst_clone/build
+EORUN
+
+
+# stage : pre_main image with VeloC and Catalyst
 FROM pre_main AS main
+
 ARG DISTRO
 ARG DISTRO_VERSION
 ARG MPI
+
+# add Catalyst
+COPY --from=builder_catalyst /opt/catalyst /opt/catalyst
+#ENV catalyst_DIR=/opt/catalyst/lib/cmake/catalyst-${CATALYST_VERSION}
+ENV catalyst_ROOT=/opt/catalyst/
+RUN echo "/opt/catalyst/lib" > /etc/ld.so.conf.d/image_catalyst.conf \
+&& ldconfig
 
 COPY --from=velocdl /opt/veloc /opt/veloc
 
@@ -127,7 +197,8 @@ WORKDIR ${HOME}
 # stage : PDI download for tests
 FROM alpine/git AS pdidl
 
-RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+#RUN git -C /root clone --recurse-submodules https://github.com/pdidev/pdi.git /root/pdi
+RUN git -C /root clone -b catalyst-plugin --recurse-submodules https://github.com/francois-kitware/pdi /root/pdi
 
 
 # stage : test 
