@@ -127,7 +127,7 @@ rejected_cmake_version="$(printf "%s\n" "$(cmake --version | head -1 | cut -f3 -
 if [ "${rejected_cmake_version}" = "${CMAKE_MINIMAL_VERSION_FOR_CATALYST}" ]; then
     cmake_exec=cmake
 else
-    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/"${cmake_tar_filename} \
+    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/cmake-"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"-linux-x86_64.tar.gz" \
     && echo "${EXPECTED_CMAKE_SHA256}  cmake-bin.tar.gz" | sha256sum --check --quiet
     tar -xf cmake-bin.tar.gz
     cmake_exec=${HOME}/cmake-${CMAKE_MINIMAL_VERSION_FOR_CATALYST}-linux-x86_64/bin/cmake
