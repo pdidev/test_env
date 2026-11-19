@@ -3,7 +3,7 @@ BASE_BUILDDEPS="cmake doxygen pkgconf py-setuptools"
 # libraries that are required in all cases
 BASE_LIBS="py-numpy py-pyyaml python"
 # libraries that depend on MPI & are required in all cases
-BASE_MPILIBS="py-mpi4py veloc conduit~hdf5~hdf5_compat~fortran libcatalyst+mpi+python"
+BASE_MPILIBS="py-mpi4py veloc conduit~hdf5~fortran libcatalyst+mpi+python"
 #TODO: libcatalyst+python was introduced in spack 0.22, switch back to a single list when our minimum requirement goes at or above that
 BASE_MPILIBS_OLDSPACK="py-mpi4py veloc libcatalyst+mpi"
 # libraries that are optional because embedded in PDI
