@@ -102,6 +102,7 @@ FROM pre_main AS builder_catalyst
 
 ARG CATALYST_VERSION
 ARG CMAKE_MINIMAL_VERSION_FOR_CATALYST
+ARG EXPECTED_CMAKE_SHA256
 
 RUN mkdir -p /opt
 ENV HOME=/opt
@@ -121,19 +122,13 @@ RUN set -ex \
 
 RUN <<EORUN
 set -ex
-#cmake_installed=$(cmake --version | head -1 | cut -f3 -d" ")
-#
-#mapfile -t sorted < <(printf "%s\n" "$cmake_installed" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V)
-#
-#cmake_exec=cmake
-#if [[ ${sorted[0]} == ${CMAKE_MINIMAL_VERSION_FOR_CATALYST} ]]; then
-
 rejected_cmake_version="$(printf "%s\n" "$(cmake --version | head -1 | cut -f3 -d" ")" "$CMAKE_MINIMAL_VERSION_FOR_CATALYST" | sort -V | head -1)"
 
 if [ "${rejected_cmake_version}" = "${CMAKE_MINIMAL_VERSION_FOR_CATALYST}" ]; then
     cmake_exec=cmake
 else
-    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/cmake-"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"-linux-x86_64.tar.gz"
+    curl -LfsSo cmake-bin.tar.gz "https://github.com/Kitware/CMake/releases/download/v"${CMAKE_MINIMAL_VERSION_FOR_CATALYST}"/"${cmake_tar_filename} \
+    && echo "${EXPECTED_CMAKE_SHA256}  cmake-bin.tar.gz" | sha256sum --check --quiet
     tar -xf cmake-bin.tar.gz
     cmake_exec=${HOME}/cmake-${CMAKE_MINIMAL_VERSION_FOR_CATALYST}-linux-x86_64/bin/cmake
 fi
